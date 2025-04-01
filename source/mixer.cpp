@@ -4,6 +4,8 @@
 
 #include <cmath>
 #include <cstdio>
+#include <vector>
+#include <memory>
 #include <portaudio.h>
 
 namespace Mixer {
@@ -12,14 +14,16 @@ namespace Mixer {
     double block_start_time_value = 0.0;
     double global_volume_value = 0.8;
 
-    WavOsc debug_processor;
+    std::vector<std::shared_ptr<Processor>> processors;
 
     int pa_callback(const void*, void* output_buffer, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info, PaStreamCallbackFlags flags, void* user_data) {
         (void)user_data;
         (void)flags;
         (void)time_info;
         
-        debug_processor.process_block(frames_per_buffer, (float*)output_buffer);
+        for (auto& processor : processors) {
+            processor->process_block(frames_per_buffer, (float*)output_buffer);
+        }
 
         block_start_time_value += (1.0 / output_sample_rate) * frames_per_buffer;
 
@@ -84,6 +88,10 @@ namespace Mixer {
             stream = NULL;
             return;
         }
+
+        // debug
+        processors.resize(1);
+        processors[0] = std::make_shared<WavOsc>();
     }
     
     double sample_rate() {
