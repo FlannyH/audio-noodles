@@ -1,0 +1,15 @@
+[submodule "external/glfw"]
+	path = external/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "external/glbinding"]
+	path = external/glbinding
+	url = https://github.com/cginternals/glbinding.git
+[submodule "external/glm"]
+	path = external/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "external/stb"]
+	path = external/stb
+	url = https://github.com/nothings/stb.git
+[submodule "external/portaudio"]
+	path = external/portaudio
+	url = https://github.com/PortAudio/portaudio
