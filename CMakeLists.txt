@@ -37,6 +37,8 @@ project ("AudioNoodles")
 # Add source to this project's executable.
 add_executable (AudioNoodles 
   "source/audio_noodle.cpp" 
+  "source/mixer.cpp" 
+  "source/mixer.hpp" 
 )
 
 # Set debug working directory
@@ -53,13 +55,16 @@ endif()
 add_subdirectory(external/glfw)
 add_subdirectory(external/glbinding)
 add_subdirectory(external/glm)
+add_subdirectory(external/portaudio)
 target_link_libraries(AudioNoodles 
   glfw
   glbinding
   glm::glm
+  portaudio
 )
 target_include_directories(AudioNoodles PRIVATE 
-  ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/glm/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/
+  ${CMAKE_CURRENT_SOURCE_DIR}/external/portaudio/include/
 )
