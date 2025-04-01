@@ -1,4 +1,5 @@
 #include "mixer.hpp"
+#include "processor.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -6,25 +7,20 @@
 
 namespace Mixer {
     PaStream* stream = NULL;
-    const int output_sample_rate = 44100;
-    double time = 0.0;
-    double global_volume = 0.8f;
+    const double output_sample_rate = 44100;
+    double block_start_time_value = 0.0;
+    double global_volume_value = 0.8;
+
+    Processor debug_processor;
 
     int pa_callback(const void*, void* output_buffer, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info, PaStreamCallbackFlags flags, void* user_data) {
         (void)user_data;
         (void)flags;
         (void)time_info;
         
-        const double sample_length_sec = (double)1.0 / (double)output_sample_rate;
-        float* output = (float*)output_buffer;
+        debug_processor.process_block(frames_per_buffer, (float*)output_buffer);
 
-        for (size_t i = 0; i < frames_per_buffer; ++i) {
-            double sample_l = sin(time * 440.0 * 2.0 * 3.14159265);
-            double sample_r = sin(time * 440.0 * 2.0 * 3.14159265);
-            output[2*i + 0] = (float)(sample_l * global_volume);
-            output[2*i + 1] = (float)(sample_r * global_volume);
-            time += sample_length_sec;
-        } 
+        block_start_time_value += (1.0 / output_sample_rate) * frames_per_buffer;
 
         return paContinue;
     }
@@ -87,5 +83,17 @@ namespace Mixer {
             stream = NULL;
             return;
         }
+    }
+    
+    double sample_rate() {
+        return output_sample_rate;
+    }
+    
+    double block_start_time() {
+        return block_start_time_value;
+    }
+    
+    double global_volume() {
+        return global_volume_value;
     }
 }
