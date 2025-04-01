@@ -1,3 +1,5 @@
+#pragma once
+
 struct Processor {
-    void process_block(const size_t n_samples, float* output);
+    virtual void process_block(const size_t n_samples, float* output) = 0;
 };

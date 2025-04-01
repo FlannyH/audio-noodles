@@ -41,6 +41,8 @@ add_executable (AudioNoodles
   "source/mixer.hpp" 
   "source/processor.cpp" 
   "source/processor.hpp" 
+  "source/processors/wav_osc.cpp" 
+  "source/processors/wav_osc.hpp" 
 )
 
 # Set debug working directory

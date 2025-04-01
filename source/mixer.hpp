@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Mixer {
     void init();
     double sample_rate();

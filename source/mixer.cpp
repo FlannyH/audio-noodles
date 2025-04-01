@@ -1,5 +1,6 @@
 #include "mixer.hpp"
 #include "processor.hpp"
+#include "processors/wav_osc.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -11,7 +12,7 @@ namespace Mixer {
     double block_start_time_value = 0.0;
     double global_volume_value = 0.8;
 
-    Processor debug_processor;
+    WavOsc debug_processor;
 
     int pa_callback(const void*, void* output_buffer, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info, PaStreamCallbackFlags flags, void* user_data) {
         (void)user_data;
