@@ -1,8 +1,9 @@
 #include <cstdio>
 #include "mixer.hpp"
+#include "midi.hpp"
 
 int main() {
-    Mixer::init();
+    Midi::init();
     printf("hello world\n");
     while(1){};
 }
