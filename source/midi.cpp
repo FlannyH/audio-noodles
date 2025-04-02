@@ -1,47 +1,26 @@
-#include <RtMidi.h>
+#include "midi.hpp"
 #include "log.hpp"
+#include <RtMidi.h>
+#include <mutex>
 
 namespace Midi {
     std::shared_ptr<RtMidiIn> midi_in;
+    std::vector<MidiMessage> message_queue;
+    std::mutex mutex;
 
     void midi_message_callback(double delta_time, std::vector<unsigned char>* message, void* user_data) {
-        const uint8_t type = (message->at(0) >> 4) & 0x07;
-        const uint8_t channel = message->at(0) & 0x0F;
+        MidiMessage midi_message{};
+        midi_message.status = message->at(0);
+        if (message->size() > 1) 
+            midi_message.data1 = message->at(1);
+        if (message->size() > 2) 
+            midi_message.data2 = message->at(2);
+        if (message->size() > 3) 
+            midi_message.data3 = message->at(3);
 
-        if (type == 0) {
-            const uint8_t key = message->at(1);
-            const uint8_t velocity = message->at(2);
-            printf("[Channel %2i] Note Off: key %i, velocity %i\n", channel, key, velocity);
-        }
-        else if (type == 1) {
-            const uint8_t key = message->at(1);
-            const uint8_t velocity = message->at(2);
-            printf("[Channel %2i] Note On: key %i, velocity %i\n", channel, key, velocity);
-        }
-        else if (type == 2) {
-            const uint8_t key = message->at(1);
-            const uint8_t pressure = message->at(2);
-            printf("[Channel %2i] Polyphonic Aftertouch: key %i, pressure %i\n", channel, key, pressure);
-        }
-        else if (type == 3) {
-            const uint8_t controller = message->at(1);
-            const uint8_t data = message->at(2);
-            printf("[Channel %2i] Control Change: controller %i, data %i\n", channel, controller, data);
-        }
-        else if (type == 4) {
-            const uint8_t program = message->at(1);
-            printf("[Channel %2i] Program Change: program %i\n", channel, program);
-        }
-        else if (type == 5) {
-            const uint8_t pressure = message->at(1);
-            printf("[Channel %2i] Channel Aftertouch: pressure %i\n", channel, pressure);
-        }
-        else if (type == 6) {
-            const uint16_t lsb = message->at(1);
-            const uint16_t msb = message->at(2);
-            const uint16_t pitch_wheel = (msb << 8) + lsb;
-            printf("[Channel %2i] Pitch Wheel: %i\n", channel, pitch_wheel);
-        }
+        mutex.lock();
+        message_queue.push_back(midi_message);
+        mutex.unlock();
     }
 
     void init() {
@@ -58,5 +37,50 @@ namespace Midi {
     }
 
     void process() {
+        if (message_queue.empty()) return;
+
+        mutex.lock();
+
+        for (auto& message : message_queue) {
+            const int type = message.type();
+            const int channel = message.channel();
+
+            if (type == 0) {
+                const uint8_t key = message.data1;
+                const uint8_t velocity = message.data2;
+                printf("[Channel %2i] Note Off: key %i, velocity %i\n", channel, key, velocity);
+            }
+            else if (type == 1) {
+                const uint8_t key = message.data1;
+                const uint8_t velocity = message.data2;
+                printf("[Channel %2i] Note On: key %i, velocity %i\n", channel, key, velocity);
+            }
+            else if (type == 2) {
+                const uint8_t key = message.data1;
+                const uint8_t pressure = message.data2;
+                printf("[Channel %2i] Polyphonic Aftertouch: key %i, pressure %i\n", channel, key, pressure);
+            }
+            else if (type == 3) {
+                const uint8_t controller = message.data1;
+                const uint8_t data = message.data2;
+                printf("[Channel %2i] Control Change: controller %i, data %i\n", channel, controller, data);
+            }
+            else if (type == 4) {
+                const uint8_t program = message.data1;
+                printf("[Channel %2i] Program Change: program %i\n", channel, program);
+            }
+            else if (type == 5) {
+                const uint8_t pressure = message.data1;
+                printf("[Channel %2i] Channel Aftertouch: pressure %i\n", channel, pressure);
+            }
+            else if (type == 6) {
+                const uint16_t pitch_wheel = message.data16();
+                printf("[Channel %2i] Pitch Wheel: %i\n", channel, pitch_wheel);
+            }
+        }
+
+        mutex.unlock();
+
+        message_queue.clear();
     }
 }
