@@ -1,5 +1,6 @@
 #include "midi.hpp"
 #include "log.hpp"
+#include "session.hpp"
 #include <RtMidi.h>
 #include <mutex>
 
@@ -45,37 +46,43 @@ namespace Midi {
             const int type = message.type();
             const int channel = message.channel();
 
-            if (type == 0) {
-                const uint8_t key = message.data1;
-                const uint8_t velocity = message.data2;
-                printf("[Channel %2i] Note Off: key %i, velocity %i\n", channel, key, velocity);
-            }
-            else if (type == 1) {
-                const uint8_t key = message.data1;
-                const uint8_t velocity = message.data2;
-                printf("[Channel %2i] Note On: key %i, velocity %i\n", channel, key, velocity);
-            }
-            else if (type == 2) {
-                const uint8_t key = message.data1;
-                const uint8_t pressure = message.data2;
-                printf("[Channel %2i] Polyphonic Aftertouch: key %i, pressure %i\n", channel, key, pressure);
-            }
-            else if (type == 3) {
-                const uint8_t controller = message.data1;
-                const uint8_t data = message.data2;
-                printf("[Channel %2i] Control Change: controller %i, data %i\n", channel, controller, data);
-            }
-            else if (type == 4) {
-                const uint8_t program = message.data1;
-                printf("[Channel %2i] Program Change: program %i\n", channel, program);
-            }
-            else if (type == 5) {
-                const uint8_t pressure = message.data1;
-                printf("[Channel %2i] Channel Aftertouch: pressure %i\n", channel, pressure);
-            }
-            else if (type == 6) {
-                const uint16_t pitch_wheel = message.data16();
-                printf("[Channel %2i] Pitch Wheel: %i\n", channel, pitch_wheel);
+            for (auto& track : Session::tracks()) {            
+                if (type == 0) {
+                    const uint8_t key = message.data1;
+                    const uint8_t velocity = message.data2;
+                    track.midi_note_off(channel, key, velocity);
+                }
+                else if (type == 1) {
+                    const uint8_t key = message.data1;
+                    const uint8_t velocity = message.data2;
+                    
+                    if (velocity > 0) 
+                        track.midi_note_on(channel, key, velocity);
+                    else 
+                        track.midi_note_off(channel, key, velocity);
+                }
+                else if (type == 2) {
+                    const uint8_t key = message.data1;
+                    const uint8_t pressure = message.data2;
+                    track.midi_poly_aftertouch(channel, key, pressure);
+                }
+                else if (type == 3) {
+                    const uint8_t id = message.data1;
+                    const uint8_t value = message.data2;
+                    track.midi_control_change(channel, id, value);
+                }
+                else if (type == 4) {
+                    const uint8_t program = message.data1;
+                    track.midi_program_change(channel, program);
+                }
+                else if (type == 5) {
+                    const uint8_t pressure = message.data1;
+                    track.midi_channel_aftertouch(channel, pressure);
+                }
+                else if (type == 6) {
+                    const uint16_t value = message.data16();
+                    track.midi_pitch_wheel(channel, value);
+                }
             }
         }
 
