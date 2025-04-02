@@ -1,10 +1,14 @@
 #pragma once
 #include <cstdint>
+#include <memory>
+#include "processors/wav_osc.hpp"
 
 struct Track {
     uint16_t midi_input_channel_mask = 1;
     double pitch_wheel_range_cents = 200.0;
+    std::shared_ptr<WavOsc> debug_processor = nullptr;
 
+    Track();
     void midi_note_on(int channel, uint8_t key, uint8_t velocity);
     void midi_note_off(int channel, uint8_t key, uint8_t velocity);
     void midi_poly_aftertouch(int channel, uint8_t key, uint8_t pressure);

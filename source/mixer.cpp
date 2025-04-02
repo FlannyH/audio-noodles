@@ -93,7 +93,11 @@ namespace Mixer {
         processors.resize(1);
         processors[0] = std::make_shared<WavOsc>();
     }
-    
+
+    void register_processor(std::shared_ptr<Processor> processor) {
+        processors.push_back(processor);
+    }
+
     double sample_rate() {
         return output_sample_rate;
     }
