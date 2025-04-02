@@ -4,7 +4,7 @@
 
 int main() {
     Midi::init();
-    printf("hello world\n");
+    Session::tracks().push_back(Track{});
     while(1){
         Midi::process();
     };

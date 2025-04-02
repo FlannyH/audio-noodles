@@ -36,17 +36,21 @@ project ("AudioNoodles")
 
 # Add source to this project's executable.
 add_executable (AudioNoodles 
-  "source/audio_noodle.cpp" 
-  "source/log.cpp" 
-  "source/log.hpp" 
-  "source/midi.cpp" 
-  "source/midi.hpp" 
-  "source/mixer.cpp" 
-  "source/mixer.hpp" 
-  "source/processor.cpp" 
-  "source/processor.hpp" 
-  "source/processors/wav_osc.cpp" 
-  "source/processors/wav_osc.hpp" 
+  "source/audio_noodle.cpp"
+  "source/log.cpp"
+  "source/log.hpp"
+  "source/midi.cpp"
+  "source/midi.hpp"
+  "source/mixer.cpp"
+  "source/mixer.hpp"
+  "source/track.cpp"
+  "source/track.hpp"
+  "source/session.cpp"
+  "source/session.hpp"
+  "source/processor.cpp"
+  "source/processor.hpp"
+  "source/processors/wav_osc.cpp"
+  "source/processors/wav_osc.hpp"
 )
 
 # Set debug working directory
