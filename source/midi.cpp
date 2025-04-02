@@ -46,7 +46,11 @@ namespace Midi {
             const int type = message.type();
             const int channel = message.channel();
 
-            for (auto& track : Session::tracks()) {            
+            for (auto& track : Session::tracks()) {     
+                // If the track isn't listening to this midi channel, skip the track
+                if ((track.midi_input_channel_mask & (1 << channel)) == 0)
+                    continue;
+
                 if (type == 0) {
                     const uint8_t key = message.data1;
                     const uint8_t velocity = message.data2;
