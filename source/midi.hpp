@@ -6,7 +6,7 @@ namespace Midi {
     void process();
     
     constexpr int midi_channel_global = -1;
-    
+
     struct MidiMessage {
         uint8_t status;
         uint8_t data1;
@@ -14,7 +14,7 @@ namespace Midi {
         uint8_t data3;
 
         int channel() {
-            if (status & 0xF0 != 0xF0) 
+            if ((status & 0xF0) != 0xF0) 
                 return (status & 0x0F);
             else
                 return midi_channel_global; 
