@@ -37,6 +37,12 @@ void WavOsc::process_block(const size_t n_frames, float *output) {
                     sample += (t_wrap < 0.5)? (+1.0/n_samples) : (-1.0/n_samples);
                 }
             }
+            else if (this->wave_type == WaveType::triangle) {
+                double wave_time = (time * frequency);
+                double t_wrap = wave_time - trunc(wave_time);
+                if (t_wrap < 0.5)   sample = (t_wrap * 4.0) - 1.0;
+                else                sample = 1.0 - (t_wrap - 0.5) * 4.0; 
+            }
             double volume_multiplier = ((double)voice.velocity) / 127.0;
             double adsr_volume = voice.vol_env.adsr_volume;
             double final_volume = volume_multiplier * adsr_volume * Mixer::global_volume();
