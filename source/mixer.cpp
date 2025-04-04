@@ -88,10 +88,6 @@ namespace Mixer {
             stream = NULL;
             return;
         }
-
-        // debug
-        processors.resize(1);
-        processors[0] = std::make_shared<WavOsc>();
     }
 
     void register_processor(std::shared_ptr<Processor> processor) {
