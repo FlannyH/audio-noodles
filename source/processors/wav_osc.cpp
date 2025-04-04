@@ -36,7 +36,7 @@ void WavOsc::process_block(const size_t n_frames, float *output) {
                     t += delta;
                     double wave_time = (t * frequency);
                     double t_wrap = wave_time - trunc(wave_time);
-                    sample += (t_wrap < 0.5)? (+1.0/n_samples) : (-1.0/n_samples);
+                    sample += (t_wrap < this->square_pulse_width)? (+1.0/n_samples) : (-1.0/n_samples);
                 }
             }
             else if (this->wave_type == WaveType::triangle) {
