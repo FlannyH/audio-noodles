@@ -22,14 +22,27 @@ void WavOsc::process_block(const size_t n_frames, float *output) {
             voice.vol_env.tick(sample_length_sec, this->params);
             double key_relative_to_a4 = ((double)voice.key) - 69.0; // nice
             double frequency = 440.0 * pow(2.0, key_relative_to_a4 / 12.0); // todo: non-440 hz tuning, pitch wheel, mod vibrato, microtonality
-            double sample_l = sin(time * frequency * 2.0 * 3.14159265);
-            double sample_r = sin(time * frequency * 2.0 * 3.14159265);
+            double sample = 0.0;
+            if (this->wave_type == WaveType::sine) {
+                sample = sin(time * frequency * 2.0 * 3.14159265); 
+            }
+            else if (this->wave_type == WaveType::square) {
+                constexpr int n_samples = 8;
+                const double delta = 0.25 * sample_length_sec;
+                double t = time - (delta * (double)n_samples / 2.0);
+                for (int j = 0; j < n_samples; ++j) {
+                    t += delta;
+                    double wave_time = (t * frequency);
+                    double t_wrap = wave_time - trunc(wave_time);
+                    sample += (t_wrap < 0.5)? (+1.0/n_samples) : (-1.0/n_samples);
+                }
+            }
             double volume_multiplier = ((double)voice.velocity) / 127.0;
             double adsr_volume = voice.vol_env.adsr_volume;
             double final_volume = volume_multiplier * adsr_volume * Mixer::global_volume();
             final_volume = final_volume * final_volume;
-            output[2*i + 0] += (float)(sample_l * final_volume);
-            output[2*i + 1] += (float)(sample_r * final_volume);
+            output[2*i + 0] += (float)(sample * final_volume);
+            output[2*i + 1] += (float)(sample * final_volume);
         }
         time += sample_length_sec;
     }

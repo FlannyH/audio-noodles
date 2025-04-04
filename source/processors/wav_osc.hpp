@@ -4,6 +4,12 @@
 #include "../adsr.hpp"
 #include <vector>
 
+enum class WaveType {
+    none = 0,
+    sine,
+    square,
+};
+
 struct Voice {
     VolEnv vol_env;
     uint8_t key;
