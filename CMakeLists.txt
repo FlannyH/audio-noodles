@@ -39,6 +39,8 @@ add_executable (AudioNoodles
   "source/audio_noodle.cpp"
   "source/log.cpp"
   "source/log.hpp"
+  "source/adsr.cpp"
+  "source/adsr.hpp"
   "source/midi.cpp"
   "source/midi.hpp"
   "source/mixer.cpp"
