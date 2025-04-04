@@ -7,8 +7,7 @@ Track::Track() {
     Mixer::register_processor(this->debug_processor);
 }
 
-void Track::midi_note_on(int channel, uint8_t key, uint8_t velocity)
-{
+void Track::midi_note_on(int channel, uint8_t key, uint8_t velocity) {
     LOG(Debug, "[Channel %2i] Note On: key %i, velocity %i", channel, key, velocity);
     this->debug_processor->key_on(key, velocity);
 }

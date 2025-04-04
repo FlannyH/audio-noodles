@@ -1,10 +1,11 @@
 #pragma once
 
 #include "../processor.hpp"
+#include "../adsr.hpp"
 #include <vector>
 
 struct Voice {
-    uint8_t is_playing;
+    VolEnv vol_env;
     uint8_t key;
     uint8_t velocity;
 };
@@ -16,4 +17,5 @@ struct WavOsc : Processor {
     virtual void key_off(uint8_t key) override;
 
     std::vector<Voice> voice_pool;
+    VolEnvParams params;
 };
