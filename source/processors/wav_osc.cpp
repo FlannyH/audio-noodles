@@ -3,6 +3,8 @@
 
 #include <cmath>
 
+thread_local uint32_t noise_state = 0x796C694C;
+
 WavOsc::WavOsc() {
     this->voice_pool.resize(16);
 }
@@ -53,6 +55,14 @@ void WavOsc::process_block(const size_t n_frames, float *output) {
                     double t_wrap = wave_time - trunc(wave_time);
                     sample += (t_wrap * 2.0) - 1.0;
                 }
+            }
+            else if (this->wave_type== WaveType::noise) {
+                uint32_t x = noise_state;
+	            x ^= x << 13;
+	            x ^= x >> 17;
+	            x ^= x << 5;
+                noise_state = x;
+                sample = x / INT32_MAX;
             }
             double volume_multiplier = ((double)voice.velocity) / 127.0;
             double adsr_volume = voice.vol_env.adsr_volume;
