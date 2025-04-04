@@ -43,6 +43,17 @@ void WavOsc::process_block(const size_t n_frames, float *output) {
                 if (t_wrap < 0.5)   sample = (t_wrap * 4.0) - 1.0;
                 else                sample = 1.0 - (t_wrap - 0.5) * 4.0; 
             }
+            else if (this->wave_type == WaveType::sawtooth) {
+                constexpr int n_samples = 8;
+                const double delta = 0.25 * sample_length_sec;
+                double t = time - (delta * (double)n_samples / 2.0);
+                for (int j = 0; j < n_samples; ++j) {
+                    t += delta;
+                    double wave_time = (t * frequency);
+                    double t_wrap = wave_time - trunc(wave_time);
+                    sample += (t_wrap * 2.0) - 1.0;
+                }
+            }
             double volume_multiplier = ((double)voice.velocity) / 127.0;
             double adsr_volume = voice.vol_env.adsr_volume;
             double final_volume = volume_multiplier * adsr_volume * Mixer::global_volume();

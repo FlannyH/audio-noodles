@@ -9,6 +9,7 @@ enum class WaveType {
     sine,
     square,
     triangle,
+    sawtooth,
 };
 
 struct Voice {
@@ -25,5 +26,5 @@ struct WavOsc : Processor {
 
     std::vector<Voice> voice_pool;
     VolEnvParams params;
-    WaveType wave_type = WaveType::triangle;
+    WaveType wave_type = WaveType::sawtooth;
 };
