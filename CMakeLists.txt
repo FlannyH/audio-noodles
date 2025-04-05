@@ -47,6 +47,7 @@ add_executable (AudioNoodles
   "source/mixer.hpp"
   "source/track.cpp"
   "source/track.hpp"
+  "source/common.hpp"
   "source/session.cpp"
   "source/session.hpp"
   "source/processor.cpp"
