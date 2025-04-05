@@ -27,6 +27,6 @@ struct WavOsc : Processor {
 
     std::vector<Voice> voice_pool;
     VolEnvParams params;
-    WaveType wave_type = WaveType::square;
+    WaveType wave_type = WaveType::sawtooth;
     float square_pulse_width = 0.375f;
 };
