@@ -74,18 +74,20 @@ void WavOsc::process_block(const size_t n_frames, float *output) {
             const double adsr_volume = voice.vol_env.adsr_volume;
             double final_volume = volume_multiplier * adsr_volume * Mixer::global_volume();
             final_volume = final_volume * final_volume;
-            output[2*i + 0] += (float)(sample * final_volume);
-            output[2*i + 1] += (float)(sample * final_volume);
+            output[2*i + 0] += (float)(sample * final_volume) * ((float)Common::lut_panning[0   + (size_t)((voice.panning + 1.0f) * 127.0)] / 4095.0f);
+            output[2*i + 1] += (float)(sample * final_volume) * ((float)Common::lut_panning[254 - (size_t)((voice.panning + 1.0f) * 127.0)] / 4095.0f);
             voice.phase += sample_length_sec;
         }
     }
 }
 
 void WavOsc::key_on(uint8_t key, uint8_t velocity) {
-    float fkey = (float)key - (this->unison_depth / 2.0);
-    float fphase = -unison_phase_shift / 2.0;
-    const float phase_delta = unison_phase_shift / (float)this->unison_count;
-    const float key_delta = this->unison_depth / (float)this->unison_count;
+    float fkey = (float)key - (this->unison_depth / 2.0f);
+    float fphase = -this->unison_phase_shift / 2.0f;
+    float fpan = -this->unison_wideness;
+    const float key_delta = this->unison_depth / (float)(this->unison_count - 1);
+    const float phase_delta = this->unison_phase_shift / (float)(this->unison_count - 1);
+    const float pan_delta = this->unison_wideness * 2.0f / (float)(this->unison_count - 1);
     for (int i = 0; i < this->unison_count; ++i) {
         for (auto& voice : this->voice_pool) {
             if (voice.vol_env.stage != VolEnvStage::idle) 
@@ -95,6 +97,7 @@ void WavOsc::key_on(uint8_t key, uint8_t velocity) {
             wrapped_phase = (wrapped_phase >= 1.0f) ? (wrapped_phase - 1.0f) : (wrapped_phase);
             voice.phase = wrapped_phase;
             voice.actual_note = fkey;
+            voice.panning = fpan;
             voice.key = key;
             voice.velocity = ((float)velocity / 127.0f) / sqrtf((float)this->unison_count);
             voice.vol_env.stage = VolEnvStage::delay;
@@ -102,6 +105,7 @@ void WavOsc::key_on(uint8_t key, uint8_t velocity) {
         }
         fkey += key_delta;
         fphase += phase_delta;
+        fpan += pan_delta;
     }
 }
 

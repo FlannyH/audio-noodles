@@ -17,6 +17,7 @@ struct Voice {
     VolEnv vol_env;
     float actual_note;
     float velocity;
+    float panning;
     double phase;
     uint8_t key;
 };
@@ -32,6 +33,7 @@ struct WavOsc : Processor {
     WaveType wave_type = WaveType::sawtooth;
     float square_pulse_width = 0.375f;
     float unison_depth = 0.3f;
+    float unison_wideness = 1.0f;
     float unison_phase_shift = 0.3f;
     int unison_count = 9;
 };
