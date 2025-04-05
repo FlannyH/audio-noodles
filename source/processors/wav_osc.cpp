@@ -14,8 +14,6 @@ void WavOsc::process_block(const size_t n_frames, float *output) {
     double time = Mixer::block_start_time();
 
     for (size_t i = 0; i < n_frames; ++i) {
-        output[2*i + 0] = 0.0f;
-        output[2*i + 1] = 0.0f;
         for (auto& voice : this->voice_pool) {
             if (voice.vol_env.stage == VolEnvStage::idle) 
                 continue;

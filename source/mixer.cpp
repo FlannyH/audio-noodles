@@ -20,6 +20,8 @@ namespace Mixer {
         (void)user_data;
         (void)flags;
         (void)time_info;
+
+        memset(output_buffer, 0, sizeof(float) * 2 * frames_per_buffer);
         
         for (auto& processor : processors) {
             processor->process_block(frames_per_buffer, (float*)output_buffer);
