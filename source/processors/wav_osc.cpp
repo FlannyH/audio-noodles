@@ -68,7 +68,7 @@ void WavOsc::process_block(const size_t n_frames, float *output) {
 	            x ^= x >> 17;
 	            x ^= x << 5;
                 noise_state = x;
-                sample = x / INT32_MAX;
+                sample = (((double)x / (double)UINT32_MAX) * 2.0) - 1.0;
             }
             const double volume_multiplier = (double)voice.velocity;
             const double adsr_volume = voice.vol_env.adsr_volume;
