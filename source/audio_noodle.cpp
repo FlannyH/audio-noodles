@@ -1,6 +1,6 @@
 #include <cstdio>
-#include "mixer.hpp"
 #include "midi.hpp"
+#include "mixer.hpp"
 #include "session.hpp"
 
 int main() {
