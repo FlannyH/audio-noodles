@@ -15,8 +15,10 @@ enum class WaveType {
 
 struct Voice {
     VolEnv vol_env;
+    float actual_note;
+    float velocity;
+    double phase;
     uint8_t key;
-    uint8_t velocity;
 };
 
 struct WavOsc : Processor {
@@ -29,4 +31,7 @@ struct WavOsc : Processor {
     VolEnvParams params;
     WaveType wave_type = WaveType::sawtooth;
     float square_pulse_width = 0.375f;
+    float unison_depth = 0.3f;
+    float unison_phase_shift = 0.3f;
+    int unison_count = 9;
 };
