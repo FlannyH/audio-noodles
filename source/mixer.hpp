@@ -8,4 +8,4 @@ namespace Mixer {
     double sample_rate();
     double block_start_time();
     double global_volume();
-}
+} // namespace Mixer

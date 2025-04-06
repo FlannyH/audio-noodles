@@ -16,14 +16,16 @@ namespace Mixer {
 
     std::vector<std::shared_ptr<Processor>> processors;
 
-    int pa_callback(const void*, void* output_buffer, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info, PaStreamCallbackFlags flags, void* user_data) {
+    int pa_callback(
+        const void*, void* output_buffer, unsigned long frames_per_buffer, const PaStreamCallbackTimeInfo* time_info,
+        PaStreamCallbackFlags flags, void* user_data) {
         (void)user_data;
         (void)flags;
         (void)time_info;
 
         memset(output_buffer, 0, sizeof(float) * 2 * frames_per_buffer);
-        
-        for (auto& processor : processors) {
+
+        for (auto& processor: processors) {
             processor->process_block(frames_per_buffer, (float*)output_buffer);
         }
 
@@ -31,7 +33,7 @@ namespace Mixer {
 
         return paContinue;
     }
-    
+
     void pa_stream_finished(void* user_data) {
         (void)user_data;
         return;
@@ -41,17 +43,13 @@ namespace Mixer {
         Pa_Initialize();
 
         const int device_index = Pa_GetDefaultOutputDevice();
-        if (device_index == paNoDevice) { 
+        if (device_index == paNoDevice) {
             printf("Failed to get audio output device\n");
-            return; 
+            return;
         }
 
         const PaStreamParameters output_parameters = {
-            device_index,
-            2,
-            paFloat32,
-            Pa_GetDeviceInfo(device_index)->defaultLowOutputLatency,
-            NULL,
+            device_index, 2, paFloat32, Pa_GetDeviceInfo(device_index)->defaultLowOutputLatency, NULL,
         };
 
         const PaDeviceInfo* device_info = Pa_GetDeviceInfo(device_index);
@@ -60,12 +58,7 @@ namespace Mixer {
         }
 
         PaError error = Pa_OpenStream(
-            &stream,
-            NULL,
-            &output_parameters,
-            output_sample_rate,
-            paFramesPerBufferUnspecified,
-            paClipOff,
+            &stream, NULL, &output_parameters, output_sample_rate, paFramesPerBufferUnspecified, paClipOff,
             &pa_callback,
             NULL // todo: userdata?
         );
@@ -74,7 +67,7 @@ namespace Mixer {
             return;
         }
 
-        //Set stream finished callback
+        // Set stream finished callback
         error = Pa_SetStreamFinishedCallback(stream, &pa_stream_finished);
         if (error != paNoError) {
             printf("Error setting up audio stream!\n");
@@ -92,19 +85,11 @@ namespace Mixer {
         }
     }
 
-    void register_processor(std::shared_ptr<Processor> processor) {
-        processors.push_back(processor);
-    }
+    void register_processor(std::shared_ptr<Processor> processor) { processors.push_back(processor); }
 
-    double sample_rate() {
-        return output_sample_rate;
-    }
-    
-    double block_start_time() {
-        return block_start_time_value;
-    }
-    
-    double global_volume() {
-        return global_volume_value;
-    }
-}
+    double sample_rate() { return output_sample_rate; }
+
+    double block_start_time() { return block_start_time_value; }
+
+    double global_volume() { return global_volume_value; }
+} // namespace Mixer

@@ -7,7 +7,7 @@ int main() {
     Midi::init();
     Mixer::init();
     Session::tracks().push_back(Track{});
-    while(1){
+    while (1) {
         Midi::process();
     };
 }

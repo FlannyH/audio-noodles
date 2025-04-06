@@ -12,12 +12,11 @@ void VolEnv::tick(double delta_time, const VolEnvParams& params) {
             this->stage = VolEnvStage::attack;
         }
     }
-    
+
     if (this->stage == VolEnvStage::attack) {
         if (params.attack == 0.0) {
             this->stage = VolEnvStage::hold;
-        }
-        else {
+        } else {
             this->adsr_volume = std::min(this->stage_time / params.attack, 1.0);
             if (this->stage_time >= params.attack) {
                 this->stage_time -= params.attack;
@@ -25,7 +24,7 @@ void VolEnv::tick(double delta_time, const VolEnvParams& params) {
             }
         }
     }
-    
+
     if (this->stage == VolEnvStage::hold) {
         this->adsr_volume = 1.0;
         if (this->stage_time >= params.hold) {
@@ -33,12 +32,11 @@ void VolEnv::tick(double delta_time, const VolEnvParams& params) {
             this->stage = VolEnvStage::decay;
         }
     }
-    
+
     if (this->stage == VolEnvStage::decay) {
         if (params.decay == 0) {
             this->stage = VolEnvStage::sustain;
-        }
-        else {
+        } else {
             this->adsr_volume = std::lerp(1.0, params.sustain, this->stage_time / params.decay);
             if (this->stage_time >= params.decay) {
                 this->stage_time -= params.decay;
@@ -46,7 +44,7 @@ void VolEnv::tick(double delta_time, const VolEnvParams& params) {
             }
         }
     }
-    
+
     if (this->stage == VolEnvStage::sustain) {
         this->adsr_volume = params.sustain;
         if (params.sustain == 0.0) {
@@ -54,13 +52,12 @@ void VolEnv::tick(double delta_time, const VolEnvParams& params) {
             this->adsr_volume = 0.0;
         }
     }
-    
+
     if (this->stage == VolEnvStage::release) {
         if (params.release == 0.0) {
             this->stage = VolEnvStage::idle;
             this->adsr_volume = 0.0;
-        }
-        else {
+        } else {
             this->adsr_volume -= params.release * delta_time;
             if (this->adsr_volume <= 0.0) {
                 this->stage = VolEnvStage::idle;
