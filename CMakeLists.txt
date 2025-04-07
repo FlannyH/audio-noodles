@@ -52,6 +52,15 @@ add_executable (AudioNoodles
   "source/session.hpp"
   "source/processor.cpp"
   "source/processor.hpp"
+  "source/input.cpp"
+  "source/input.hpp"
+  "source/graphics/device.cpp"
+  "source/graphics/device.hpp"
+  "source/graphics/renderer.cpp"
+  "source/graphics/renderer.hpp"
+  "source/graphics/resource.hpp"
+  "source/graphics/opengl/device_opengl.cpp"
+  "source/graphics/opengl/device_opengl.hpp"
   "source/processors/wav_osc.cpp"
   "source/processors/wav_osc.hpp"
 )
@@ -86,3 +95,6 @@ target_include_directories(AudioNoodles PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/external/portaudio/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/rtmidi/
 )
+
+# Copy runtime files to build output
+file(COPY assets/ DESTINATION ${CMAKE_BINARY_DIR}/assets)

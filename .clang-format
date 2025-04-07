@@ -38,7 +38,7 @@ BraceWrapping:
   BeforeLambdaBody: false
   BeforeWhile: false
 BreakBeforeBraces: Custom
-ColumnLimit: 120
+ColumnLimit: 128
 IndentPPDirectives: BeforeHash
 IndentWidth: 4
 Language: Cpp
