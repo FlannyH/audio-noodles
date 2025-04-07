@@ -17,14 +17,14 @@ namespace Input {
         memcpy(current.keys, incoming.keys, sizeof(previous.keys));
         memcpy(previous.mouse_buttons, current.mouse_buttons, sizeof(previous.mouse_buttons));
         memcpy(current.mouse_buttons, incoming.mouse_buttons, sizeof(previous.mouse_buttons));
-        previous.mouse_x = current.mouse_x;
-        current.mouse_x = incoming.mouse_x;
-        previous.mouse_y = current.mouse_y;
-        current.mouse_y = incoming.mouse_y;
+        previous.mouse_x        = current.mouse_x;
+        current.mouse_x         = incoming.mouse_x;
+        previous.mouse_y        = current.mouse_y;
+        current.mouse_y         = incoming.mouse_y;
         previous.mouse_scroll_x = current.mouse_scroll_x;
-        current.mouse_scroll_x = incoming.mouse_scroll_x;
+        current.mouse_scroll_x  = incoming.mouse_scroll_x;
         previous.mouse_scroll_y = current.mouse_scroll_y;
-        current.mouse_scroll_y = incoming.mouse_scroll_y;
+        current.mouse_scroll_y  = incoming.mouse_scroll_y;
     }
 
     bool key_held(Key key) { return current.keys[(size_t)key]; }
@@ -56,8 +56,7 @@ namespace Input {
     }
 
     glm::vec2 mouse_scroll() {
-        return glm::vec2(
-            current.mouse_scroll_x - previous.mouse_scroll_x, current.mouse_scroll_y - previous.mouse_scroll_y);
+        return glm::vec2(current.mouse_scroll_x - previous.mouse_scroll_x, current.mouse_scroll_y - previous.mouse_scroll_y);
     }
 
     glm::vec2 mouse_position() {

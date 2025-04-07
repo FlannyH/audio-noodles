@@ -88,12 +88,12 @@ namespace Input {
     };
 
     struct InputData {
-        double mouse_x = 0.0;
-        double mouse_y = 0.0;
-        double mouse_scroll_x = 0.0;
-        double mouse_scroll_y = 0.0;
+        double mouse_x                                       = 0.0;
+        double mouse_y                                       = 0.0;
+        double mouse_scroll_x                                = 0.0;
+        double mouse_scroll_y                                = 0.0;
         bool mouse_buttons[(size_t)MouseButton::ButtonCount] = {0};
-        bool keys[(size_t)Key::KeyCount] = {0};
+        bool keys[(size_t)Key::KeyCount]                     = {0};
     };
 
     void update();

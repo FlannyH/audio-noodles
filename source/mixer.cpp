@@ -10,10 +10,10 @@
 #include <portaudio.h>
 
 namespace Mixer {
-    PaStream* stream = NULL;
+    PaStream* stream                = NULL;
     const double output_sample_rate = 44100;
-    double block_start_time_value = 0.0;
-    double global_volume_value = 0.8;
+    double block_start_time_value   = 0.0;
+    double global_volume_value      = 0.8;
 
     std::vector<std::shared_ptr<Processor>> processors;
 

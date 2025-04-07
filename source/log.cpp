@@ -20,7 +20,7 @@ namespace Log {
         std::lock_guard<std::mutex> lock(mutex);
 
         char msg_buf[4096] = {0};
-        int offset = 0;
+        int offset         = 0;
 
         constexpr uint32_t log_level_colors[] = {
             7,  // debug: light grey
@@ -44,7 +44,7 @@ namespace Log {
             SetConsoleTextAttribute(hConsole, *(WORD*)(&color_value));
 #else
             constexpr int color_mapping[] = {0, 4, 2, 6, 1, 5, 3, 7};
-            const int code = color_mapping[color_value & 0x07] + 30;
+            const int code                = color_mapping[color_value & 0x07] + 30;
             if (color_value >= 0x08) offset += snprintf(msg_buf, sizeof(msg_buf) - offset, "\e[1;%im", code);
             else offset += snprintf(msg_buf, sizeof(msg_buf) - offset, "\e[%im", code);
 #endif

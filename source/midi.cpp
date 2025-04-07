@@ -22,7 +22,7 @@ namespace Midi {
     }
 
     void init() {
-        midi_in = std::make_shared<RtMidiIn>();
+        midi_in            = std::make_shared<RtMidiIn>();
         const auto n_ports = midi_in->getPortCount();
 
         if (n_ports == 0) {
@@ -40,7 +40,7 @@ namespace Midi {
         mutex.lock();
 
         for (auto& message: message_queue) {
-            const int type = message.type();
+            const int type    = message.type();
             const int channel = message.channel();
 
             for (auto& track: Session::tracks()) {
@@ -48,21 +48,21 @@ namespace Midi {
                 if ((track.midi_input_channel_mask & (1 << channel)) == 0) continue;
 
                 if (type == 0) {
-                    const uint8_t key = message.data1;
+                    const uint8_t key      = message.data1;
                     const uint8_t velocity = message.data2;
                     track.midi_note_off(channel, key, velocity);
                 } else if (type == 1) {
-                    const uint8_t key = message.data1;
+                    const uint8_t key      = message.data1;
                     const uint8_t velocity = message.data2;
 
                     if (velocity > 0) track.midi_note_on(channel, key, velocity);
                     else track.midi_note_off(channel, key, velocity);
                 } else if (type == 2) {
-                    const uint8_t key = message.data1;
+                    const uint8_t key      = message.data1;
                     const uint8_t pressure = message.data2;
                     track.midi_poly_aftertouch(channel, key, pressure);
                 } else if (type == 3) {
-                    const uint8_t id = message.data1;
+                    const uint8_t id    = message.data1;
                     const uint8_t value = message.data2;
                     track.midi_control_change(channel, id, value);
                 } else if (type == 4) {

@@ -52,15 +52,15 @@ namespace Gfx {
         switch (severity) {
         case gl::GL_DEBUG_SEVERITY_HIGH:
             severity_str = "High";
-            log_level = Log::Level::Error;
+            log_level    = Log::Level::Error;
             break;
         case gl::GL_DEBUG_SEVERITY_MEDIUM:
             severity_str = "Medium";
-            log_level = Log::Level::Warning;
+            log_level    = Log::Level::Warning;
             break;
         case gl::GL_DEBUG_SEVERITY_LOW:
             severity_str = "Low";
-            log_level = Log::Level::Info;
+            log_level    = Log::Level::Info;
             break;
         default: severity_str = "Unknown"; return;
         }
@@ -79,7 +79,7 @@ namespace Gfx {
 
         // Read shader source file
         size_t shader_size = 0;
-        char* shader_data = NULL;
+        char* shader_data  = NULL;
 
         // Open file
         std::ifstream file(path, std::ifstream::binary);
@@ -95,13 +95,13 @@ namespace Gfx {
         file.seekg(0, file.beg);
 
         // Read data
-        shader_data = new char[shader_size + 1];
+        shader_data              = new char[shader_size + 1];
         shader_data[shader_size] = 0;
         file.read(shader_data, shader_size);
 
         // Create shader on GPU
         const gl::GLenum type_to_create = shader_types[(int)type];
-        const gl::GLuint shader = gl::glCreateShader(type_to_create);
+        const gl::GLuint shader         = gl::glCreateShader(type_to_create);
 
         // Compile shader source
         const gl::GLint shader_size_gl = (gl::GLint)shader_size;
@@ -168,9 +168,9 @@ namespace Gfx {
         // Calculate delta time
         static double prev_time = 0.0;
         static double curr_time = 0.0;
-        prev_time = curr_time;
-        curr_time = glfwGetTime();
-        delta_time = curr_time - prev_time;
+        prev_time               = curr_time;
+        curr_time               = glfwGetTime();
+        delta_time              = curr_time - prev_time;
 
         // Any frametime above 1.0 seconds (or less than 1 fps) is spicy, so we should limit the deltatime
         if (delta_time > 1.0) {
@@ -209,15 +209,15 @@ namespace Gfx {
         gl::glGetProgramiv(shader_gpu, gl::GL_LINK_STATUS, &success);
         if (!success) {
             char info_log[512] = {0};
-            int length = 0;
+            int length         = 0;
             gl::glGetProgramInfoLog(shader_gpu, 512, NULL, info_log);
             LOG(Error, "Failed to link program%s%s", (length > 0) ? ": " : "", (length > 0) ? info_log : "");
         }
 
         // Keep track of its resource ID
-        auto resource_id_pair = allocate_resource_slot(ResourceType::Pipeline);
-        PipelineResource* resource = new PipelineResource();
-        resource->base.gpu_handle32 = shader_gpu;
+        auto resource_id_pair                = allocate_resource_slot(ResourceType::Pipeline);
+        PipelineResource* resource           = new PipelineResource();
+        resource->base.gpu_handle32          = shader_gpu;
         resources.at(resource_id_pair.id.id) = (Resource*)resource;
 
         return resource_id_pair.id;
@@ -225,7 +225,7 @@ namespace Gfx {
 
     void DeviceOpenGL::begin_raster_pass(const ResourceID raster_pipeline) {
         render_pass_active = raster_pipeline;
-        auto pipeline = resources.at(raster_pipeline.id); // no need to cast, only accessing variables from base class
+        auto pipeline      = resources.at(raster_pipeline.id); // no need to cast, only accessing variables from base class
         gl::glUseProgram(pipeline->gpu_handle32);
         gl::glBindVertexArray(empty_vao);
         gl::glUniform1i(0, 0); // texture_bound = 0
@@ -287,10 +287,10 @@ namespace Gfx {
         gl::glGenBuffers(1, &gl_id);
 
         // Keep track of the resource
-        auto resource_id_pair = allocate_resource_slot(ResourceType::Buffer);
-        BufferResource* resource = new BufferResource();
-        resource->base.gpu_handle32 = gl_id;
-        resource->size = size_bytes;
+        auto resource_id_pair                = allocate_resource_slot(ResourceType::Buffer);
+        BufferResource* resource             = new BufferResource();
+        resource->base.gpu_handle32          = gl_id;
+        resource->size                       = size_bytes;
         resources.at(resource_id_pair.id.id) = (Resource*)resource;
 
         // todo(lily): support user specified buffer flags
@@ -355,8 +355,8 @@ namespace Gfx {
         assert(type != TextureType::Invalid && "Attempt to create GPU texture with invalid type!");
         assert(format != PixelFormat::Invalid && "Attempt to create GPU texture with invalid format!");
 
-        const gl::GLenum gl_type = texture_type_to_gl(type);
-        const gl::GLenum gl_format = texture_format_to_gl_format(format);
+        const gl::GLenum gl_type      = texture_type_to_gl(type);
+        const gl::GLenum gl_format    = texture_format_to_gl_format(format);
         const gl::GLenum gl_data_type = texture_format_to_gl_data_type(format);
 
         gl::GLuint gl_id = 0;
@@ -385,12 +385,12 @@ namespace Gfx {
         gl::glBindTexture(gl_type, 0);
 
         // Keep track of its resource ID
-        auto resource_id_pair = allocate_resource_slot(ResourceType::Texture);
-        TextureResource* resource = new TextureResource();
-        resource->base.gpu_handle32 = gl_id;
-        resource->width = resolution.x;
-        resource->height = resolution.y;
-        resource->pixel_format = format;
+        auto resource_id_pair                = allocate_resource_slot(ResourceType::Texture);
+        TextureResource* resource            = new TextureResource();
+        resource->base.gpu_handle32          = gl_id;
+        resource->width                      = resolution.x;
+        resource->height                     = resolution.y;
+        resource->pixel_format               = format;
         resources.at(resource_id_pair.id.id) = (Resource*)resource;
 
         return resource_id_pair.id;
@@ -448,13 +448,13 @@ namespace Gfx {
 
     static void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
         Input::InputData* incoming_input_data = (Input::InputData*)glfwGetWindowUserPointer(window);
-        incoming_input_data->mouse_x = xpos;
-        incoming_input_data->mouse_y = ypos;
+        incoming_input_data->mouse_x          = xpos;
+        incoming_input_data->mouse_y          = ypos;
     }
 
     static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
         Input::InputData* incoming_input_data = (Input::InputData*)glfwGetWindowUserPointer(window);
-        Input::MouseButton mouse_button = Input::MouseButton::Left;
+        Input::MouseButton mouse_button       = Input::MouseButton::Left;
         switch (button) {
         case GLFW_MOUSE_BUTTON_LEFT: mouse_button = Input::MouseButton::Left; break;
         case GLFW_MOUSE_BUTTON_RIGHT: mouse_button = Input::MouseButton::Right; break;
@@ -488,7 +488,7 @@ namespace Gfx {
             recycled_resource_slots.pop_front();
             return PairResourceID{
                 .resource = resources.at(slot.id),
-                .id = slot,
+                .id       = slot,
             };
         }
 
@@ -497,7 +497,7 @@ namespace Gfx {
         resources.push_back(nullptr);
         return PairResourceID{
             .resource = resources.at(slot.id),
-            .id = slot,
+            .id       = slot,
         };
     }
 } // namespace Gfx

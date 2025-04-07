@@ -6,9 +6,9 @@ namespace Log {
 #else
     constexpr Level min_level = Level::Info;
 #endif
-    constexpr bool display_time = true;
+    constexpr bool display_time      = true;
     constexpr bool display_log_level = true;
-    constexpr bool color = true;
+    constexpr bool color             = true;
 
     void write(const Level level, const char* message, ...);
 } // namespace Log

@@ -10,15 +10,15 @@ namespace Gfx {
     enum class AnchorPoint { TopLeft = 0, Top, TopRight, Left, Center, Right, BottomLeft, Bottom, BottomRight };
 
     struct DrawParams {
-        glm::vec4 color = {1, 1, 1, 1};
-        float depth = 0.0f;
+        glm::vec4 color          = {1, 1, 1, 1};
+        float depth              = 0.0f;
         AnchorPoint anchor_point = AnchorPoint::Center;
         // Line specific parameters
         float line_width = 0.001f; // Will always result in at least 1 pixel wide lines
 
         // Rectangle specific parameters
-        glm::vec2 texcoord_tl = glm::vec2(0.0f, 0.0f);
-        glm::vec2 texcoord_br = glm::vec2(1.0f, 1.0f);
+        glm::vec2 texcoord_tl         = glm::vec2(0.0f, 0.0f);
+        glm::vec2 texcoord_br         = glm::vec2(1.0f, 1.0f);
         float rectangle_outline_width = 0.0f; // Values equal to or less than 0.0f will make the rectangle filled.
                                               // Otherwise, it will always result in at least 1 pixel wide lines.
         ResourceID texture = ResourceID::invalid();
@@ -30,11 +30,11 @@ namespace Gfx {
 
     struct TextureCreationParams {
         PixelFormat format = PixelFormat::Invalid;
-        TextureType type = TextureType::Invalid;
-        size_t width = 0;
-        size_t height = 0;
-        size_t depth = 1; // Only applicable to 3D textures and texture arrays
-        void* data = nullptr;
+        TextureType type   = TextureType::Invalid;
+        size_t width       = 0;
+        size_t height      = 0;
+        size_t depth       = 1; // Only applicable to 3D textures and texture arrays
+        void* data         = nullptr;
     };
 
     struct PosTexcoord {

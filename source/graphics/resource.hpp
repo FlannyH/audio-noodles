@@ -13,7 +13,7 @@ namespace Gfx {
     };
 
     struct ResourceID {
-        uint32_t id : 24;
+        uint32_t id   : 24;
         uint32_t type : 8;
         uint32_t as_u32() const { return (id & 0xFFFFFF) | (type << 24); }
         static ResourceID from_u32(uint32_t in) { return ResourceID{.id = in & 0x00FFFFFF, .type = in >> 24}; }
@@ -47,17 +47,17 @@ namespace Gfx {
         Vertex2D(
             glm::vec3 _pos, glm::vec4 _color, glm::vec2 _texcoords = glm::vec2(0.0f),
             ResourceID _texture_id = ResourceID::invalid()) {
-            position = glm::vec4(_pos, 0.0f);
-            color = _color;
-            texcoords = _texcoords;
+            position   = glm::vec4(_pos, 0.0f);
+            color      = _color;
+            texcoords  = _texcoords;
             texture_id = _texture_id;
         }
         Vertex2D(
             glm::vec2 _pos, float depth, glm::vec4 _color, glm::vec2 _texcoords = glm::vec2(0.0f),
             ResourceID _texture_id = ResourceID::invalid()) {
-            position = glm::vec4(_pos, depth, 0.0f);
-            color = _color;
-            texcoords = _texcoords;
+            position   = glm::vec4(_pos, depth, 0.0f);
+            color      = _color;
+            texcoords  = _texcoords;
             texture_id = _texture_id;
         }
     };

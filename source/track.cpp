@@ -33,6 +33,4 @@ void Track::midi_channel_aftertouch(int channel, uint8_t pressure) {
     LOG(Debug, "[Channel %2i] Channel Aftertouch: pressure %i", channel, pressure);
 }
 
-void Track::midi_pitch_wheel(int channel, uint16_t value) {
-    LOG(Debug, "[Channel %2i] Pitch Wheel: %i", channel, value);
-}
+void Track::midi_pitch_wheel(int channel, uint16_t value) { LOG(Debug, "[Channel %2i] Pitch Wheel: %i", channel, value); }

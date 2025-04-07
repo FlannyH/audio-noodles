@@ -4,8 +4,8 @@
 #include "processors/wav_osc.hpp"
 
 struct Track {
-    uint16_t midi_input_channel_mask = 1;
-    double pitch_wheel_range_cents = 200.0;
+    uint16_t midi_input_channel_mask        = 1;
+    double pitch_wheel_range_cents          = 200.0;
     std::shared_ptr<WavOsc> debug_processor = nullptr;
 
     Track();

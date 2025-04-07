@@ -8,9 +8,9 @@
 #include <glm/geometric.hpp>
 
 namespace Gfx {
-    Device* device = nullptr; // Will be initialized to a child class of Device (e.g. DeviceOpenGL)
+    Device* device        = nullptr; // Will be initialized to a child class of Device (e.g. DeviceOpenGL)
     glm::vec2 window_size = glm::vec2(0.0f);
-    float aspect_ratio = 1.0f;
+    float aspect_ratio    = 1.0f;
 
     // 2D rendering
     ResourceID pipeline_2d = {0, 0};
@@ -26,7 +26,7 @@ namespace Gfx {
 
         // Create common buffers
         constexpr size_t render_queue_max_vertex_count = 65536 * 16;
-        constexpr size_t render_data_3d_buffer_size = 128 * 1024;
+        constexpr size_t render_data_3d_buffer_size    = 128 * 1024;
         render_queue_2d_gpu_buffer =
             device->create_buffer("Render queue 2D GPU buffer", sizeof(Vertex2D) * render_queue_max_vertex_count);
 
@@ -50,7 +50,7 @@ namespace Gfx {
         // Update window size
         int w, h;
         device->get_window_size(w, h);
-        window_size = {(float)w, (float)h};
+        window_size  = {(float)w, (float)h};
         aspect_ratio = window_size.x / window_size.y;
 
         render_queue_2d.clear();
@@ -81,13 +81,13 @@ namespace Gfx {
         }
 
         // Figure out rectangle to draw
-        const glm::vec2 direction = b - a;
-        const glm::vec2 perpendicular = glm::normalize(glm::vec2(direction.y, -direction.x));
+        const glm::vec2 direction               = b - a;
+        const glm::vec2 perpendicular           = glm::normalize(glm::vec2(direction.y, -direction.x));
         const glm::vec2 corrected_perpendicular = (perpendicular * width) * glm::vec2(1.0f / aspect_ratio, 1.0f);
-        const glm::vec2 v0 = a - corrected_perpendicular;
-        const glm::vec2 v1 = a + corrected_perpendicular;
-        const glm::vec2 v2 = b + corrected_perpendicular;
-        const glm::vec2 v3 = b - corrected_perpendicular;
+        const glm::vec2 v0                      = a - corrected_perpendicular;
+        const glm::vec2 v1                      = a + corrected_perpendicular;
+        const glm::vec2 v2                      = b + corrected_perpendicular;
+        const glm::vec2 v3                      = b - corrected_perpendicular;
         draw_quad_2d({v0}, {v1}, {v2}, {v3}, draw_params);
     }
 
@@ -190,17 +190,17 @@ namespace Gfx {
 
     ResourceID create_texture2d_from_file(const std::string& path) {
         // Read image - tell stb_image we want RGBA_8
-        FILE* file = fopen(path.c_str(), "rb");
-        int x = 0;
-        int y = 0;
+        FILE* file    = fopen(path.c_str(), "rb");
+        int x         = 0;
+        int y         = 0;
         stbi_uc* data = stbi_load_from_file(file, &x, &y, nullptr, 4);
 
         return create_texture_from_data(TextureCreationParams{
             .format = PixelFormat::RGBA_8,
-            .type = TextureType::Single2D,
-            .width = (size_t)x,
+            .type   = TextureType::Single2D,
+            .width  = (size_t)x,
             .height = (size_t)y,
-            .data = data,
+            .data   = data,
         });
     }
 } // namespace Gfx

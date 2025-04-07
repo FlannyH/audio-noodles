@@ -1,8 +1,8 @@
 # Format Style Options - Created with Clang Power Tools
 ---
 AlignAfterOpenBracket: AlwaysBreak
-AlignConsecutiveAssignments: None
-AlignConsecutiveBitFields: None
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveBitFields: Consecutive
 AlignConsecutiveDeclarations: None
 AlignConsecutiveMacros: None
 AlignEscapedNewlines: Right
