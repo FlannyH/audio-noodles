@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <vector>
 #include <memory>
+#include <cstring>
 #include <portaudio.h>
 
 namespace Mixer {
@@ -58,8 +59,7 @@ namespace Mixer {
         }
 
         PaError error = Pa_OpenStream(
-            &stream, NULL, &output_parameters, output_sample_rate, paFramesPerBufferUnspecified, paClipOff,
-            &pa_callback,
+            &stream, NULL, &output_parameters, output_sample_rate, paFramesPerBufferUnspecified, paClipOff, &pa_callback,
             NULL // todo: userdata?
         );
         if (error != paNoError || stream == NULL) {
