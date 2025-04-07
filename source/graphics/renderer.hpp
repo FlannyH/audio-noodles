@@ -1,8 +1,11 @@
 #pragma once
 #include "device.hpp"
 #include "resource.hpp"
+#include "transform.hpp"
+#include "../colors.hpp"
 #include <map>
 #include <string>
+#include <memory>
 
 namespace Gfx {
     enum class RenderAPI { OpenGL };
@@ -42,6 +45,25 @@ namespace Gfx {
         glm::vec2 texcoord;
     };
 
+    struct PixelRect {
+        glm::i16vec2 top_left;
+        glm::i16vec2 size;
+    };
+
+    struct Font {
+        std::vector<PixelRect> glyph_rects;
+        std::map<wchar_t, std::vector<int>> wchar_mapping;
+        glm::i16vec2 glyph_cell_size = glm::i16vec2(0);
+        ResourceID tex_id            = ResourceID::invalid();
+    };
+
+    struct TextDrawParams {
+        Transform transform{};
+        AnchorPoint position_anchor = AnchorPoint::Center;
+        AnchorPoint text_anchor;
+        Color color;
+    };
+
     // Renderer is responsible for creating a window, rendering graphics, and handling input
     // Meta
     bool init(
@@ -68,6 +90,11 @@ namespace Gfx {
     void
     draw_quad_2d_pixels(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, PosTexcoord v3, const DrawParams& draw_params = {});
     void draw_rectangle_2d_pixels(glm::vec2 top_left, glm::vec2 bottom_right, DrawParams draw_params = {});
+
+    // Text
+    std::shared_ptr<Font> load_font(const std::string& path);
+    void draw_text_pixels(const std::string& text, TextDrawParams params);
+    void draw_text_pixels(const std::wstring& text, TextDrawParams params);
 
     // Resources
     ResourceID create_buffer(const std::string_view& name, const size_t size, const void* data = nullptr);
