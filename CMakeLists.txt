@@ -54,6 +54,8 @@ add_executable (AudioNoodles
   "source/session.hpp"
   "source/processor.cpp"
   "source/processor.hpp"
+  "source/ui/scene.cpp"
+  "source/ui/scene.hpp"
   "source/ui/value_system.hpp"
   "source/graphics/device.cpp"
   "source/graphics/device.hpp"
