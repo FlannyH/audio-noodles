@@ -28,6 +28,9 @@ namespace Gfx {
         Single3D,
     };
 
+    // Implement support for this in the renderer
+    enum class TextureScaleMode { Stretch, Tile, Slice };
+
     enum class PixelFormat {
         Invalid = 0,
         R_8,

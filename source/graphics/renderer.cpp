@@ -280,6 +280,8 @@ namespace Gfx {
         return new_font;
     }
 
+    float get_font_height() { return font->glyph_cell_size.y; }
+
     void draw_text_pixels(const std::wstring& text, TextDrawParams params) {
         if (!font) return;
 
