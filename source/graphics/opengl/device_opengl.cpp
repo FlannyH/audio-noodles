@@ -481,6 +481,10 @@ namespace Gfx {
         glfwSetScrollCallback(window, mouse_scroll_callback);
     }
 
+    void DeviceOpenGL::set_mouse_visible(bool visible) {
+        glfwSetInputMode(window, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+    }
+
     PairResourceID DeviceOpenGL::allocate_resource_slot(const ResourceType type) {
         // Reuse previously deallocated slots
         if (recycled_resource_slots.empty() == false) {

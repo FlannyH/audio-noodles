@@ -44,7 +44,8 @@ namespace Gfx {
         void bind_texture(int slot, const ResourceID texture) override;
 
         // Input
-        void input_setup();
+        void input_setup() override;
+        void set_mouse_visible(bool visible) override;
 
       private:
         PairResourceID allocate_resource_slot(const ResourceType type);

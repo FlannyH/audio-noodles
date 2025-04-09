@@ -50,8 +50,13 @@ namespace Gfx {
 
     float get_delta_time() { return device->get_delta_time(); }
 
-    float get_fps() { return 1.0f / get_delta_time(); }
 
+    float get_fps() { return 1.0f / get_delta_time(); }
+    
+    void set_mouse_visible(bool visible) {
+        device->set_mouse_visible(visible);
+    }
+    
     void begin_frame() {
         // Update window size
         int w, h;

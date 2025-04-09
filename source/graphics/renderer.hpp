@@ -73,6 +73,7 @@ namespace Gfx {
     glm::vec2 get_window_size();
     float get_delta_time();
     float get_fps();
+    void set_mouse_visible(bool visible);
 
     // Rendering
     void begin_frame();
