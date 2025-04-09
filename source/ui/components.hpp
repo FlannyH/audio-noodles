@@ -879,8 +879,7 @@ namespace UI {
                 const double old_val = val;
 
                 // Map the vertical mouse scroll to the value
-                // todo
-                // val += static_cast<double>(input.mouse_wheel()) * number_range->step;
+                val += static_cast<double>(Input::mouse_scroll().y) * number_range->step;
 
                 // Clamp the value to the bounds
                 val = std::max(val, number_range->min);
