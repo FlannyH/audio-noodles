@@ -103,25 +103,14 @@ namespace Gfx {
     }
 
     void draw_triangle_2d(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, const DrawParams& draw_params) {
-        constexpr glm::vec2 anchor_offsets[] = {
-            glm::vec2(-1.0f, 1.0f),  // TopLeft
-            glm::vec2(0.0f, 1.0f),   // Top
-            glm::vec2(1.0f, 1.0f),   // TopRight
-            glm::vec2(-1.0f, 0.0f),  // Left
-            glm::vec2(0.0f, 0.0f),   // Center
-            glm::vec2(1.0f, 0.0f),   // Right
-            glm::vec2(-1.0f, -1.0f), // BottomLeft
-            glm::vec2(0.0f, -1.0f),  // Bottom
-            glm::vec2(1.0f, -1.0f),  // BottomRight
-        };
         render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
-            (v0.pos * 2.0f) + anchor_offsets[(size_t)draw_params.anchor_point], draw_params.depth, draw_params.color,
+            Gfx::anchor_offset(v0.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color,
             v0.texcoord, draw_params.texture));
         render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
-            (v1.pos * 2.0f) + anchor_offsets[(size_t)draw_params.anchor_point], draw_params.depth, draw_params.color,
+            Gfx::anchor_offset(v1.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color,
             v1.texcoord, draw_params.texture));
         render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
-            (v2.pos * 2.0f) + anchor_offsets[(size_t)draw_params.anchor_point], draw_params.depth, draw_params.color,
+            Gfx::anchor_offset(v2.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color,
             v2.texcoord, draw_params.texture));
     }
 
@@ -189,6 +178,22 @@ namespace Gfx {
         draw_params.rectangle_outline_width /= window_size.y;
         draw_rectangle_2d(top_left / window_size, bottom_right / window_size, draw_params);
     }
+
+    glm::vec2 anchor_offset(glm::vec2 top_left, Gfx::AnchorPoint anchor) { 
+        constexpr glm::vec2 anchor_offsets[] = {
+            glm::vec2(-1.0f, 1.0f),  // TopLeft
+            glm::vec2(0.0f, 1.0f),   // Top
+            glm::vec2(1.0f, 1.0f),   // TopRight
+            glm::vec2(-1.0f, 0.0f),  // Left
+            glm::vec2(0.0f, 0.0f),   // Center
+            glm::vec2(1.0f, 0.0f),   // Right
+            glm::vec2(-1.0f, -1.0f), // BottomLeft
+            glm::vec2(0.0f, -1.0f),  // Bottom
+            glm::vec2(1.0f, -1.0f),  // BottomRight
+        };
+        return top_left + anchor_offsets[(size_t)anchor];
+    }
+
     std::shared_ptr<Font> load_font(const std::string& path) {
         std::shared_ptr<Font> new_font = std::make_shared<Font>();
 

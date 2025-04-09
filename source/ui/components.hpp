@@ -30,6 +30,7 @@ namespace UI {
         Gfx::AnchorPoint anchor{};
     };
 
+    // todo: naming conventions
     enum class ClickState { idle = 0, hover, click };
 
     struct Clickable {};
@@ -754,20 +755,17 @@ namespace UI {
 
             // Get mouse position, and get an actual correct top-left and bottom-right
             // todo
-            /*
-            const glm::vec2 mouse_pos =
-                renderer.pixels_to_normalized(input.mouse_pos(MouseRelative::window), AnchorPoint::top_left);
-            glm::vec2 tl_      = renderer.pixels_to_normalized(transform->top_left, transform->anchor);
-            glm::vec2 br_      = renderer.pixels_to_normalized(transform->bottom_right, transform->anchor);
-            const glm::vec2 tl = {std::min(tl_.x, br_.x), std::min(tl_.y, br_.y)};
-            const glm::vec2 br = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
+            const glm::vec2 mouse_pos = Input::mouse_position_pixels();
+            glm::vec2 tl_             = Gfx::anchor_offset(transform->top_left, transform->anchor);
+            glm::vec2 br_             = Gfx::anchor_offset(transform->bottom_right, transform->anchor);
+            const glm::vec2 tl        = {std::min(tl_.x, br_.x), std::min(tl_.y, br_.y)};
+            const glm::vec2 br        = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
 
             // Determine whether the mouse is inside the component's bounding box
-            const bool is_inside_bb = mouse_pos.x >= tl.x && mouse_pos.y >= tl.y && mouse_pos.x <= br.x && mouse_pos.y <=
-            br.y;
+            const bool is_inside_bb = mouse_pos.x >= tl.x && mouse_pos.y >= tl.y && mouse_pos.x <= br.x && mouse_pos.y <= br.y;
 
             // If the element hasn't been clicked
-            if (mouse_interact->state != ClickState::click && input.mouse_held(0) == false) {
+            if (mouse_interact->state != ClickState::click && Input::mouse_button_held(Input::MouseButton::Left) == false) {
                 // If the mouse cursor is inside the UI component's bounding box, set the ClickState to hover
                 if (is_inside_bb) {
                     mouse_interact->state = ClickState::hover;
@@ -778,13 +776,13 @@ namespace UI {
                 }
             }
             // If we're hovering over the element and we click, set the ClickState to clicking
-            if (input.mouse_down(0)) {
+            if (Input::mouse_button_held(Input::MouseButton::Left)) {
                 if (mouse_interact->state == ClickState::hover) {
                     mouse_interact->state = ClickState::click;
                 }
             }
             // If we release the mouse while this element is in click state,
-            if (input.mouse_up(0) && mouse_interact->state == ClickState::click) {
+            if (Input::mouse_button_released(Input::MouseButton::Left) && mouse_interact->state == ClickState::click) {
                 // and the mouse is still on the component, and the component is clickable
                 if (is_inside_bb && clickable && function) {
                     // Call the function of this clickable
@@ -792,15 +790,16 @@ namespace UI {
                 }
                 // Reset the MouseInteract state back to idle
                 mouse_interact->state = ClickState::idle;
-                input.mouse_visible(true);
+                Gfx::set_mouse_visible(true);
             }
-            // If we're hovering over the element and we middle click, AND the component has a value, set that value to
-            default auto* value       = scene.get_component<Value>(entity); const auto* range =
-            scene.get_component<NumberRange>(entity); if (input.mouse_down(2) && value && range && mouse_interact->state ==
-            ClickState::hover) { if (value->type == VarType::float64) { value->set<double>(range->default_value);
+            // If we're hovering over the element and we middle click, AND the component has a value, set that value to default
+            auto* value       = scene.get_component<Value>(entity);
+            const auto* range = scene.get_component<NumberRange>(entity);
+            if (Input::mouse_button_pressed(Input::MouseButton::Middle) && value && range && mouse_interact->state == ClickState::hover) {
+                if (value->type == VarType::float64) {
+                    value->set<double>(range->default_value);
                 }
             }
-            */
         }
 
         // Handle multi-hitbox components
@@ -850,11 +849,9 @@ namespace UI {
 
                 // Map the mouse movement to the value
                 if (draggable && draggable->is_horizontal) {
-                    // todo
-                    // val += static_cast<double>(input.mouse_pos(MouseRelative::relative).x) * number_range->step;
+                    val += static_cast<double>(Input::mouse_movement_pixels().x) * number_range->step;
                 } else {
-                    // todo
-                    // val -= static_cast<double>(input.mouse_pos(MouseRelative::relative).y) * number_range->step;
+                    val -= static_cast<double>(Input::mouse_movement_pixels().y) * number_range->step;
                 }
 
                 // Clamp the value to the bounds
@@ -865,8 +862,7 @@ namespace UI {
                 value->has_changed = (val != old_val);
 
                 // Make the mouse invisible
-                // todo
-                // input.mouse_visible(false);
+                Gfx::set_mouse_visible(false);
             }
         }
 

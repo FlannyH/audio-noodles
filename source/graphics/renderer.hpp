@@ -91,6 +91,7 @@ namespace Gfx {
     void
     draw_quad_2d_pixels(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, PosTexcoord v3, const DrawParams& draw_params = {});
     void draw_rectangle_2d_pixels(glm::vec2 top_left, glm::vec2 bottom_right, DrawParams draw_params = {});
+    glm::vec2 anchor_offset(glm::vec2 top_left, Gfx::AnchorPoint anchor);
 
     // Text
     std::shared_ptr<Font> load_font(const std::string& path);
