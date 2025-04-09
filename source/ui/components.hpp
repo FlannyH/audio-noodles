@@ -15,7 +15,7 @@ namespace UI {
     struct Transform {
         Transform(
             const glm::vec2 tl, const glm::vec2 br, const float dpth = 0.5f,
-            const Gfx::AnchorPoint anch = Gfx::AnchorPoint::TopLeft) {
+            const Gfx::AnchorPoint anch = Gfx::AnchorPoint::BottomLeft) {
             const float x_min = std::min(tl.x, br.x);
             const float x_max = std::max(tl.x, br.x);
             const float y_min = std::min(tl.y, br.y);
@@ -299,7 +299,7 @@ namespace UI {
         // Create entity
         const EntityID entity = scene.new_entity();
         scene.add_component<UI::Transform>(entity, transform);
-        scene.add_component<Value>(entity, {name, VarType::float64, scene.value_pool}); // todo: make add int type
+        scene.add_component<Value>(entity, {name, VarType::float64, scene.value_pool}); // todo: add int type
         scene.get_component<Value>(entity)->set(static_cast<double>(initial_index));
         scene.add_component<MultiHitbox>(entity, multihitbox);
         scene.add_component<RadioButton>(entity, {options, initial_index});
@@ -332,7 +332,7 @@ namespace UI {
         // Create entity
         const EntityID entity = scene.new_entity();
         scene.add_component<UI::Transform>(entity, transform);
-        scene.add_component<Value>(entity, {name, VarType::float64, scene.value_pool}); // todo: make add int type
+        scene.add_component<Value>(entity, {name, VarType::float64, scene.value_pool}); // todo: add int type
         scene.add_component<MouseInteract>(entity);
         scene.add_component<MultiHitbox>(entity, multi_hitbox);
         scene.add_component<Combobox>(entity, combobox);
@@ -364,7 +364,13 @@ namespace UI {
                     color *= 0.7f;
                 }
             }
-            // todo
+            Gfx::draw_rectangle_2d(
+                transform->top_left, transform->bottom_right,
+                {
+                    .color = color, .depth = transform->depth + 0.001f, .anchor_point = transform->anchor,
+                    // todo: rework .texture = ... sprite->sprites[0].tex_path
+                    // todo: rework .tex_scale_mode = ... sprite->sprites[0].tex_type
+                });
             // renderer.draw_box_textured(
             //     *transform, sprite->sprites[0].tex_path, sprite->sprites[0].tex_type, transform->top_left,
             //     transform->bottom_right, color, transform->depth + 0.001f, transform->anchor);
@@ -423,7 +429,6 @@ namespace UI {
                 transform_top_left + Gfx::get_window_size() * anchor_offsets[static_cast<size_t>(transform->anchor)];
             const glm::vec2 offset_from_top_left =
                 (transform_bottom_right - transform_top_left) * anchor_offsets[static_cast<size_t>(text->ui_anchor)];
-            // todo
             // if (!slider)
             // renderer.draw_text(
             //     {transform_top_left, transform_bottom_right, transform->depth, transform->anchor}, text->text,
@@ -482,29 +487,55 @@ namespace UI {
             if (draggable && draggable->is_horizontal) {
                 const float dist_left =
                     static_cast<float>(((val - range->min) / (range->max - range->min) - 0.5)) * 2 * (scale.x - margin);
-                // todo
-                // renderer.draw_line(
-                //     *transform, center + glm::vec2{scale.x, 0}, center - glm::vec2{scale.x, 0}, {0, 0, 0, 1}, 4,
-                //     transform->depth + 0.0002f);
-                // renderer.draw_line(
-                //     *transform, center + glm::vec2{scale.x, 0}, center - glm::vec2{scale.x, 0}, {1, 1, 1, 1}, 2,
-                //     transform->depth + 0.0001f);
-                // renderer.draw_box_solid(
-                //     *transform, center + glm::vec2{dist_left - 10, -20}, center + glm::vec2{dist_left + 10, +20}, {1, 1, 1,
-                //     1});
+                Gfx::draw_line_2d_pixels(
+                    center + glm::vec2{scale.x, 0}, center - glm::vec2{scale.x, 0},
+                    {
+                        .color        = Colors::WHITE,
+                        .depth        = transform->depth + 0.0002f,
+                        .anchor_point = transform->anchor,
+                        .line_width   = 4.0f,
+                    });
+                Gfx::draw_line_2d_pixels(
+                    center + glm::vec2{scale.x, 0}, center - glm::vec2{scale.x, 0},
+                    {
+                        .color        = Colors::WHITE,
+                        .depth        = transform->depth + 0.0001f,
+                        .anchor_point = transform->anchor,
+                        .line_width   = 2.0f,
+                    });
+                Gfx::draw_rectangle_2d_pixels(
+                    center + glm::vec2{dist_left - 10, -20}, center + glm::vec2{dist_left + 10, +20},
+                    {
+                        .color        = Colors::WHITE,
+                        .depth        = transform->depth,
+                        .anchor_point = transform->anchor,
+                    });
             } else {
                 const float dist_bottom =
                     static_cast<float>(((val - range->min) / (range->max - range->min) - 0.5)) * 2 * -(scale.y - margin);
-                // todo
-                // renderer.draw_line(
-                //     *transform, center + glm::vec2{0, scale.y}, center - glm::vec2{0, scale.y}, {0, 0, 0, 1}, 4,
-                //     transform->depth + 0.0002f);
-                // renderer.draw_line(
-                //     *transform, center + glm::vec2{0, scale.y}, center - glm::vec2{0, scale.y}, {1, 1, 1, 1}, 2,
-                //     transform->depth + 0.0001f);
-                // renderer.draw_box_solid(
-                //     *transform, center + glm::vec2{-20, dist_bottom - 10}, center + glm::vec2{+20, dist_bottom + 10},
-                //     {1, 1, 1, 1});
+                Gfx::draw_line_2d_pixels(
+                    center + glm::vec2{0, scale.y}, center - glm::vec2{0, scale.y},
+                    {
+                        .color        = Colors::WHITE,
+                        .depth        = transform->depth + 0.0002f,
+                        .anchor_point = transform->anchor,
+                        .line_width   = 4.0f,
+                    });
+                Gfx::draw_line_2d_pixels(
+                    center + glm::vec2{0, scale.y}, center - glm::vec2{0, scale.y},
+                    {
+                        .color        = Colors::WHITE,
+                        .depth        = transform->depth + 0.0001f,
+                        .anchor_point = transform->anchor,
+                        .line_width   = 2.0f,
+                    });
+                Gfx::draw_rectangle_2d_pixels(
+                    center + glm::vec2{-20, dist_bottom - 10}, center + glm::vec2{+20, dist_bottom + 10},
+                    {
+                        .color        = Colors::WHITE,
+                        .depth        = transform->depth,
+                        .anchor_point = transform->anchor,
+                    });
             }
         }
 
@@ -598,8 +629,8 @@ namespace UI {
             //     *transform, box_top_left, box_bottom_right, {0, 0, 0, 1}, transform->depth, 0, transform->anchor);
             // if (combobox->current_selected_index != -1)
             //     renderer.draw_text(
-            //         *transform, combobox->list_items[combobox->current_selected_index], transform->top_left + text_offset,
-            //         {2, 2}, {0, 0, 0, 0}, transform->depth - 0.01f, transform->anchor, AnchorPoint::left);
+            //         *transform, combobox->list_items[combobox->current_selected_index], transform->top_left +
+            //         text_offset, {2, 2}, {0, 0, 0, 0}, transform->depth - 0.01f, transform->anchor, AnchorPoint::left);
             // else
             //     renderer.draw_text(
             //         *transform, L"<no item selected>", transform->top_left + text_offset, {2, 2}, {0, 0, 0, 0},
@@ -647,9 +678,9 @@ namespace UI {
                     // Create a hitbox for the current item
                     Hitbox curr_item_hitbox{};
                     // todo
-                    // curr_item_hitbox.top_left     = renderer.apply_anchor_in_pixel_space(box_top_left, transform->anchor);
-                    // curr_item_hitbox.bottom_right = renderer.apply_anchor_in_pixel_space(box_bottom_right,
-                    // transform->anchor);
+                    // curr_item_hitbox.top_left     = renderer.apply_anchor_in_pixel_space(box_top_left,
+                    // transform->anchor); curr_item_hitbox.bottom_right =
+                    // renderer.apply_anchor_in_pixel_space(box_bottom_right, transform->anchor);
 
                     // If the mouse is over it, change the color based on the mouse
                     // todo
@@ -659,7 +690,8 @@ namespace UI {
                     //     }
                     //     if (multi_hitbox->click_states[1] == ClickState::click) {
                     //         // This is a bit cursed, but it'll have to do
-                    //         // We will actually update the combobox selected index in the rendering code, since we already do
+                    //         // We will actually update the combobox selected index in the rendering code, since we
+                    //         already do
                     //         a
                     //         // ton of logic here to figure out where the mouse is anyway
                     //         color *= 0.7f;
@@ -706,14 +738,14 @@ namespace UI {
             //     *transform, transform->top_left, transform->bottom_right, box->color_inner * multiply,
             //     transform->depth + 0.001f, transform->anchor);
             // renderer.draw_box_line(
-            //     *transform, transform->top_left, transform->bottom_right, box->color_outer, box->thickness, transform->depth,
-            //     transform->anchor);
+            //     *transform, transform->top_left, transform->bottom_right, box->color_outer, box->thickness,
+            //     transform->depth, transform->anchor);
         }
     }
 
     inline void system_comp_mouse_interact(Scene& scene) {
-        // Loop over all MouseInteract components, and handle the state. In this loop we also handle click events since that's
-        // literally 2 extra lines of code
+        // Loop over all MouseInteract components, and handle the state. In this loop we also handle click events since
+        // that's literally 2 extra lines of code
         for (const auto entity: scene.view<UI::Transform, MouseInteract>()) {
             const auto* transform = scene.get_component<UI::Transform>(entity);
             const auto* clickable = scene.get_component<Clickable>(entity);
@@ -731,7 +763,8 @@ namespace UI {
             const glm::vec2 br = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
 
             // Determine whether the mouse is inside the component's bounding box
-            const bool is_inside_bb = mouse_pos.x >= tl.x && mouse_pos.y >= tl.y && mouse_pos.x <= br.x && mouse_pos.y <= br.y;
+            const bool is_inside_bb = mouse_pos.x >= tl.x && mouse_pos.y >= tl.y && mouse_pos.x <= br.x && mouse_pos.y <=
+            br.y;
 
             // If the element hasn't been clicked
             if (mouse_interact->state != ClickState::click && input.mouse_held(0) == false) {
@@ -761,12 +794,10 @@ namespace UI {
                 mouse_interact->state = ClickState::idle;
                 input.mouse_visible(true);
             }
-            // If we're hovering over the element and we middle click, AND the component has a value, set that value to default
-            auto* value       = scene.get_component<Value>(entity);
-            const auto* range = scene.get_component<NumberRange>(entity);
-            if (input.mouse_down(2) && value && range && mouse_interact->state == ClickState::hover) {
-                if (value->type == VarType::float64) {
-                    value->set<double>(range->default_value);
+            // If we're hovering over the element and we middle click, AND the component has a value, set that value to
+            default auto* value       = scene.get_component<Value>(entity); const auto* range =
+            scene.get_component<NumberRange>(entity); if (input.mouse_down(2) && value && range && mouse_interact->state ==
+            ClickState::hover) { if (value->type == VarType::float64) { value->set<double>(range->default_value);
                 }
             }
             */
@@ -956,7 +987,8 @@ namespace UI {
             //         float max = combobox->item_height * static_cast<float>(combobox->list_items.size()) -
             //         combobox->list_height; max       = std::max(min, max); combobox->target_scroll_position =
             //         std::clamp(combobox->target_scroll_position, min, max); combobox->current_selected_index =
-            //             std::clamp(combobox->current_selected_index, 0, static_cast<int>(combobox->list_items.size()) - 1);
+            //             std::clamp(combobox->current_selected_index, 0, static_cast<int>(combobox->list_items.size()) -
+            //             1);
             //         value->set<double>(combobox->current_selected_index);
             //     }
             // }
@@ -975,27 +1007,26 @@ namespace UI {
 
     inline void update_entities(Scene& scene, float delta_time) {
         // Render sprites
-        // todo
-        // system_comp_sprite(scene, renderer);
-        // system_comp_special_render(scene, renderer, input);
+        system_comp_sprite(scene);
+        system_comp_special_render(scene);
 
-        // // Render text
-        // system_comp_text(scene, renderer);
+        // Render text
+        system_comp_text(scene);
 
-        // // Handle clickable components
-        // system_comp_mouse_interact(scene, renderer, input);
+        // Handle clickable components
+        system_comp_mouse_interact(scene);
 
-        // // Handle comboboxes - special case: if a combobox is interacted with, don't handle any other ones
-        // bool combobox_handled = false;
-        // system_comp_combobox(scene, input, delta_time, combobox_handled);
+        // Handle comboboxes - special case: if a combobox is interacted with, don't handle any other ones
+        bool combobox_handled = false;
+        system_comp_combobox(scene, delta_time, combobox_handled);
 
-        // if (combobox_handled == false) {
-        //     // Handle other mouse interactable components
-        //     system_comp_draggable_clickable(scene, input);
+        if (combobox_handled == false) {
+            // Handle other mouse interactable components
+            system_comp_draggable_clickable(scene);
 
-        //     // Handle radio buttons
-        //     system_comp_radio_buttons(scene, renderer, input);
-        // }
+            // Handle radio buttons
+            system_comp_radio_buttons(scene);
+        }
 
         // Handle value changes
         for (const auto entity: scene.view<Value, Function>()) {

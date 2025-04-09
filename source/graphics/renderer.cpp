@@ -282,7 +282,7 @@ namespace Gfx {
 
     float get_font_height() { return font->glyph_cell_size.y; }
 
-    void draw_text_pixels(const std::wstring& text, TextDrawParams params) {
+    void draw_text_pixels(const std::wstring_view& text, TextDrawParams params) {
         if (!font) return;
 
         glm::vec2 cur_pos = params.transform.position;
