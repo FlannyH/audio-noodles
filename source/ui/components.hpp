@@ -466,13 +466,12 @@ namespace UI {
             auto* draggable = scene.get_component<Draggable>(entity);
 
             // Draw the slider
-            glm::vec2 top_left = transform->top_left;
+            glm::vec2 top_left     = transform->top_left;
             glm::vec2 bottom_right = transform->bottom_right;
             if (text && draggable) {
                 if (draggable->is_horizontal == false) {
                     bottom_right.y -= Gfx::get_font_height() * text->scale.y;
-                }
-                else {
+                } else {
                     top_left.x += Gfx::get_font_max_width() * 3.2f * text->scale.x;
                 }
             }

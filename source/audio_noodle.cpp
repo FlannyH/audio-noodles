@@ -31,7 +31,8 @@ int main() {
         UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Right));
     UI::create_text(
         scene, "debug_text", {{-128, -128}, {0, 0}, 0.5f, Gfx::AnchorPoint::BottomRight},
-        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::BottomRight));
+        UI::Text(
+            L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::BottomRight));
     UI::create_text(
         scene, "debug_text", {{-64, -128}, {64, 0}, 0.5f, Gfx::AnchorPoint::Bottom},
         UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Bottom));
@@ -45,7 +46,7 @@ int main() {
     // UI::create_wheelknob(scene, "debug_numberbox", { { 300, 600 }, { 200, 700 } }, { 0.0, 100.0, 1.0, 0, 0 });
     UI::create_slider(scene, "debug_numberbox", {{500, 300}, {600, 700}}, {0.0, 100.0, 1.0, 50, 0});
     UI::create_slider(scene, "debug_numberbox", {{600, 300}, {1000, 360}}, {0.0, 100.0, 1.0, 50, 0});
-    
+
     // UI::create_radio_button(scene, "debug_radio_button", { { 700, 400 }, { 1100, 640 } }, std::vector<std::wstring>({
     //     L"hello",
     //     L"there",
