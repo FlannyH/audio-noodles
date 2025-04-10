@@ -50,13 +50,10 @@ namespace Gfx {
 
     float get_delta_time() { return device->get_delta_time(); }
 
-
     float get_fps() { return 1.0f / get_delta_time(); }
-    
-    void set_mouse_visible(bool visible) {
-        device->set_mouse_visible(visible);
-    }
-    
+
+    void set_mouse_visible(bool visible) { device->set_mouse_visible(visible); }
+
     void begin_frame() {
         // Update window size
         int w, h;
@@ -104,14 +101,14 @@ namespace Gfx {
 
     void draw_triangle_2d(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, const DrawParams& draw_params) {
         render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
-            Gfx::anchor_offset(v0.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color,
-            v0.texcoord, draw_params.texture));
+            Gfx::anchor_offset(v0.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color, v0.texcoord,
+            draw_params.texture));
         render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
-            Gfx::anchor_offset(v1.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color,
-            v1.texcoord, draw_params.texture));
+            Gfx::anchor_offset(v1.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color, v1.texcoord,
+            draw_params.texture));
         render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
-            Gfx::anchor_offset(v2.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color,
-            v2.texcoord, draw_params.texture));
+            Gfx::anchor_offset(v2.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color, v2.texcoord,
+            draw_params.texture));
     }
 
     void draw_quad_2d(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, PosTexcoord v3, const DrawParams& draw_params) {
@@ -131,10 +128,10 @@ namespace Gfx {
             const glm::vec2 tc3(draw_params.texcoord_tl.x, draw_params.texcoord_br.y);
             draw_quad_2d({v0, tc0}, {v1, tc1}, {v2, tc2}, {v3, tc3}, draw_params);
         } else {
-            float x1 = std::min(top_left.x, bottom_right.x) + (2.0f * draw_params.rectangle_outline_width / aspect_ratio);
-            float x2 = std::max(top_left.x, bottom_right.x) - (2.0f * draw_params.rectangle_outline_width / aspect_ratio);
-            float y1 = std::min(top_left.y, bottom_right.y) + (2.0f * draw_params.rectangle_outline_width);
-            float y2 = std::max(top_left.y, bottom_right.y) - (2.0f * draw_params.rectangle_outline_width);
+            float x1 = std::min(top_left.x, bottom_right.x) + (draw_params.rectangle_outline_width / aspect_ratio);
+            float x2 = std::max(top_left.x, bottom_right.x) - (draw_params.rectangle_outline_width / aspect_ratio);
+            float y1 = std::min(top_left.y, bottom_right.y) + (draw_params.rectangle_outline_width);
+            float y2 = std::max(top_left.y, bottom_right.y) - (draw_params.rectangle_outline_width);
 
             // Outside coords
             const glm::vec2 v0(top_left.x, top_left.y);
@@ -179,19 +176,23 @@ namespace Gfx {
         draw_rectangle_2d(top_left / window_size, bottom_right / window_size, draw_params);
     }
 
-    glm::vec2 anchor_offset(glm::vec2 top_left, Gfx::AnchorPoint anchor) { 
-        constexpr glm::vec2 anchor_offsets[] = {
-            glm::vec2(-1.0f, 1.0f),  // TopLeft
-            glm::vec2(0.0f, 1.0f),   // Top
-            glm::vec2(1.0f, 1.0f),   // TopRight
-            glm::vec2(-1.0f, 0.0f),  // Left
-            glm::vec2(0.0f, 0.0f),   // Center
-            glm::vec2(1.0f, 0.0f),   // Right
-            glm::vec2(-1.0f, -1.0f), // BottomLeft
-            glm::vec2(0.0f, -1.0f),  // Bottom
-            glm::vec2(1.0f, -1.0f),  // BottomRight
-        };
-        return top_left + anchor_offsets[(size_t)anchor];
+    constexpr glm::vec2 anchor_offsets[] = {
+        glm::vec2(0.0f, 0.0f), // TopLeft
+        glm::vec2(0.5f, 0.0f), // Top
+        glm::vec2(1.0f, 0.0f), // TopRight
+        glm::vec2(0.0f, 0.5f), // Left
+        glm::vec2(0.5f, 0.5f), // Center
+        glm::vec2(1.0f, 0.5f), // Right
+        glm::vec2(0.0f, 1.0f), // BottomLeft
+        glm::vec2(0.5f, 1.0f), // Bottom
+        glm::vec2(1.0f, 1.0f), // BottomRight
+    };
+
+    glm::vec2 anchor_offset(glm::vec2 top_left, Gfx::AnchorPoint anchor) { return top_left + anchor_offsets[(size_t)anchor]; }
+
+    glm::vec2 anchor_offset_pixels(glm::vec2 top_left, Gfx::AnchorPoint anchor, glm::vec2 anchor_size) {
+        if (anchor_size.x == 0.0f || anchor_size.y == 0.0f) anchor_size = window_size;
+        return top_left + anchor_offsets[(size_t)anchor] * anchor_size;
     }
 
     std::shared_ptr<Font> load_font(const std::string& path) {
@@ -292,7 +293,7 @@ namespace Gfx {
 
     float get_font_height() { return font->glyph_cell_size.y; }
 
-    void draw_text_pixels(const std::wstring_view& text, TextDrawParams params) {
+    void draw_text_pixels(const wchar_t* text, TextDrawParams params) {
         if (!font) return;
 
         glm::vec2 cur_pos = params.transform.position;
@@ -301,15 +302,16 @@ namespace Gfx {
         float height = static_cast<float>(font->glyph_cell_size.y) * params.transform.scale.y;
         std::vector<float> widths;
         {
-            float width = 0;
-            for (auto& c: text) {
-                if (c == '\n') {
+            float width      = 0;
+            const wchar_t* c = text - 1;
+            while (*(++c) != 0) {
+                if (*c == '\n') {
                     widths.push_back(width);
                     width = 0;
                     continue;
                 }
 
-                std::vector<int>& wentry = font->wchar_mapping[static_cast<wchar_t>(c)];
+                std::vector<int>& wentry = font->wchar_mapping[(size_t)*c];
                 if (!wentry.empty())
                     width += static_cast<float>(font->glyph_rects[wentry[0]].size.x) * params.transform.scale.x;
             }
@@ -317,59 +319,39 @@ namespace Gfx {
         }
         height *= static_cast<float>(widths.size());
 
-        constexpr glm::vec2 anchor_offsets[] = {
-            {-1, 1},  // top left
-            {0, 1},   // top
-            {1, 1},   // top right
-            {-1, 0},  // left
-            {0, 0},   // center
-            {1, 0},   // right
-            {-1, -1}, // bottom left
-            {0, -1},  // bottom
-            {1, -1},  // bottom right
-        };
-
         // Calculate offsets based on text anchor point
         std::vector<glm::vec3> offsets(widths.size());
         for (size_t i = 0; i < widths.size(); i++) {
-            // Get the offset from the table
-            glm::vec3 offset = glm::vec3(anchor_offsets[static_cast<size_t>(params.text_anchor)], 0);
-
-            // We also need to invert the x-axis
-            offset.x = -offset.x;
-
-            // Since text by default renders from top_left, we need to offset the offset to the center
-            offset.x -= 1;
-            offset.y -= 1;
-
-            // We need to scale this to the width and height of the
-            offset.x *= widths[i] * 0.5f;
-            offset.y *= height * 0.5f;
+            // Apply text anchor
+            glm::vec3 offset = glm::vec3(anchor_offset({0.0f, 0.0f}, params.text_anchor), 0);
+            offset.x *= -widths[i];
+            offset.y *= -height;
 
             // Add it to the offset array
             offsets[i] = offset;
         }
 
-        int width_idx = 0;
-        for (auto& c: text) {
+        int width_idx    = 0;
+        const wchar_t* c = text - 1;
+        while (*(++c) != 0) {
             // Handle newline
-            if (c == '\n') {
+            if (*c == '\n') {
                 cur_pos.x = params.transform.position.x;
                 cur_pos.y += static_cast<float>(font->glyph_cell_size.y) * params.transform.scale.y;
                 width_idx++;
                 continue;
             }
-            if (c == '\r') {
+            if (*c == '\r') {
                 cur_pos.x = params.transform.position.x;
                 continue;
             }
-            if (c == '\t') {
+            if (*c == '\t') {
                 cur_pos.x += static_cast<float>(font->glyph_cell_size.x * 4);
                 continue;
             }
 
             // Create verts
-            std::vector<int>& wentry = font->wchar_mapping[static_cast<wchar_t>(c)];
+            std::vector<int>& wentry = font->wchar_mapping[(size_t)*c];
 
             for (size_t i = 0; i < wentry.size(); i++) {
                 auto wc                 = wentry[i];
@@ -399,7 +381,8 @@ namespace Gfx {
     }
 
     void draw_text_pixels(const std::string& text, TextDrawParams params) {
-        draw_text_pixels(std::wstring(text.begin(), text.end()), params);
+        auto str = std::wstring(text.begin(), text.end());
+        draw_text_pixels(str.c_str(), params);
     }
 
     ResourceID create_buffer(const std::string_view& name, const size_t size, const void* data) {

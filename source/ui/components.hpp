@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 #include "scene.hpp"
 // #include "value_system.hpp"
@@ -15,7 +16,7 @@ namespace UI {
     struct Transform {
         Transform(
             const glm::vec2 tl, const glm::vec2 br, const float dpth = 0.5f,
-            const Gfx::AnchorPoint anch = Gfx::AnchorPoint::BottomLeft) {
+            const Gfx::AnchorPoint anch = Gfx::AnchorPoint::TopLeft) {
             const float x_min = std::min(tl.x, br.x);
             const float x_max = std::max(tl.x, br.x);
             const float y_min = std::min(tl.y, br.y);
@@ -71,8 +72,8 @@ namespace UI {
             text_length = string.size() + 1;
             text        = new wchar_t[text_length];
             memcpy(text, string.data(), (string.size() + 1) * sizeof(string[0]));
-            ui_anchor   = txt_anchr;
-            text_anchor = ui_anchr;
+            ui_anchor   = ui_anchr;
+            text_anchor = txt_anchr;
             color       = col;
             scale       = scl;
         }
@@ -252,7 +253,7 @@ namespace UI {
             L"",
             {2, 2},
             {1, 1, 1, 1},
-            Gfx::AnchorPoint::Center,
+            Gfx::AnchorPoint::Bottom,
             Gfx::AnchorPoint::Bottom,
         }) {
         const glm::vec2 scale    = transform.bottom_right - transform.top_left;
@@ -380,22 +381,11 @@ namespace UI {
 
     inline void system_comp_text(Scene& scene) {
         for (const auto entity: scene.view<UI::Transform, Text>()) {
-            const auto* transform            = scene.get_component<UI::Transform>(entity);
-            auto* text                       = scene.get_component<Text>(entity);
-            auto* value                      = scene.get_component<Value>(entity);
-            const auto* slider               = scene.get_component<Slider>(entity);
-            const auto* range                = scene.get_component<NumberRange>(entity);
-            const glm::vec2 anchor_offsets[] = {
-                {0.5f, 0.5f}, // center
-                {0.0f, 0.0f}, // top left
-                {0.5f, 0.0f}, // top
-                {1.0f, 0.0f}, // top right
-                {1.0f, 0.5f}, // right
-                {1.0f, 1.0f}, // bottom right
-                {0.5f, 1.0f}, // bottom
-                {0.0f, 1.0f}, // bottom left
-                {0.0f, 0.5f}, // left
-            };
+            const auto* transform = scene.get_component<UI::Transform>(entity);
+            auto* text            = scene.get_component<Text>(entity);
+            auto* value           = scene.get_component<Value>(entity);
+            const auto* slider    = scene.get_component<Slider>(entity);
+            const auto* range     = scene.get_component<NumberRange>(entity);
 
             if (value) {
                 if (value->type == VarType::wstring) {
@@ -422,24 +412,37 @@ namespace UI {
             }
 
             // Calculate position relative to top_left
-            glm::vec2 transform_top_left     = transform->top_left + text->margins;
-            glm::vec2 transform_bottom_right = transform->bottom_right - text->margins;
+            const glm::vec2 transform_top_left     = transform->top_left;     // + text->margins;
+            const glm::vec2 transform_bottom_right = transform->bottom_right; // - text->margins;
+            const glm::vec2 transform_rect_size    = transform_bottom_right - transform_top_left;
 
-            // todo: panels instead of full window
-            const glm::vec2 top_left =
-                transform_top_left + Gfx::get_window_size() * anchor_offsets[static_cast<size_t>(transform->anchor)];
-            const glm::vec2 offset_from_top_left =
-                (transform_bottom_right - transform_top_left) * anchor_offsets[static_cast<size_t>(text->ui_anchor)];
-            // if (!slider)
-            // renderer.draw_text(
-            //     {transform_top_left, transform_bottom_right, transform->depth, transform->anchor}, text->text,
-            //     top_left + offset_from_top_left, text->scale, text->color, transform->depth, AnchorPoint::top_left,
-            //     text->text_anchor);
-            // else
-            // renderer.draw_text(
-            //     {{-9999, -9999}, {9999, 9999}, transform->depth, transform->anchor}, text->text,
-            //     top_left + offset_from_top_left, text->scale, text->color, transform->depth, AnchorPoint::top_left,
-            //     text->text_anchor);
+            const glm::vec2 anchored_top_left = Gfx::anchor_offset_pixels(transform_top_left, transform->anchor);
+            const glm::vec2 ui_anchored_top_left =
+                Gfx::anchor_offset_pixels(anchored_top_left, text->ui_anchor, transform_rect_size);
+            Gfx::draw_rectangle_2d_pixels(
+                anchored_top_left, anchored_top_left + transform_rect_size,
+                {
+                    .color                   = {1.0f, 1.0f, 1.0f, 1.0f},
+                    .anchor_point            = Gfx::AnchorPoint::TopLeft,
+                    .rectangle_outline_width = 2.0f,
+                });
+            Gfx::draw_rectangle_2d_pixels(
+                ui_anchored_top_left - glm::vec2(2.0f, 2.0f), ui_anchored_top_left + glm::vec2(2.0f, 2.0f),
+                {
+                    .color                   = {1.0f, 0.0f, 0.0f, 1.0f},
+                    .anchor_point            = Gfx::AnchorPoint::TopLeft,
+                    .rectangle_outline_width = 2.0f,
+                });
+
+            Gfx::draw_text_pixels(
+                text->text,
+                (Gfx::TextDrawParams){
+                    .transform =
+                        {.position = glm::vec3(ui_anchored_top_left, transform->depth), .scale = glm::vec3(text->scale, 1.0f)},
+                    .position_anchor = Gfx::AnchorPoint::TopLeft,
+                    .text_anchor     = text->text_anchor,
+                    .color           = text->color,
+                });
 #ifdef _DEBUG
             // todo
             // renderer.draw_circle_solid(*transform, top_left, {4, 4}, {1, 0, 1, 1});
@@ -756,8 +759,8 @@ namespace UI {
             // Get mouse position, and get an actual correct top-left and bottom-right
             // todo
             const glm::vec2 mouse_pos = Input::mouse_position_pixels();
-            glm::vec2 tl_             = Gfx::anchor_offset(transform->top_left, transform->anchor);
-            glm::vec2 br_             = Gfx::anchor_offset(transform->bottom_right, transform->anchor);
+            glm::vec2 tl_             = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor);
+            glm::vec2 br_             = Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor);
             const glm::vec2 tl        = {std::min(tl_.x, br_.x), std::min(tl_.y, br_.y)};
             const glm::vec2 br        = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
 
@@ -795,7 +798,8 @@ namespace UI {
             // If we're hovering over the element and we middle click, AND the component has a value, set that value to default
             auto* value       = scene.get_component<Value>(entity);
             const auto* range = scene.get_component<NumberRange>(entity);
-            if (Input::mouse_button_pressed(Input::MouseButton::Middle) && value && range && mouse_interact->state == ClickState::hover) {
+            if (Input::mouse_button_pressed(Input::MouseButton::Middle) && value && range &&
+                mouse_interact->state == ClickState::hover) {
                 if (value->type == VarType::float64) {
                     value->set<double>(range->default_value);
                 }

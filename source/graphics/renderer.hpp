@@ -92,12 +92,15 @@ namespace Gfx {
     draw_quad_2d_pixels(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, PosTexcoord v3, const DrawParams& draw_params = {});
     void draw_rectangle_2d_pixels(glm::vec2 top_left, glm::vec2 bottom_right, DrawParams draw_params = {});
     glm::vec2 anchor_offset(glm::vec2 top_left, Gfx::AnchorPoint anchor);
+    glm::vec2 anchor_offset_pixels(
+        glm::vec2 top_left, Gfx::AnchorPoint anchor,
+        glm::vec2 anchor_size = glm::vec2(0.0f, 0.0f)); // if anchor_size == 0, it uses the window size
 
     // Text
     std::shared_ptr<Font> load_font(const std::string& path);
     float get_font_height();
     void draw_text_pixels(const std::string& text, TextDrawParams params);
-    void draw_text_pixels(const std::wstring_view& text, TextDrawParams params);
+    void draw_text_pixels(const wchar_t* text, TextDrawParams params);
 
     // Resources
     ResourceID create_buffer(const std::string_view& name, const size_t size, const void* data = nullptr);
