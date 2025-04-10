@@ -293,6 +293,8 @@ namespace Gfx {
 
     float get_font_height() { return font->glyph_cell_size.y; }
 
+    float get_font_max_width() { return font->glyph_cell_size.x; }
+
     void draw_text_pixels(const wchar_t* text, TextDrawParams params) {
         if (!font) return;
 

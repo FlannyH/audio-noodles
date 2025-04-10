@@ -99,6 +99,7 @@ namespace Gfx {
     // Text
     std::shared_ptr<Font> load_font(const std::string& path);
     float get_font_height();
+    float get_font_max_width();
     void draw_text_pixels(const std::string& text, TextDrawParams params);
     void draw_text_pixels(const wchar_t* text, TextDrawParams params);
 

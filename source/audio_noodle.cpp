@@ -19,32 +19,33 @@ int main() {
     //     }, { L"Button1", {2, 2},  { 1, 0, 0, 1 }, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Center});
     UI::create_text(
         scene, "debug_text", {{0, 0}, {128, 128}, 0.5f, Gfx::AnchorPoint::TopLeft},
-        UI::Text(L"XxX", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::TopLeft));
+        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::TopLeft));
     UI::create_text(
         scene, "debug_text", {{-64, 0}, {64, 128}, 0.5f, Gfx::AnchorPoint::Top},
-        UI::Text(L"XXx", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Top));
+        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Top));
     UI::create_text(
         scene, "debug_text", {{-128, 0}, {0, 128}, 0.5f, Gfx::AnchorPoint::TopRight},
-        UI::Text(L"XxX", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::TopRight));
+        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::TopRight));
     UI::create_text(
         scene, "debug_text", {{-128, -64}, {0, 64}, 0.5f, Gfx::AnchorPoint::Right},
-        UI::Text(L"XXx", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Right));
+        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Right));
     UI::create_text(
         scene, "debug_text", {{-128, -128}, {0, 0}, 0.5f, Gfx::AnchorPoint::BottomRight},
-        UI::Text(L"XxX", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::BottomRight));
+        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::BottomRight));
     UI::create_text(
         scene, "debug_text", {{-64, -128}, {64, 0}, 0.5f, Gfx::AnchorPoint::Bottom},
-        UI::Text(L"XxX", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Bottom));
+        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Bottom));
     UI::create_text(
         scene, "debug_text", {{0, -128}, {128, 0}, 0.5f, Gfx::AnchorPoint::BottomLeft},
-        UI::Text(L"XxX", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::BottomLeft));
+        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::BottomLeft));
     UI::create_text(
         scene, "debug_text", {{0, -64}, {128, 64}, 0.5f, Gfx::AnchorPoint::Left},
-        UI::Text(L"XxX", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Left));
+        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Left));
     // UI::create_numberbox(scene, "debug_numberbox", { { 100, 600 }, { 200, 700 } }, { 0.0, 100.0, 1.0, 0, 0 });
     // UI::create_wheelknob(scene, "debug_numberbox", { { 300, 600 }, { 200, 700 } }, { 0.0, 100.0, 1.0, 0, 0 });
     UI::create_slider(scene, "debug_numberbox", {{500, 300}, {600, 700}}, {0.0, 100.0, 1.0, 50, 0});
-    UI::create_slider(scene, "debug_numberbox", {{600, 300}, {1000, 360}}, {0.0, 100.0, 1.0, 50, 0}, false);
+    UI::create_slider(scene, "debug_numberbox", {{600, 300}, {1000, 360}}, {0.0, 100.0, 1.0, 50, 0});
+    
     // UI::create_radio_button(scene, "debug_radio_button", { { 700, 400 }, { 1100, 640 } }, std::vector<std::wstring>({
     //     L"hello",
     //     L"there",

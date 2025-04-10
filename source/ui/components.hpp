@@ -259,8 +259,8 @@ namespace UI {
         const glm::vec2 scale    = transform.bottom_right - transform.top_left;
         const bool is_horizontal = (scale.x) > (scale.y);
         if (is_horizontal) {
-            text.ui_anchor   = Gfx::AnchorPoint::Bottom;
-            text.text_anchor = Gfx::AnchorPoint::Top;
+            text.ui_anchor   = Gfx::AnchorPoint::Left;
+            text.text_anchor = Gfx::AnchorPoint::Left;
         }
 
         const EntityID entity = scene.new_entity();
@@ -419,20 +419,6 @@ namespace UI {
             const glm::vec2 anchored_top_left = Gfx::anchor_offset_pixels(transform_top_left, transform->anchor);
             const glm::vec2 ui_anchored_top_left =
                 Gfx::anchor_offset_pixels(anchored_top_left, text->ui_anchor, transform_rect_size);
-            Gfx::draw_rectangle_2d_pixels(
-                anchored_top_left, anchored_top_left + transform_rect_size,
-                {
-                    .color                   = {1.0f, 1.0f, 1.0f, 1.0f},
-                    .anchor_point            = Gfx::AnchorPoint::TopLeft,
-                    .rectangle_outline_width = 2.0f,
-                });
-            Gfx::draw_rectangle_2d_pixels(
-                ui_anchored_top_left - glm::vec2(2.0f, 2.0f), ui_anchored_top_left + glm::vec2(2.0f, 2.0f),
-                {
-                    .color                   = {1.0f, 0.0f, 0.0f, 1.0f},
-                    .anchor_point            = Gfx::AnchorPoint::TopLeft,
-                    .rectangle_outline_width = 2.0f,
-                });
 
             Gfx::draw_text_pixels(
                 text->text,
@@ -480,12 +466,18 @@ namespace UI {
             auto* draggable = scene.get_component<Draggable>(entity);
 
             // Draw the slider
+            glm::vec2 top_left = transform->top_left;
             glm::vec2 bottom_right = transform->bottom_right;
-            if (text && draggable && draggable->is_horizontal == false) {
-                bottom_right.y -= Gfx::get_font_height() * text->scale.y;
+            if (text && draggable) {
+                if (draggable->is_horizontal == false) {
+                    bottom_right.y -= Gfx::get_font_height() * text->scale.y;
+                }
+                else {
+                    top_left.x += Gfx::get_font_max_width() * 3.2f * text->scale.x;
+                }
             }
-            const glm::vec2 center = (transform->top_left + bottom_right) / 2.0f;
-            const glm::vec2 scale  = center - transform->top_left;
+            const glm::vec2 center = (top_left + bottom_right) / 2.0f;
+            const glm::vec2 scale  = center - top_left;
             double& val            = value->get_as_ref<double>();
             float margin           = 8;
             if (draggable && draggable->is_horizontal) {
