@@ -3,6 +3,7 @@
 #include "mixer.hpp"
 #include "session.hpp"
 #include "ui/scene.hpp"
+#include "ui/panel.hpp"
 #include "ui/components.hpp"
 #include "graphics/renderer.hpp"
 
@@ -12,7 +13,8 @@ int main() {
     Gfx::init(Gfx::RenderAPI::OpenGL, 1280, 720, "Audio Noodles");
     Session::tracks().push_back(Track{});
 
-    UI::Scene scene;
+    UI::Panel panel{.top_left = {0, 0}, .size = {512, 512}};
+    auto& scene = panel.scene;
     // UI::create_button(scene, { { -100, -150 }, { 100, -250 }, 0.0f, Gfx::AnchorPoint::Center }, []()
     //     {
     //         printf("hi1!\n");
@@ -77,7 +79,7 @@ int main() {
         Input::update();
 
         Gfx::begin_frame();
-        UI::update_entities(scene, Gfx::get_delta_time());
+        panel.update(Gfx::get_delta_time());
         Gfx::end_frame();
 
         // todo: move this to separate thread
