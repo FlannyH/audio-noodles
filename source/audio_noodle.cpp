@@ -13,7 +13,7 @@ int main() {
     Gfx::init(Gfx::RenderAPI::OpenGL, 1280, 720, "Audio Noodles");
     Session::tracks().push_back(Track{});
 
-    UI::Panel panel{.top_left = {0, 0}, .size = {512, 512}};
+    UI::Panel panel{.top_left = {0, 0}, .size = {1024, 1024}};
     auto& scene = panel.scene;
     // UI::create_button(scene, { { -100, -150 }, { 100, -250 }, 0.0f, Gfx::AnchorPoint::Center }, []()
     //     {
@@ -79,6 +79,8 @@ int main() {
         Input::update();
 
         Gfx::begin_frame();
+        panel.top_left.x += 0.15f;
+        panel.top_left.y += 0.075f;
         panel.update(Gfx::get_delta_time());
         Gfx::end_frame();
 

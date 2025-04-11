@@ -416,7 +416,7 @@ namespace UI {
             const glm::vec2 transform_bottom_right = transform->bottom_right; // - text->margins;
             const glm::vec2 transform_rect_size    = transform_bottom_right - transform_top_left;
 
-            const glm::vec2 anchored_top_left = Gfx::anchor_offset_pixels(transform_top_left, transform->anchor);
+            const glm::vec2 anchored_top_left = Gfx::anchor_offset_pixels(transform_top_left + scene.top_left, transform->anchor, scene.panel_size);
             const glm::vec2 ui_anchored_top_left =
                 Gfx::anchor_offset_pixels(anchored_top_left, text->ui_anchor, transform_rect_size);
 
@@ -466,8 +466,8 @@ namespace UI {
             auto* draggable = scene.get_component<Draggable>(entity);
 
             // Draw the slider
-            glm::vec2 top_left     = transform->top_left;
-            glm::vec2 bottom_right = transform->bottom_right;
+            glm::vec2 top_left     = transform->top_left + scene.top_left;
+            glm::vec2 bottom_right = transform->bottom_right + scene.top_left;
             if (text && draggable) {
                 if (draggable->is_horizontal == false) {
                     bottom_right.y -= Gfx::get_font_height() * text->scale.y;
@@ -750,8 +750,8 @@ namespace UI {
             // Get mouse position, and get an actual correct top-left and bottom-right
             // todo
             const glm::vec2 mouse_pos = Input::mouse_position_pixels();
-            glm::vec2 tl_             = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor);
-            glm::vec2 br_             = Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor);
+            glm::vec2 tl_             = Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+            glm::vec2 br_             = Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
             const glm::vec2 tl        = {std::min(tl_.x, br_.x), std::min(tl_.y, br_.y)};
             const glm::vec2 br        = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
 

@@ -2,6 +2,7 @@
 #include "value_system.hpp"
 #include "../log.hpp"
 #include <vector>
+#include <glm/vec2.hpp>
 
 #define MAX_ENTITIES 1024
 
@@ -59,6 +60,8 @@ namespace UI {
       public:
         Scene() { view_out = new EntityID[8192]; }
         EntityID new_entity();
+        void update_extents(glm::vec2 top_left, glm::vec2 size);
+
         // Add a component from an entity, initializing the component by copying an existing object
         template <typename T> void add_component(EntityID entity, T comp);
 
@@ -77,6 +80,8 @@ namespace UI {
 
         // This stores the variables that this plugin instance will use
         ValuePool value_pool;
+        glm::vec2 top_left;
+        glm::vec2 panel_size;
 
       private:
         std::vector<Pool> pools = std::vector<Pool>(64);
@@ -186,5 +191,10 @@ namespace UI {
         // If this fails, there's a problem
         LOG(Error, "Ran out of entity slots!");
         throw;
+    }
+    
+    inline void Scene::update_extents(glm::vec2 top_left, glm::vec2 size) {
+        this->top_left = top_left;
+        this->panel_size = size;
     }
 } // namespace UI
