@@ -11,6 +11,8 @@ uniform layout (location = 0) int texture_bound;
 void main() {
     frag_color = out_color;
     if (texture_bound == 1) {
-        frag_color *= texture(tex, out_texcoord);
+        vec4 tex = texture(tex, out_texcoord);
+        if (tex.a < 0.5f) discard;
+        frag_color *= tex;
     } 
 }
