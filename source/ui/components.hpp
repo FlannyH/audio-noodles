@@ -998,8 +998,8 @@ namespace UI {
         }
     }
 
-    inline void update_entities(Scene& scene, float delta_time) {
-        Gfx::set_clip_rect(scene.top_left, scene.panel_size);
+    inline void update_entities(Scene& scene, float delta_time, float window_bar_size) {
+        Gfx::set_clip_rect(scene.top_left - glm::vec2(0, window_bar_size), scene.panel_size + glm::vec2(0, window_bar_size));
 
         // Render sprites
         system_comp_sprite(scene);

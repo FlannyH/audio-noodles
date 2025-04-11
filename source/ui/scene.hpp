@@ -60,7 +60,7 @@ namespace UI {
       public:
         Scene() { view_out = new EntityID[8192]; }
         EntityID new_entity();
-        void update_extents(glm::vec2 top_left, glm::vec2 size);
+        void update_extents(glm::vec2 top_left, glm::vec2 size, float window_bar_height);
 
         // Add a component from an entity, initializing the component by copying an existing object
         template <typename T> void add_component(EntityID entity, T comp);
@@ -193,8 +193,10 @@ namespace UI {
         throw;
     }
     
-    inline void Scene::update_extents(glm::vec2 top_left, glm::vec2 size) {
+    inline void Scene::update_extents(glm::vec2 top_left, glm::vec2 size, float window_bar_height) {
         this->top_left = top_left;
+        this->top_left.y += window_bar_height;
         this->panel_size = size;
+        this->panel_size.y -= window_bar_height;
     }
 } // namespace UI
