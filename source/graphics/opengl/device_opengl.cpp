@@ -183,8 +183,10 @@ namespace Gfx {
     void DeviceOpenGL::end_frame() { glfwSwapBuffers(window); }
 
     void DeviceOpenGL::clear_framebuffer(glm::vec4 color) {
+        gl::glDisable(gl::GL_SCISSOR_TEST);
         gl::glClearColor(color.r, color.g, color.b, color.a);
         gl::glClear(gl::ClearBufferMask::GL_COLOR_BUFFER_BIT);
+        gl::glEnable(gl::GL_SCISSOR_TEST);
     }
 
     void DeviceOpenGL::set_camera(const Transform& transform) { TODO(); }
