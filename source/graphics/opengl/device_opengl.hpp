@@ -23,6 +23,7 @@ namespace Gfx {
         void end_frame() override;
         void clear_framebuffer(glm::vec4 color);
         void set_camera(const Transform& transform) override;
+        void set_clip_rect(glm::vec2 top_left, glm::vec2 size) override;
         float get_delta_time() override;
 
         // Rendering pipelines

@@ -78,6 +78,7 @@ namespace Gfx {
     // Rendering
     void begin_frame();
     void end_frame();
+    void set_clip_rect(glm::vec2 top_left = {0.0f, 0.0f}, glm::vec2 size = {99999.0f, 99999.0f});
 
     // 2D rendering in normalized device coordinates (-1.0 to 1.0)
     void draw_line_2d(glm::vec2 v0, glm::vec2 v1, const DrawParams& draw_params = {});

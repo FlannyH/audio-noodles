@@ -189,6 +189,16 @@ namespace Gfx {
 
     void DeviceOpenGL::set_camera(const Transform& transform) { TODO(); }
 
+    void DeviceOpenGL::set_clip_rect(glm::vec2 top_left, glm::vec2 size) {
+        int w, h;
+        this->get_window_size(w, h);
+        const gl::GLint left   = (gl::GLint)top_left.x;
+        const gl::GLint top    = h - (gl::GLint)top_left.y - size.y;
+        const gl::GLint width  = (gl::GLint)size.x;
+        const gl::GLint height = (gl::GLint)size.y;
+        gl::glScissor(left, top, width, height);
+    }
+
     float DeviceOpenGL::get_delta_time() { return (float)delta_time; }
 
     ResourceID DeviceOpenGL::load_pipeline_raster(const char* shader_vs, const char* shader_ps) {
@@ -228,6 +238,7 @@ namespace Gfx {
         auto pipeline      = resources.at(raster_pipeline.id); // no need to cast, only accessing variables from base class
         gl::glUseProgram(pipeline->gpu_handle32);
         gl::glBindVertexArray(empty_vao);
+        gl::glEnable(gl::GL_SCISSOR_TEST);
         gl::glUniform1i(0, 0); // texture_bound = 0
     }
 

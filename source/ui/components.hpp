@@ -416,7 +416,8 @@ namespace UI {
             const glm::vec2 transform_bottom_right = transform->bottom_right; // - text->margins;
             const glm::vec2 transform_rect_size    = transform_bottom_right - transform_top_left;
 
-            const glm::vec2 anchored_top_left = Gfx::anchor_offset_pixels(transform_top_left + scene.top_left, transform->anchor, scene.panel_size);
+            const glm::vec2 anchored_top_left =
+                Gfx::anchor_offset_pixels(transform_top_left + scene.top_left, transform->anchor, scene.panel_size);
             const glm::vec2 ui_anchored_top_left =
                 Gfx::anchor_offset_pixels(anchored_top_left, text->ui_anchor, transform_rect_size);
 
@@ -750,10 +751,12 @@ namespace UI {
             // Get mouse position, and get an actual correct top-left and bottom-right
             // todo
             const glm::vec2 mouse_pos = Input::mouse_position_pixels();
-            glm::vec2 tl_             = Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
-            glm::vec2 br_             = Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
-            const glm::vec2 tl        = {std::min(tl_.x, br_.x), std::min(tl_.y, br_.y)};
-            const glm::vec2 br        = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
+            glm::vec2 tl_ =
+                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+            glm::vec2 br_ =
+                Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
+            const glm::vec2 tl = {std::min(tl_.x, br_.x), std::min(tl_.y, br_.y)};
+            const glm::vec2 br = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
 
             // Determine whether the mouse is inside the component's bounding box
             const bool is_inside_bb = mouse_pos.x >= tl.x && mouse_pos.y >= tl.y && mouse_pos.x <= br.x && mouse_pos.y <= br.y;
@@ -996,6 +999,8 @@ namespace UI {
     }
 
     inline void update_entities(Scene& scene, float delta_time) {
+        Gfx::set_clip_rect(scene.top_left, scene.panel_size);
+
         // Render sprites
         system_comp_sprite(scene);
         system_comp_special_render(scene);
@@ -1037,5 +1042,6 @@ namespace UI {
             //     *transform, transform->top_left, transform->bottom_right, {1, 0, 1, 1}, 1, 0, transform->anchor);
         }
 #endif
+        // Gfx::set_clip_rect();
     }
 } // namespace UI

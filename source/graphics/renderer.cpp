@@ -82,6 +82,10 @@ namespace Gfx {
         device->end_frame();
     }
 
+    void set_clip_rect(glm::vec2 top_left, glm::vec2 size) {
+        device->set_clip_rect(top_left, size);
+    }
+
     void draw_line_2d(glm::vec2 a, glm::vec2 b, const DrawParams& draw_params) {
         float width = draw_params.line_width;
         if (width * window_size.y < 0.5f) {
