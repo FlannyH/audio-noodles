@@ -79,8 +79,6 @@ int main() {
         Input::update();
 
         Gfx::begin_frame();
-        panel.top_left.x += 0.15f;
-        panel.top_left.y += 0.075f;
         panel.update(Gfx::get_delta_time());
         Gfx::end_frame();
 
