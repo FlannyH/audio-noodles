@@ -76,6 +76,7 @@ int main() {
     // );
 
     while (Gfx::should_stay_open()) {
+        Gfx::set_cursor_mode(Gfx::CursorMode::Arrow);
         Input::update();
 
         Gfx::begin_frame();

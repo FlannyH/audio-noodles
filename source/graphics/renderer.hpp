@@ -74,9 +74,10 @@ namespace Gfx {
     float get_delta_time();
     float get_fps();
     void set_mouse_visible(bool visible);
+    void set_cursor_mode(CursorMode cursor_mode);
 
-    // Rendering
-    void begin_frame();
+        // Rendering
+        void begin_frame();
     void end_frame();
     void set_clip_rect(glm::vec2 top_left = {0.0f, 0.0f}, glm::vec2 size = {99999.0f, 99999.0f});
 

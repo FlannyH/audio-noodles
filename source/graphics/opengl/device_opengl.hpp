@@ -47,6 +47,7 @@ namespace Gfx {
         // Input
         void input_setup() override;
         void set_mouse_visible(bool visible) override;
+        void set_cursor_mode(Gfx::CursorMode cursor_mode) override;
 
       private:
         PairResourceID allocate_resource_slot(const ResourceType type);
@@ -57,6 +58,7 @@ namespace Gfx {
         std::deque<uint32_t> recycled_resource_slots;
         uint32_t empty_vao;
         double delta_time = 0.0;
+        std::vector<GLFWcursor*> cursors;
 
         ResourceID render_pass_active = ResourceID::invalid();
     };

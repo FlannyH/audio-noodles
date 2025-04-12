@@ -95,4 +95,6 @@ namespace Gfx {
     struct PipelineResource {
         Resource base;
     };
+
+    enum class CursorMode { Arrow = 0, IBeam, Crosshair, Hand, ResizeEW, ResizeNS, ResizeNWSE, ResizeNESW, Denied };
 } // namespace Gfx

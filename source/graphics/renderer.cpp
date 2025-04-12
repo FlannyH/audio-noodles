@@ -54,6 +54,10 @@ namespace Gfx {
 
     void set_mouse_visible(bool visible) { device->set_mouse_visible(visible); }
 
+    void set_cursor_mode(CursorMode cursor_mode) {
+        device->set_cursor_mode(cursor_mode);
+    }
+
     void begin_frame() {
         // Update window size
         int w, h;

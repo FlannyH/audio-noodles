@@ -154,6 +154,16 @@ namespace Gfx {
         gl::glGenVertexArrays(1, &empty_vao);
 
         input_setup();
+
+        cursors.push_back(glfwCreateStandardCursor(GLFW_ARROW_CURSOR));
+        cursors.push_back(glfwCreateStandardCursor(GLFW_IBEAM_CURSOR));
+        cursors.push_back(glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR));
+        cursors.push_back(glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR));
+        cursors.push_back(glfwCreateStandardCursor(GLFW_RESIZE_EW_CURSOR));
+        cursors.push_back(glfwCreateStandardCursor(GLFW_RESIZE_NS_CURSOR));
+        cursors.push_back(glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR));
+        cursors.push_back(glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR));
+        cursors.push_back(glfwCreateStandardCursor(GLFW_RESIZE_ALL_CURSOR));
     }
 
     void DeviceOpenGL::handle_resize(int width, int height) { gl::glViewport(0, 0, width, height); }
@@ -496,6 +506,10 @@ namespace Gfx {
 
     void DeviceOpenGL::set_mouse_visible(bool visible) {
         glfwSetInputMode(window, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+    }
+
+    void DeviceOpenGL::set_cursor_mode(Gfx::CursorMode cursor_mode) {
+        glfwSetCursor(this->window, this->cursors[(size_t)cursor_mode]);
     }
 
     PairResourceID DeviceOpenGL::allocate_resource_slot(const ResourceType type) {

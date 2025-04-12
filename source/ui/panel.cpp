@@ -10,10 +10,16 @@ namespace UI {
         constexpr float double_click_time = 0.3f;
 
         // Window dragging
-        if (Input::mouse_button_pressed(Input::MouseButton::Left) && Input::mouse_position_pixels().x > this->top_left.x &&
-            Input::mouse_position_pixels().x < this->top_left.x + this->size.x &&
-            Input::mouse_position_pixels().y > this->top_left.y &&
-            Input::mouse_position_pixels().y < this->top_left.y + window_bar_height) {
+        const bool is_mouse_inside_title_bar = Input::mouse_position_pixels().x > this->top_left.x &&
+                                               Input::mouse_position_pixels().x < this->top_left.x + this->size.x &&
+                                               Input::mouse_position_pixels().y > this->top_left.y &&
+                                               Input::mouse_position_pixels().y < this->top_left.y + window_bar_height;
+
+        if (is_mouse_inside_title_bar) {
+            Gfx::set_cursor_mode(Gfx::CursorMode::Hand);
+        }
+
+        if (Input::mouse_button_pressed(Input::MouseButton::Left) && is_mouse_inside_title_bar) {
             this->being_dragged        = true;
             this->begin_drag_mouse_pos = Input::mouse_position_pixels();
         }
@@ -60,7 +66,7 @@ namespace UI {
                 } else {
                     this->pre_max_top_left = this->top_left;
                     this->pre_max_size     = this->size;
-                    this->maximized = true;
+                    this->maximized        = true;
                 }
             }
             this->double_click_timer = double_click_time;
@@ -69,8 +75,8 @@ namespace UI {
 
         // Update maximized locations every frame (the user might have resized the parent)
         if (this->maximized) {
-            this->top_left         = glm::vec2(0.0f, 0.0f);
-            this->size             = Gfx::get_window_size();
+            this->top_left = glm::vec2(0.0f, 0.0f);
+            this->size     = Gfx::get_window_size();
         }
 
         // Update panel size

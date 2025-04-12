@@ -1,5 +1,6 @@
 #pragma once
 #include "resource.hpp"
+#include "renderer.hpp"
 #include <string_view>
 #include "../input.hpp"
 
@@ -47,8 +48,9 @@ namespace Gfx {
         virtual void bind_texture(int slot, const ResourceID texture)                                                   = 0;
 
         // Input
-        virtual void input_setup()                   = 0;
-        virtual void set_mouse_visible(bool visible) = 0;
+        virtual void input_setup()                           = 0;
+        virtual void set_mouse_visible(bool visible)         = 0;
+        virtual void set_cursor_mode(Gfx::CursorMode cursor_mode) = 0;
         Input::InputData* fetch_incoming_input_data_pointer();
     };
 } // namespace Gfx
