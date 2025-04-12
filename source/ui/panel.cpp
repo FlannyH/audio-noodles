@@ -6,13 +6,16 @@ namespace UI {
     void Panel::update(float delta_time) {
         constexpr float window_bar_height = 40.0f;
         constexpr float snap_sensitivity  = 32.0f;
+        constexpr float unmax_sensitivity = 32.0f;
+        constexpr float double_click_time = 0.3f;
 
         // Window dragging
         if (Input::mouse_button_pressed(Input::MouseButton::Left) && Input::mouse_position_pixels().x > this->top_left.x &&
             Input::mouse_position_pixels().x < this->top_left.x + this->size.x &&
             Input::mouse_position_pixels().y > this->top_left.y &&
             Input::mouse_position_pixels().y < this->top_left.y + window_bar_height) {
-            this->being_dragged = true;
+            this->being_dragged        = true;
+            this->begin_drag_mouse_pos = Input::mouse_position_pixels();
         }
 
         if (this->being_dragged && Input::mouse_button_released(Input::MouseButton::Left)) {
@@ -23,6 +26,14 @@ namespace UI {
             const glm::vec2 mouse_movement = Input::mouse_movement_pixels();
             const glm::vec2 parent_size    = Gfx::get_window_size(); // todo: nested panels should reference the parent
             this->top_left += mouse_movement;
+
+            // Unmaximize
+            if (this->maximized &&
+                glm::distance(Input::mouse_position_pixels(), this->begin_drag_mouse_pos) > unmax_sensitivity) {
+                this->top_left  = Input::mouse_position_pixels() - glm::vec2(this->size.x / 2.0f, window_bar_height / 2.0f);
+                this->size      = this->pre_max_size;
+                this->maximized = false;
+            }
 
             // Snap to sides
             if (mouse_movement.x < 0.0f && this->top_left.x < snap_sensitivity) {
@@ -37,6 +48,29 @@ namespace UI {
             if (mouse_movement.y > 0.0f && (parent_size.y - this->top_left.y - this->size.y) < snap_sensitivity) {
                 this->top_left.y = parent_size.y - this->size.y;
             }
+        }
+
+        // Double click title bar to maximize and unmaximize
+        if (Input::mouse_button_pressed(Input::MouseButton::Left)) {
+            if (this->double_click_timer > 0.0f) {
+                if (this->maximized) {
+                    this->top_left  = this->pre_max_top_left;
+                    this->size      = this->pre_max_size;
+                    this->maximized = false;
+                } else {
+                    this->pre_max_top_left = this->top_left;
+                    this->pre_max_size     = this->size;
+                    this->maximized = true;
+                }
+            }
+            this->double_click_timer = double_click_time;
+        }
+        double_click_timer -= delta_time;
+
+        // Update maximized locations every frame (the user might have resized the parent)
+        if (this->maximized) {
+            this->top_left         = glm::vec2(0.0f, 0.0f);
+            this->size             = Gfx::get_window_size();
         }
 
         // Update panel size
