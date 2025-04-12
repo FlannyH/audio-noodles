@@ -4,16 +4,18 @@
 namespace UI {
 
     void Panel::update(float delta_time) {
-        constexpr float window_bar_height = 40.0f;
-        constexpr float snap_sensitivity  = 32.0f;
-        constexpr float unmax_sensitivity = 32.0f;
-        constexpr float double_click_time = 0.3f;
+        constexpr float window_bar_height  = 40.0f;
+        constexpr float snap_sensitivity   = 32.0f;
+        constexpr float unmax_sensitivity  = 32.0f;
+        constexpr float resize_sensitivity = 16.0f;
+        constexpr float double_click_time  = 0.3f;
 
         // Window dragging
-        const bool is_mouse_inside_title_bar = Input::mouse_position_pixels().x > this->top_left.x &&
-                                               Input::mouse_position_pixels().x < this->top_left.x + this->size.x &&
-                                               Input::mouse_position_pixels().y > this->top_left.y &&
-                                               Input::mouse_position_pixels().y < this->top_left.y + window_bar_height;
+        const glm::vec2 mouse_pos      = Input::mouse_position_pixels();
+        const glm::vec2 mouse_movement = Input::mouse_movement_pixels();
+        const bool is_mouse_inside_title_bar =
+            mouse_pos.x > this->top_left.x && mouse_pos.x < this->top_left.x + this->size.x && mouse_pos.y > this->top_left.y &&
+            mouse_pos.y < this->top_left.y + window_bar_height;
 
         if (is_mouse_inside_title_bar) {
             Gfx::set_cursor_mode(Gfx::CursorMode::Hand);
@@ -21,7 +23,7 @@ namespace UI {
 
         if (Input::mouse_button_pressed(Input::MouseButton::Left) && is_mouse_inside_title_bar) {
             this->being_dragged        = true;
-            this->begin_drag_mouse_pos = Input::mouse_position_pixels();
+            this->begin_drag_mouse_pos = mouse_pos;
         }
 
         if (this->being_dragged && Input::mouse_button_released(Input::MouseButton::Left)) {
@@ -29,14 +31,12 @@ namespace UI {
         }
 
         if (this->being_dragged) {
-            const glm::vec2 mouse_movement = Input::mouse_movement_pixels();
-            const glm::vec2 parent_size    = Gfx::get_window_size(); // todo: nested panels should reference the parent
+            const glm::vec2 parent_size = Gfx::get_window_size(); // todo: nested panels should reference the parent
             this->top_left += mouse_movement;
 
             // Unmaximize
-            if (this->maximized &&
-                glm::distance(Input::mouse_position_pixels(), this->begin_drag_mouse_pos) > unmax_sensitivity) {
-                this->top_left  = Input::mouse_position_pixels() - glm::vec2(this->pre_max_size.x / 2.0f, window_bar_height / 2.0f);
+            if (this->maximized && glm::distance(mouse_pos, this->begin_drag_mouse_pos) > unmax_sensitivity) {
+                this->top_left  = mouse_pos - glm::vec2(this->pre_max_size.x / 2.0f, window_bar_height / 2.0f);
                 this->size      = this->pre_max_size;
                 this->maximized = false;
             }
@@ -77,6 +77,52 @@ namespace UI {
         if (this->maximized) {
             this->top_left = glm::vec2(0.0f, 0.0f);
             this->size     = Gfx::get_window_size();
+        }
+
+        // Resizing
+        int new_resize_flags   = 0;
+        constexpr int resize_l = 1;
+        constexpr int resize_r = 2;
+        constexpr int resize_t = 4;
+        constexpr int resize_b = 8;
+
+        if (abs(mouse_pos.x - (this->top_left.x + this->size.x)) < resize_sensitivity) new_resize_flags |= resize_l;
+        if (abs(mouse_pos.x - this->top_left.x) < resize_sensitivity) new_resize_flags |= resize_r;
+        if (abs(mouse_pos.y - (this->top_left.y + this->size.y)) < resize_sensitivity) new_resize_flags |= resize_b;
+        if (abs(mouse_pos.y - this->top_left.y) < resize_sensitivity) new_resize_flags |= resize_t;
+
+        if (is_mouse_inside_title_bar == false) { // Only show resize if not focused on the title bar
+            if (new_resize_flags == (resize_l) || new_resize_flags == (resize_r))
+                Gfx::set_cursor_mode(Gfx::CursorMode::ResizeEW);
+            if (new_resize_flags == (resize_t) || new_resize_flags == (resize_b))
+                Gfx::set_cursor_mode(Gfx::CursorMode::ResizeNS);
+            if (new_resize_flags == (resize_t | resize_l) || new_resize_flags == (resize_b | resize_r))
+                Gfx::set_cursor_mode(Gfx::CursorMode::ResizeNESW);
+            if (new_resize_flags == (resize_t | resize_r) || new_resize_flags == (resize_b | resize_l))
+                Gfx::set_cursor_mode(Gfx::CursorMode::ResizeNWSE);
+        }
+
+        if (is_mouse_inside_title_bar == false && Input::mouse_button_pressed(Input::MouseButton::Left)) {
+            this->resize_flags  = new_resize_flags;
+            this->being_resized = true;
+        }
+
+        if (this->being_resized) {
+            if (this->resize_flags & resize_r) {
+                this->top_left.x += mouse_movement.x;
+                this->size.x -= mouse_movement.x;
+            }
+            if (this->resize_flags & resize_l) {
+                this->size.x += mouse_movement.x;
+            }
+            if (this->resize_flags & resize_b) {
+                this->size.y += mouse_movement.y;
+            }
+            if (this->resize_flags & resize_t) {
+                this->top_left.y += mouse_movement.y;
+                this->size.y -= mouse_movement.y;
+            }
+            if (Input::mouse_button_released(Input::MouseButton::Left)) this->being_resized = false;
         }
 
         // Update panel size
