@@ -36,7 +36,7 @@ namespace UI {
             // Unmaximize
             if (this->maximized &&
                 glm::distance(Input::mouse_position_pixels(), this->begin_drag_mouse_pos) > unmax_sensitivity) {
-                this->top_left  = Input::mouse_position_pixels() - glm::vec2(this->size.x / 2.0f, window_bar_height / 2.0f);
+                this->top_left  = Input::mouse_position_pixels() - glm::vec2(this->pre_max_size.x / 2.0f, window_bar_height / 2.0f);
                 this->size      = this->pre_max_size;
                 this->maximized = false;
             }
@@ -57,7 +57,7 @@ namespace UI {
         }
 
         // Double click title bar to maximize and unmaximize
-        if (Input::mouse_button_pressed(Input::MouseButton::Left)) {
+        if (is_mouse_inside_title_bar && Input::mouse_button_pressed(Input::MouseButton::Left)) {
             if (this->double_click_timer > 0.0f) {
                 if (this->maximized) {
                     this->top_left  = this->pre_max_top_left;
