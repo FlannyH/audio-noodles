@@ -749,7 +749,6 @@ namespace UI {
             auto* mouse_interact  = scene.get_component<MouseInteract>(entity);
 
             // Get mouse position, and get an actual correct top-left and bottom-right
-            // todo
             const glm::vec2 mouse_pos = Input::mouse_position_pixels();
             glm::vec2 tl_ =
                 Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
@@ -797,6 +796,10 @@ namespace UI {
                 if (value->type == VarType::float64) {
                     value->set<double>(range->default_value);
                 }
+            }
+            // If we're hovering over the element, display grabby hand cursor
+            if (mouse_interact->state == ClickState::hover) {
+                Gfx::set_cursor_mode(Gfx::CursorMode::Hand);
             }
         }
 
