@@ -754,11 +754,16 @@ namespace UI {
                 Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
             glm::vec2 br_ =
                 Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
-            const glm::vec2 tl = {std::min(tl_.x, br_.x), std::min(tl_.y, br_.y)};
-            const glm::vec2 br = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
+            const glm::vec2 tl       = {std::min(tl_.x, br_.x), std::min(tl_.y, br_.y)};
+            const glm::vec2 br       = {std::max(tl_.x, br_.x), std::max(tl_.y, br_.y)};
+            const glm::vec2 scene_tl = scene.top_left;
+            const glm::vec2 scene_br = scene.top_left + scene.panel_size;
 
             // Determine whether the mouse is inside the component's bounding box
-            const bool is_inside_bb = mouse_pos.x >= tl.x && mouse_pos.y >= tl.y && mouse_pos.x <= br.x && mouse_pos.y <= br.y;
+            const bool is_inside_scene = mouse_pos.x >= scene_tl.x && mouse_pos.y >= scene_tl.y && mouse_pos.x <= scene_br.x &&
+                                         mouse_pos.y <= scene_br.y;
+            const bool is_inside_bb =
+                (is_inside_scene) && (mouse_pos.x >= tl.x && mouse_pos.y >= tl.y && mouse_pos.x <= br.x && mouse_pos.y <= br.y);
 
             // If the element hasn't been clicked
             if (mouse_interact->state != ClickState::click && Input::mouse_button_held(Input::MouseButton::Left) == false) {
