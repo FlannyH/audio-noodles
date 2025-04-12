@@ -5,6 +5,7 @@ namespace UI {
 
     void Panel::update(float delta_time) {
         constexpr float window_bar_height = 40.0f;
+        constexpr float snap_sensitivity  = 32.0f;
 
         // Window dragging
         if (Input::mouse_button_pressed(Input::MouseButton::Left) && Input::mouse_position_pixels().x > this->top_left.x &&
@@ -19,12 +20,28 @@ namespace UI {
         }
 
         if (this->being_dragged) {
-            this->top_left += Input::mouse_movement_pixels();
+            const glm::vec2 mouse_movement = Input::mouse_movement_pixels();
+            const glm::vec2 parent_size    = Gfx::get_window_size(); // todo: nested panels should reference the parent
+            this->top_left += mouse_movement;
+
+            // Snap to sides
+            if (mouse_movement.x < 0.0f && this->top_left.x < snap_sensitivity) {
+                this->top_left.x = 0.0f;
+            }
+            if (mouse_movement.x > 0.0f && (parent_size.x - this->top_left.x - this->size.x) < snap_sensitivity) {
+                this->top_left.x = parent_size.x - this->size.x;
+            }
+            if (mouse_movement.y < 0.0f && this->top_left.y < snap_sensitivity) {
+                this->top_left.y = 0.0f;
+            }
+            if (mouse_movement.y > 0.0f && (parent_size.y - this->top_left.y - this->size.y) < snap_sensitivity) {
+                this->top_left.y = parent_size.y - this->size.y;
+            }
         }
 
         // Update panel size
         scene.update_extents(this->top_left, this->size, window_bar_height);
-        
+
         // Rendering
         Gfx::draw_text_pixels( // Panel name
             name,
