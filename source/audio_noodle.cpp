@@ -44,7 +44,7 @@ int main() {
         scene, "debug_numberbox", {{-128, -96}, {128, 32}, 0.5f, Gfx::AnchorPoint::Bottom}, {0.0, 100.0, 1.0, 50, 0});
 
     UI::create_radio_button(
-        scene, "debug_radio_button", {{-160, 128}, {160, 320}, 0.5f, Gfx::AnchorPoint::Top},
+        scene, "debug_radio_button", {{-120, 128}, {200, 320}, 0.5f, Gfx::AnchorPoint::Top},
         std::vector<std::wstring>({
             L"hello",
             L"there",
@@ -53,24 +53,24 @@ int main() {
             L"ui element :)",
         }),
         0);
-    // UI::create_combobox(scene, "debug_combobox", { {800, 20}, {1200, 80}, 0.01f }, std::vector<std::wstring>({
-    //     L"Option 1",
-    //     L"Option 2",
-    //     L"Option 3",
-    //     L"Option 4",
-    //     L"Option 5",
-    //     L"Option 6",
-    //     L"Option 7",
-    //     L"Option 8",
-    //     L"Option 9",
-    //     L"Option A",
-    //     L"Option B",
-    //     L"Option C",
-    //     L"Option D",
-    //     L"Option E",
-    //     L"Option F",
-    //     })
-    // );
+    UI::create_combobox(scene, "debug_combobox", { {-160, 340}, {160, 400}, 0.01f, Gfx::AnchorPoint::Top }, std::vector<std::wstring>({
+        L"Option 1",
+        L"Option 2",
+        L"Option 3",
+        L"Option 4",
+        L"Option 5",
+        L"Option 6",
+        L"Option 7",
+        L"Option 8",
+        L"Option 9",
+        L"Option A",
+        L"Option B",
+        L"Option C",
+        L"Option D",
+        L"Option E",
+        L"Option F",
+        })
+    );
 
     while (Gfx::should_stay_open()) {
         Gfx::set_cursor_mode(Gfx::CursorMode::Arrow);
