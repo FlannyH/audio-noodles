@@ -5,10 +5,12 @@ namespace UI {
 
     void Panel::update(float delta_time) {
         constexpr float window_bar_height  = 40.0f;
-        constexpr float snap_sensitivity   = 32.0f;
-        constexpr float unmax_sensitivity  = 32.0f;
+        constexpr float snap_sensitivity   = 24.0f;
+        constexpr float unmax_distance     = 32.0f;
         constexpr float resize_sensitivity = 16.0f;
         constexpr float double_click_time  = 0.3f;
+
+        const bool should_snap = Input::key_held(Input::Key::LeftShift) || Input::key_held(Input::Key::RightShift);
 
         // Window dragging
         const glm::vec2 mouse_pos      = Input::mouse_position_pixels();
@@ -35,24 +37,26 @@ namespace UI {
             this->top_left += mouse_movement;
 
             // Unmaximize
-            if (this->maximized && glm::distance(mouse_pos, this->begin_drag_mouse_pos) > unmax_sensitivity) {
+            if (this->maximized && glm::distance(mouse_pos, this->begin_drag_mouse_pos) > unmax_distance) {
                 this->top_left  = mouse_pos - glm::vec2(this->pre_max_size.x / 2.0f, window_bar_height / 2.0f);
                 this->size      = this->pre_max_size;
                 this->maximized = false;
             }
 
-            // Snap to sides
-            if (mouse_movement.x < 0.0f && this->top_left.x < snap_sensitivity) {
-                this->top_left.x = 0.0f;
-            }
-            if (mouse_movement.x > 0.0f && (parent_size.x - this->top_left.x - this->size.x) < snap_sensitivity) {
-                this->top_left.x = parent_size.x - this->size.x;
-            }
-            if (mouse_movement.y < 0.0f && this->top_left.y < snap_sensitivity) {
-                this->top_left.y = 0.0f;
-            }
-            if (mouse_movement.y > 0.0f && (parent_size.y - this->top_left.y - this->size.y) < snap_sensitivity) {
-                this->top_left.y = parent_size.y - this->size.y;
+            // Snap to sides when holding shift
+            if (should_snap) {
+                if (mouse_movement.x < 0.0f && this->top_left.x < snap_sensitivity) {
+                    this->top_left.x = 0.0f;
+                }
+                if (mouse_movement.x > 0.0f && (parent_size.x - this->top_left.x - this->size.x) < snap_sensitivity) {
+                    this->top_left.x = parent_size.x - this->size.x;
+                }
+                if (mouse_movement.y < 0.0f && this->top_left.y < snap_sensitivity) {
+                    this->top_left.y = 0.0f;
+                }
+                if (mouse_movement.y > 0.0f && (parent_size.y - this->top_left.y - this->size.y) < snap_sensitivity) {
+                    this->top_left.y = parent_size.y - this->size.y;
+                }
             }
         }
 
@@ -67,6 +71,7 @@ namespace UI {
                     this->pre_max_top_left = this->top_left;
                     this->pre_max_size     = this->size;
                     this->maximized        = true;
+                    this->being_dragged    = false;
                 }
             }
             this->double_click_timer = double_click_time;
@@ -76,7 +81,8 @@ namespace UI {
         // Update maximized locations every frame (the user might have resized the parent)
         if (this->maximized) {
             this->top_left = glm::vec2(0.0f, 0.0f);
-            this->size     = Gfx::get_window_size();
+            this->size.x   = std::clamp(Gfx::get_window_size().x, min_size.x, max_size.x);
+            this->size.y   = std::clamp(Gfx::get_window_size().y, min_size.y, max_size.y);
         }
 
         // Resizing
@@ -109,20 +115,83 @@ namespace UI {
 
         if (this->being_resized) {
             if (this->resize_flags & resize_r) {
+                float movement = mouse_movement.x;
                 this->top_left.x += mouse_movement.x;
                 this->size.x -= mouse_movement.x;
+                if (this->size.x < this->min_size.x) {
+                    const float difference = this->min_size.x - this->size.x;
+                    this->top_left.x -= difference;
+                    this->size.x += difference;
+                }
+                if (this->size.x > this->max_size.x) {
+                    const float difference = this->size.x - this->max_size.x;
+                    this->top_left.x += difference;
+                    this->size.x -= difference;
+                }
             }
             if (this->resize_flags & resize_l) {
                 this->size.x += mouse_movement.x;
+                if (this->size.x > this->max_size.x) this->size.x = this->max_size.x;
+                if (this->size.x < this->min_size.x) this->size.x = this->min_size.x;
             }
             if (this->resize_flags & resize_b) {
                 this->size.y += mouse_movement.y;
+                if (this->size.y > this->max_size.y) this->size.y = this->max_size.y;
+                if (this->size.y < this->min_size.y) this->size.y = this->min_size.y;
             }
             if (this->resize_flags & resize_t) {
                 this->top_left.y += mouse_movement.y;
                 this->size.y -= mouse_movement.y;
+                if (this->size.y < this->min_size.y) {
+                    const float difference = this->min_size.y - this->size.y;
+                    this->top_left.y -= difference;
+                    this->size.y += difference;
+                }
+                if (this->size.y > this->max_size.y) {
+                    const float difference = this->size.y - this->max_size.y;
+                    this->top_left.y += difference;
+                    this->size.y -= difference;
+                }
             }
             if (Input::mouse_button_released(Input::MouseButton::Left)) this->being_resized = false;
+        }
+
+        if ((this->being_dragged || this->being_resized) && should_snap) {
+            if (should_snap) {
+                if (this->top_left.x + this->size.x > Gfx::get_window_size().x) {
+                    const float difference = this->top_left.x + this->size.x - Gfx::get_window_size().x;
+                    this->size.x -= difference;
+                    if (this->size.x < this->min_size.x) {
+                        this->top_left.x -= this->min_size.x - this->size.x;
+                        this->size.x = this->min_size.x;
+                    }
+                }
+                if (this->top_left.y + this->size.y > Gfx::get_window_size().y) {
+                    const float difference = this->top_left.y + this->size.y - Gfx::get_window_size().y;
+                    this->size.y -= difference;
+                    if (this->size.y < this->min_size.y) {
+                        this->top_left.y -= this->min_size.y - this->size.y;
+                        this->size.y = this->min_size.y;
+                    }
+                }
+
+                if (this->top_left.x < 0.0f) {
+                    this->size.x += this->top_left.x;
+                    this->top_left.x = 0.0f;
+                    if (this->size.x < this->min_size.x) {
+                        this->top_left.x -= this->min_size.x - this->size.x;
+                        this->size.x = this->min_size.x;
+                    }
+                }
+                if (this->top_left.y < 0.0f) {
+                    this->size.y += this->top_left.y;
+                    this->top_left.y = 0.0f;
+                    if (this->size.y < this->min_size.y) {
+                        this->top_left.y -= this->min_size.y - this->size.y;
+                        this->size.y = this->min_size.y;
+                    }
+                }
+            }
         }
 
         // Update panel size

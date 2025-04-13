@@ -13,7 +13,7 @@ int main() {
     Gfx::init(Gfx::RenderAPI::OpenGL, 1280, 720, "Audio Noodles");
     Session::tracks().push_back(Track{});
 
-    UI::Panel panel{.top_left = {0, 0}, .size = {768, 512}};
+    UI::Panel panel{.top_left = {0, 0}, .min_size = {640, 600}, .max_size = {2048, 1024}, .size = {800, 600}};
     auto& scene = panel.scene;
     UI::create_button(
         scene, {{-75, 32}, {160, 100}, 0.0f, Gfx::AnchorPoint::Top}, []() { printf("hi1!\n"); },
@@ -35,13 +35,13 @@ int main() {
         scene, "debug_text", {{-64, -128}, {64, 0}, 0.5f, Gfx::AnchorPoint::Bottom},
         UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Bottom));
     UI::create_numberbox(
-        scene, "debug_numberbox", {{-160, 32}, {-85, 100}, 0.5f, Gfx::AnchorPoint::Top}, {0.0, 100.0, 1.0, 0, 0});
+        scene, "debug_numberbox1", {{-160, 32}, {-85, 100}, 0.5f, Gfx::AnchorPoint::Top}, {0.0, 100.0, 1.0, 0, 0});
     UI::create_wheelknob(
-        scene, "debug_numberbox", {{128, -96}, {192, -32}, 0.5f, Gfx::AnchorPoint::BottomLeft}, {0.0, 100.0, 1.0, 0, 0});
+        scene, "debug_numberbox2", {{128, -96}, {192, -32}, 0.5f, Gfx::AnchorPoint::BottomLeft}, {0.0, 100.0, 1.0, 0, 0});
     UI::create_slider(
-        scene, "debug_numberbox", {{32, -320}, {96, -32}, 0.5f, Gfx::AnchorPoint::BottomLeft}, {0.0, 100.0, 1.0, 50, 0});
+        scene, "debug_numberbox3", {{32, -320}, {96, -32}, 0.5f, Gfx::AnchorPoint::BottomLeft}, {0.0, 100.0, 1.0, 50, 0});
     UI::create_slider(
-        scene, "debug_numberbox", {{-128, -96}, {128, 32}, 0.5f, Gfx::AnchorPoint::Bottom}, {0.0, 100.0, 1.0, 50, 0});
+        scene, "debug_numberbox4", {{-128, -96}, {128, 32}, 0.5f, Gfx::AnchorPoint::Bottom}, {0.0, 100.0, 1.0, 50, 0});
 
     UI::create_radio_button(
         scene, "debug_radio_button", {{-120, 128}, {200, 320}, 0.5f, Gfx::AnchorPoint::Top},
@@ -53,24 +53,25 @@ int main() {
             L"ui element :)",
         }),
         0);
-    UI::create_combobox(scene, "debug_combobox", { {-160, 340}, {160, 400}, 0.01f, Gfx::AnchorPoint::Top }, std::vector<std::wstring>({
-        L"Option 1",
-        L"Option 2",
-        L"Option 3",
-        L"Option 4",
-        L"Option 5",
-        L"Option 6",
-        L"Option 7",
-        L"Option 8",
-        L"Option 9",
-        L"Option A",
-        L"Option B",
-        L"Option C",
-        L"Option D",
-        L"Option E",
-        L"Option F",
-        })
-    );
+    UI::create_combobox(
+        scene, "debug_combobox", {{-160, 340}, {160, 400}, 0.01f, Gfx::AnchorPoint::Top},
+        std::vector<std::wstring>({
+            L"Option 1",
+            L"Option 2",
+            L"Option 3",
+            L"Option 4",
+            L"Option 5",
+            L"Option 6",
+            L"Option 7",
+            L"Option 8",
+            L"Option 9",
+            L"Option A",
+            L"Option B",
+            L"Option C",
+            L"Option D",
+            L"Option E",
+            L"Option F",
+        }));
 
     while (Gfx::should_stay_open()) {
         Gfx::set_cursor_mode(Gfx::CursorMode::Arrow);

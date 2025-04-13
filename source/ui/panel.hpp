@@ -8,6 +8,8 @@ namespace UI {
         Scene scene;
         std::string name = "Yippee panels have names now :3";
         glm::vec2 top_left;
+        glm::vec2 min_size = {128.0f, 128.0f};
+        glm::vec2 max_size = {99999.0f, 99999.0f};
         glm::vec2 size;
         glm::vec2 pre_max_top_left;
         glm::vec2 pre_max_size;
