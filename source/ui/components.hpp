@@ -412,8 +412,8 @@ namespace UI {
             }
 
             // Calculate position relative to top_left
-            const glm::vec2 transform_top_left     = transform->top_left;     // + text->margins;
-            const glm::vec2 transform_bottom_right = transform->bottom_right; // - text->margins;
+            const glm::vec2 transform_top_left     = transform->top_left + text->margins;
+            const glm::vec2 transform_bottom_right = transform->bottom_right - text->margins;
             const glm::vec2 transform_rect_size    = transform_bottom_right - transform_top_left;
 
             const glm::vec2 anchored_top_left =
