@@ -571,13 +571,15 @@ namespace UI {
             radio_button->current_selected_index = static_cast<size_t>(value->get_as_ref<double>());
 
             // Get some information ready for the sake of my mental sanity in writing this code
-            size_t n_options             = radio_button->options.size();
-            float vertical_spacing       = (transform->bottom_right.y - transform->top_left.y) / static_cast<float>(n_options);
-            float margin                 = 2.0f;
-            float circle_size_max        = vertical_spacing / 2.0f - margin;
-            glm::vec2 circle_base_offset = transform->top_left + glm::vec2(margin + circle_size_max);
-            float outline_circle_radius  = 20;
-            float selected_circle_radius = 14;
+            size_t n_options       = radio_button->options.size();
+            float vertical_spacing = (transform->bottom_right.y - transform->top_left.y) / static_cast<float>(n_options);
+            float margin           = 2.0f;
+            float circle_size_max  = vertical_spacing / 2.0f - margin;
+            glm::vec2 circle_base_offset =
+                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size) +
+                glm::vec2(margin + circle_size_max);
+            float outline_circle_radius  = 16;
+            float selected_circle_radius = 12;
             float text_margin            = 20;
 
             // Display every option
@@ -596,25 +598,38 @@ namespace UI {
                 }
 
                 // Draw the circle outline for each of them
-                // todo
-                // renderer.draw_circle_line(
-                //     *transform, circle_base_offset + glm::vec2(0, vertical_spacing * static_cast<float>(i)),
-                //     glm::vec2(outline_circle_radius), color, 2.0f, transform->depth, transform->anchor);
+                Gfx::draw_circle_2d_pixels(
+                    circle_base_offset + glm::vec2(0, vertical_spacing * static_cast<float>(i)),
+                    glm::vec2(outline_circle_radius),
+                    {
+                        .color               = color,
+                        .depth               = transform->depth,
+                        .anchor_point        = Gfx::AnchorPoint::TopLeft,
+                        .shape_outline_width = 2.0f,
+                    });
 
                 // Draw the text
                 // todo
-                // renderer.draw_text(
-                //     *transform, radio_button->options[i],
-                //     circle_base_offset + glm::vec2(0, vertical_spacing * static_cast<float>(i)) +
-                //         glm::vec2(outline_circle_radius + text_margin, 0),
-                //     {2, 2}, color, transform->depth, AnchorPoint::top_left, AnchorPoint::left);
+                Gfx::draw_text_pixels(
+                    radio_button->options[i].c_str(),
+                    (Gfx::TextDrawParams){
+                        .transform =
+                            {.position = glm::vec3(
+                                 circle_base_offset + glm::vec2(0, vertical_spacing * static_cast<float>(i)) +
+                                     glm::vec2(outline_circle_radius + text_margin, 0),
+                                 transform->depth),
+                             .scale = {2.0f, 2.0f, 1.0f}},
+                        .position_anchor = Gfx::AnchorPoint::TopLeft,
+                        .text_anchor     = Gfx::AnchorPoint::Left,
+                        .color           = color,
+                    });
 
                 // Draw selected circle
                 if (i == radio_button->current_selected_index) {
-                    // todo
-                    // renderer.draw_circle_solid(
-                    //     *transform, circle_base_offset + glm::vec2(0, vertical_spacing * static_cast<float>(i)),
-                    //     glm::vec2(selected_circle_radius), color, transform->depth, transform->anchor);
+                    Gfx::draw_circle_2d_pixels(
+                        circle_base_offset + glm::vec2(0, vertical_spacing * static_cast<float>(i)),
+                        glm::vec2(selected_circle_radius),
+                        {.color = color, .depth = transform->depth, .anchor_point = Gfx::AnchorPoint::TopLeft});
                 }
             }
         }
@@ -951,23 +966,22 @@ namespace UI {
             }
 
             // If the component is clicked on in general
-            // todo
-            // if (input.mouse_down(0) && mouse_interact->state == ClickState::click) {
-            //     // Check for each hitbox
-            //     for (size_t i = 0; i < multi_hitbox->n_hitboxes; ++i) {
-            //         // Transform the hitbox from local space to window space
-            //         Hitbox hitbox = multi_hitbox->hitboxes[i];
-            //         hitbox.top_left += renderer.apply_anchor_in_pixel_space(transform->top_left, transform->anchor);
-            //         hitbox.bottom_right += renderer.apply_anchor_in_pixel_space(transform->top_left, transform->anchor);
+            if (Input::mouse_button_pressed(Input::MouseButton::Left) && mouse_interact->state == ClickState::click) {
+                // Check for each hitbox
+                for (size_t i = 0; i < multi_hitbox->n_hitboxes; ++i) {
+                    // Transform the hitbox from local space to window space
+                    Hitbox hitbox = multi_hitbox->hitboxes[i];
+                    hitbox.top_left += Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+                    hitbox.bottom_right += Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
 
-            //         // See if it intersects
-            //         if (hitbox.intersects(input.mouse_pos(MouseRelative::window))) {
-            //             // If so, select that value
-            //             radio_button->current_selected_index = i;
-            //             value->set<double>(static_cast<double>(i));
-            //         }
-            //     }
-            // }
+                    // See if it intersects
+                    if (hitbox.intersects(Input::mouse_position_pixels())) {
+                        // If so, select that value
+                        radio_button->current_selected_index = i;
+                        value->set<double>(static_cast<double>(i));
+                    }
+                }
+            }
         }
     }
 
