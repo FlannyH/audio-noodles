@@ -445,17 +445,41 @@ namespace UI {
             auto* range     = scene.get_component<NumberRange>(entity);
 
             // Draw the wheel
-            const glm::vec2 center = (transform->top_left + transform->bottom_right) / 2.0f;
-            const glm::vec2 scale  = center - transform->top_left;
+            const glm::vec2 top_left =
+                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+            const glm::vec2 bottom_right =
+                Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
+            const glm::vec2 center = (top_left + bottom_right) / 2.0f;
+            const glm::vec2 scale  = center - top_left;
             double& val            = value->get_as_ref<double>();
             const float angle      = static_cast<float>(
                 1.5 * 3.14159265359 + ((val - range->min) / (range->max - range->min) - 0.5) * (1.75 * 3.14159265359));
             const glm::vec2 line_b = center + glm::vec2(cosf(angle), sinf(angle)) * scale;
-            // todo
-            // renderer.draw_circle_solid(*transform, center, scale, {1, 1, 1, 1}, transform->depth + 0.0002f,
-            // transform->anchor); renderer.draw_circle_line( *transform, center, scale, {0, 0, 0, 1}, 2, transform->depth +
-            // 0.0001f, transform->anchor);
-            // renderer.draw_line(*transform, center, line_b, {0, 0, 0, 1}, 4, transform->depth + 0.0001f);
+
+            Gfx::draw_circle_2d_pixels(
+                center, scale,
+                {
+                    .color               = {1.0f, 1.0f, 1.0f, 1.0f},
+                    .depth               = transform->depth + 0.002f,
+                    .anchor_point        = Gfx::AnchorPoint::TopLeft,
+                    .shape_outline_width = 0.0f,
+                });
+            Gfx::draw_circle_2d_pixels(
+                center, scale,
+                {
+                    .color               = {0.0f, 0.0f, 0.0f, 1.0f},
+                    .depth               = transform->depth + 0.001f,
+                    .anchor_point        = Gfx::AnchorPoint::TopLeft,
+                    .shape_outline_width = 2.0f,
+                });
+            Gfx::draw_line_2d_pixels(
+                center, line_b,
+                {
+                    .color        = {0.0f, 0.0f, 0.0f, 1.0f},
+                    .depth        = transform->depth + 0.001f,
+                    .anchor_point = Gfx::AnchorPoint::TopLeft,
+                    .line_width   = 3.0f,
+                });
         }
 
         // Sliders
@@ -738,18 +762,18 @@ namespace UI {
             Gfx::draw_rectangle_2d_pixels(
                 tl, br,
                 {
-                    .color                   = box->color_inner * multiply,
-                    .depth                   = transform->depth + 0.001f,
-                    .anchor_point            = Gfx::AnchorPoint::TopLeft,
-                    .rectangle_outline_width = 0.0f,
+                    .color               = box->color_inner * multiply,
+                    .depth               = transform->depth + 0.001f,
+                    .anchor_point        = Gfx::AnchorPoint::TopLeft,
+                    .shape_outline_width = 0.0f,
                 });
             Gfx::draw_rectangle_2d_pixels(
                 tl, br,
                 {
-                    .color                   = box->color_outer * multiply,
-                    .depth                   = transform->depth,
-                    .anchor_point            = Gfx::AnchorPoint::TopLeft,
-                    .rectangle_outline_width = 1.0f,
+                    .color               = box->color_outer * multiply,
+                    .depth               = transform->depth,
+                    .anchor_point        = Gfx::AnchorPoint::TopLeft,
+                    .shape_outline_width = 1.0f,
                 });
         }
     }

@@ -20,10 +20,10 @@ namespace Gfx {
         float line_width = 0.001f; // Will always result in at least 1 pixel wide lines
 
         // Rectangle specific parameters
-        glm::vec2 texcoord_tl         = glm::vec2(0.0f, 0.0f);
-        glm::vec2 texcoord_br         = glm::vec2(1.0f, 1.0f);
-        float rectangle_outline_width = 0.0f; // Values equal to or less than 0.0f will make the rectangle filled.
-                                              // Otherwise, it will always result in at least 1 pixel wide lines.
+        glm::vec2 texcoord_tl     = glm::vec2(0.0f, 0.0f);
+        glm::vec2 texcoord_br     = glm::vec2(1.0f, 1.0f);
+        float shape_outline_width = 0.0f; // Values equal to or less than 0.0f will make the shape filled.
+                                          // Otherwise, it will always result in at least 1 pixel wide lines.
         ResourceID texture = ResourceID::invalid();
     };
 
@@ -76,8 +76,8 @@ namespace Gfx {
     void set_mouse_visible(bool visible);
     void set_cursor_mode(CursorMode cursor_mode);
 
-        // Rendering
-        void begin_frame();
+    // Rendering
+    void begin_frame();
     void end_frame();
     void set_clip_rect(glm::vec2 top_left = {0.0f, 0.0f}, glm::vec2 size = {99999.0f, 99999.0f});
 
@@ -97,6 +97,7 @@ namespace Gfx {
     glm::vec2 anchor_offset_pixels(
         glm::vec2 top_left, Gfx::AnchorPoint anchor,
         glm::vec2 anchor_size = glm::vec2(0.0f, 0.0f)); // if anchor_size == 0, it uses the window size
+    void draw_circle_2d_pixels(glm::vec2 center, glm::vec2 size, DrawParams draw_params = {});
 
     // Text
     std::shared_ptr<Font> load_font(const std::string& path);

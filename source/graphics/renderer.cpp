@@ -7,6 +7,8 @@
 #include <stb_image.h>
 #include <glm/geometric.hpp>
 
+#define CIRCLE_LUT_SIZE 24
+
 namespace Gfx {
     Device* device        = nullptr; // Will be initialized to a child class of Device (e.g. DeviceOpenGL)
     glm::vec2 window_size = glm::vec2(0.0f);
@@ -16,6 +18,7 @@ namespace Gfx {
     ResourceID pipeline_2d = {0, 0};
     std::map<uint32_t, std::vector<Vertex2D>> render_queue_2d; // maps textures to vertex buffers
     ResourceID render_queue_2d_gpu_buffer = {0, 0};
+    glm::vec2 circle_lut[CIRCLE_LUT_SIZE];
 
     // Text
     std::shared_ptr<Font> font;
@@ -39,6 +42,12 @@ namespace Gfx {
         // Load font
         font = load_font("assets/textures/font.png");
 
+        // Precalculate circles
+        for (size_t i = 0; i < CIRCLE_LUT_SIZE; ++i) {
+            float angle   = ((float)i / (float)CIRCLE_LUT_SIZE) * 2.0f * M_PI;
+            circle_lut[i] = glm::vec2(cos(angle), sin(angle));
+        }
+
         if (api == RenderAPI::OpenGL) LOG(Info, "Renderer initialized (OpenGL)");
 
         return true;
@@ -54,9 +63,7 @@ namespace Gfx {
 
     void set_mouse_visible(bool visible) { device->set_mouse_visible(visible); }
 
-    void set_cursor_mode(CursorMode cursor_mode) {
-        device->set_cursor_mode(cursor_mode);
-    }
+    void set_cursor_mode(CursorMode cursor_mode) { device->set_cursor_mode(cursor_mode); }
 
     void begin_frame() {
         // Update window size
@@ -86,9 +93,7 @@ namespace Gfx {
         device->end_frame();
     }
 
-    void set_clip_rect(glm::vec2 top_left, glm::vec2 size) {
-        device->set_clip_rect(top_left, size);
-    }
+    void set_clip_rect(glm::vec2 top_left, glm::vec2 size) { device->set_clip_rect(top_left, size); }
 
     void draw_line_2d(glm::vec2 a, glm::vec2 b, const DrawParams& draw_params) {
         float width = draw_params.line_width;
@@ -125,7 +130,7 @@ namespace Gfx {
     }
 
     void draw_rectangle_2d(glm::vec2 top_left, glm::vec2 bottom_right, const DrawParams& draw_params) {
-        if (draw_params.rectangle_outline_width <= 0.0f) {
+        if (draw_params.shape_outline_width <= 0.0f) {
             const glm::vec2 v0(top_left.x, top_left.y);
             const glm::vec2 v1(bottom_right.x, top_left.y);
             const glm::vec2 v2(bottom_right.x, bottom_right.y);
@@ -136,10 +141,10 @@ namespace Gfx {
             const glm::vec2 tc3(draw_params.texcoord_tl.x, draw_params.texcoord_br.y);
             draw_quad_2d({v0, tc0}, {v1, tc1}, {v2, tc2}, {v3, tc3}, draw_params);
         } else {
-            float x1 = std::min(top_left.x, bottom_right.x) + (draw_params.rectangle_outline_width / aspect_ratio);
-            float x2 = std::max(top_left.x, bottom_right.x) - (draw_params.rectangle_outline_width / aspect_ratio);
-            float y1 = std::min(top_left.y, bottom_right.y) + (draw_params.rectangle_outline_width);
-            float y2 = std::max(top_left.y, bottom_right.y) - (draw_params.rectangle_outline_width);
+            float x1 = std::min(top_left.x, bottom_right.x) + (draw_params.shape_outline_width / aspect_ratio);
+            float x2 = std::max(top_left.x, bottom_right.x) - (draw_params.shape_outline_width / aspect_ratio);
+            float y1 = std::min(top_left.y, bottom_right.y) + (draw_params.shape_outline_width);
+            float y2 = std::max(top_left.y, bottom_right.y) - (draw_params.shape_outline_width);
 
             // Outside coords
             const glm::vec2 v0(top_left.x, top_left.y);
@@ -180,7 +185,7 @@ namespace Gfx {
     }
 
     void draw_rectangle_2d_pixels(glm::vec2 top_left, glm::vec2 bottom_right, DrawParams draw_params) {
-        draw_params.rectangle_outline_width /= window_size.y;
+        draw_params.shape_outline_width /= window_size.y;
         draw_rectangle_2d(top_left / window_size, bottom_right / window_size, draw_params);
     }
 
@@ -201,6 +206,26 @@ namespace Gfx {
     glm::vec2 anchor_offset_pixels(glm::vec2 top_left, Gfx::AnchorPoint anchor, glm::vec2 anchor_size) {
         if (anchor_size.x == 0.0f || anchor_size.y == 0.0f) anchor_size = window_size;
         return top_left + anchor_offsets[(size_t)anchor] * anchor_size;
+    }
+
+    void draw_circle_2d(glm::vec2 center, glm::vec2 size, DrawParams draw_params) {
+        if (draw_params.shape_outline_width > 0.0f) {
+            for (size_t i = 0; i < CIRCLE_LUT_SIZE; ++i) {
+                draw_line_2d(
+                    center + circle_lut[i + 0] * size, center + circle_lut[(i + 1) % CIRCLE_LUT_SIZE] * size, draw_params);
+            }
+        } else {
+            for (size_t i = 0; i < CIRCLE_LUT_SIZE; ++i) {
+                draw_triangle_2d(
+                    {center + circle_lut[i + 0] * size}, {center + circle_lut[(i + 1) % CIRCLE_LUT_SIZE] * size}, {center},
+                    draw_params);
+            }
+        }
+    }
+
+    void draw_circle_2d_pixels(glm::vec2 center, glm::vec2 size, DrawParams draw_params) {
+        draw_params.shape_outline_width /= window_size.y;
+        draw_circle_2d(center / window_size, size / window_size, draw_params);
     }
 
     std::shared_ptr<Font> load_font(const std::string& path) {
