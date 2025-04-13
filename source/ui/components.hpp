@@ -738,7 +738,7 @@ namespace UI {
             Gfx::draw_rectangle_2d_pixels(
                 tl, br,
                 {
-                    .color                   = box->color_inner,
+                    .color                   = box->color_inner * multiply,
                     .depth                   = transform->depth + 0.001f,
                     .anchor_point            = Gfx::AnchorPoint::TopLeft,
                     .rectangle_outline_width = 0.0f,
@@ -746,7 +746,7 @@ namespace UI {
             Gfx::draw_rectangle_2d_pixels(
                 tl, br,
                 {
-                    .color                   = box->color_outer,
+                    .color                   = box->color_outer * multiply,
                     .depth                   = transform->depth,
                     .anchor_point            = Gfx::AnchorPoint::TopLeft,
                     .rectangle_outline_width = 1.0f,
@@ -818,7 +818,7 @@ namespace UI {
                 }
             }
             // If we're hovering over the element, display grabby hand cursor
-            if (mouse_interact->state == ClickState::hover) {
+            if (mouse_interact->state == ClickState::hover || mouse_interact->state == ClickState::click) {
                 Gfx::set_cursor_mode(Gfx::CursorMode::Hand);
             }
         }
