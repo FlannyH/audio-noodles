@@ -192,7 +192,7 @@ namespace UI {
         LOG(Error, "Ran out of entity slots!");
         throw;
     }
-    
+
     inline void Scene::update_extents(glm::vec2 top_left, glm::vec2 size, float window_bar_height) {
         this->top_left = top_left;
         this->top_left.y += window_bar_height;

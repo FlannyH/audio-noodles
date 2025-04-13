@@ -971,8 +971,10 @@ namespace UI {
                 for (size_t i = 0; i < multi_hitbox->n_hitboxes; ++i) {
                     // Transform the hitbox from local space to window space
                     Hitbox hitbox = multi_hitbox->hitboxes[i];
-                    hitbox.top_left += Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
-                    hitbox.bottom_right += Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+                    hitbox.top_left +=
+                        Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+                    hitbox.bottom_right +=
+                        Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
 
                     // See if it intersects
                     if (hitbox.intersects(Input::mouse_position_pixels())) {
