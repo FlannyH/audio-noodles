@@ -467,8 +467,10 @@ namespace UI {
             auto* draggable = scene.get_component<Draggable>(entity);
 
             // Draw the slider
-            glm::vec2 top_left     = transform->top_left + scene.top_left;
-            glm::vec2 bottom_right = transform->bottom_right + scene.top_left;
+            glm::vec2 top_left =
+                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+            glm::vec2 bottom_right =
+                Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
             if (text && draggable) {
                 if (draggable->is_horizontal == false) {
                     bottom_right.y -= Gfx::get_font_height() * text->scale.y;
@@ -488,7 +490,7 @@ namespace UI {
                     {
                         .color        = Colors::WHITE,
                         .depth        = transform->depth + 0.0002f,
-                        .anchor_point = transform->anchor,
+                        .anchor_point = Gfx::AnchorPoint::TopLeft,
                         .line_width   = 4.0f,
                     });
                 Gfx::draw_line_2d_pixels(
@@ -496,7 +498,7 @@ namespace UI {
                     {
                         .color        = Colors::WHITE,
                         .depth        = transform->depth + 0.0001f,
-                        .anchor_point = transform->anchor,
+                        .anchor_point = Gfx::AnchorPoint::TopLeft,
                         .line_width   = 2.0f,
                     });
                 Gfx::draw_rectangle_2d_pixels(
@@ -504,7 +506,7 @@ namespace UI {
                     {
                         .color        = Colors::WHITE,
                         .depth        = transform->depth,
-                        .anchor_point = transform->anchor,
+                        .anchor_point = Gfx::AnchorPoint::TopLeft,
                     });
             } else {
                 const float dist_bottom =
@@ -514,7 +516,7 @@ namespace UI {
                     {
                         .color        = Colors::WHITE,
                         .depth        = transform->depth + 0.0002f,
-                        .anchor_point = transform->anchor,
+                        .anchor_point = Gfx::AnchorPoint::TopLeft,
                         .line_width   = 4.0f,
                     });
                 Gfx::draw_line_2d_pixels(
@@ -522,7 +524,7 @@ namespace UI {
                     {
                         .color        = Colors::WHITE,
                         .depth        = transform->depth + 0.0001f,
-                        .anchor_point = transform->anchor,
+                        .anchor_point = Gfx::AnchorPoint::TopLeft,
                         .line_width   = 2.0f,
                     });
                 Gfx::draw_rectangle_2d_pixels(
@@ -530,7 +532,7 @@ namespace UI {
                     {
                         .color        = Colors::WHITE,
                         .depth        = transform->depth,
-                        .anchor_point = transform->anchor,
+                        .anchor_point = Gfx::AnchorPoint::TopLeft,
                     });
             }
         }
