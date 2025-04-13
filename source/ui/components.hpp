@@ -729,13 +729,26 @@ namespace UI {
                 }
             }
 
-            // todo
-            // renderer.draw_box_solid(
-            //     *transform, transform->top_left, transform->bottom_right, box->color_inner * multiply,
-            //     transform->depth + 0.001f, transform->anchor);
-            // renderer.draw_box_line(
-            //     *transform, transform->top_left, transform->bottom_right, box->color_outer, box->thickness,
-            //     transform->depth, transform->anchor);
+            const glm::vec2 tl =
+                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+            const glm::vec2 br =
+                Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
+            Gfx::draw_rectangle_2d_pixels(
+                tl, br,
+                {
+                    .color                   = box->color_inner,
+                    .depth                   = transform->depth + 0.001f,
+                    .anchor_point            = Gfx::AnchorPoint::TopLeft,
+                    .rectangle_outline_width = 0.0f,
+                });
+            Gfx::draw_rectangle_2d_pixels(
+                tl, br,
+                {
+                    .color                   = box->color_outer,
+                    .depth                   = transform->depth,
+                    .anchor_point            = Gfx::AnchorPoint::TopLeft,
+                    .rectangle_outline_width = 1.0f,
+                });
         }
     }
 

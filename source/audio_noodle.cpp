@@ -15,16 +15,13 @@ int main() {
 
     UI::Panel panel{.top_left = {0, 0}, .size = {768, 512}};
     auto& scene = panel.scene;
-    // UI::create_button(scene, { { -100, -150 }, { 100, -250 }, 0.0f, Gfx::AnchorPoint::Center }, []()
-    //     {
-    //         printf("hi1!\n");
-    //     }, { L"Button1", {2, 2},  { 1, 0, 0, 1 }, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Center});
+    UI::create_button(scene, { { -100, 32 }, { 100, 132 }, 0.0f, Gfx::AnchorPoint::Top }, []()
+        {
+            printf("hi1!\n");
+        }, { L"Button1", {2, 2},  { 1, 0, 0, 1 }, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Center});
     UI::create_text(
         scene, "debug_text", {{0, 0}, {128, 128}, 0.5f, Gfx::AnchorPoint::TopLeft},
         UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::TopLeft));
-    UI::create_text(
-        scene, "debug_text", {{-64, 0}, {64, 128}, 0.5f, Gfx::AnchorPoint::Top},
-        UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Top));
     UI::create_text(
         scene, "debug_text", {{-128, 0}, {0, 128}, 0.5f, Gfx::AnchorPoint::TopRight},
         UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::TopRight));
