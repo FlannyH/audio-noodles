@@ -97,8 +97,10 @@ namespace Gfx {
 
         render_queue.clear();
         device->begin_frame();
-        device->set_render_target(ResourceID::invalid());
-        device->clear_framebuffer(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        set_render_target(ResourceID::invalid());
+        set_viewport({0, 0}, {w, h});
+        set_clip_rect({0, 0}, {w, h});
+        device->clear_framebuffer(glm::vec4(0.0f, 0.0f, 0.5f, 1.0f));
     }
 
     void end_frame() {

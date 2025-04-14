@@ -200,9 +200,9 @@ namespace UI {
                     .format         = Gfx::PixelFormat::RGBA_8,
                     .type           = Gfx::TextureType::Single2D,
                     .width          = (size_t)this->size.x,
-                    .height         = (size_t)this->size.y,
+                    .height         = (size_t)(this->size.y - window_bar_height),
                     .depth          = 1,
-                    .is_framebuffer = 1,
+                    .is_framebuffer = true,
                     .data           = nullptr,
                 });
             } else {

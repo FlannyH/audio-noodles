@@ -207,8 +207,8 @@ namespace Gfx {
             this->get_window_size(w, h);
         } else {
             auto* resource = (TextureResource*)(resources.at(this->active_framebuffer.id));
-            w = resource->width;
-            h = resource->height;
+            w              = resource->width;
+            h              = resource->height;
         }
         const gl::GLint left   = (gl::GLint)top_left.x;
         const gl::GLint top    = h - (gl::GLint)top_left.y - size.y;
@@ -223,8 +223,8 @@ namespace Gfx {
             this->get_window_size(w, h);
         } else {
             auto* resource = (TextureResource*)(resources.at(this->active_framebuffer.id));
-            w = resource->width;
-            h = resource->height;
+            w              = resource->width;
+            h              = resource->height;
         }
         const gl::GLint left   = (gl::GLint)top_left.x;
         const gl::GLint top    = h - (gl::GLint)top_left.y - size.y;
@@ -448,6 +448,7 @@ namespace Gfx {
         resource->width                      = resolution.x;
         resource->height                     = resolution.y;
         resource->pixel_format               = format;
+        resource->type                       = type;
         resources.at(resource_id_pair.id.id) = (Resource*)resource;
 
         if (is_framebuffer) {
@@ -472,12 +473,12 @@ namespace Gfx {
 
     void DeviceOpenGL::resize_texture(ResourceID id, glm::ivec3 new_resolution) {
         if (id.is_valid() && id.type == (uint32_t)ResourceType::Texture) {
-            auto* texture                 = (TextureResource*)(&resources.at(id.id));
+            auto* texture                 = (TextureResource*)(resources.at(id.id));
             const gl::GLenum gl_type      = texture_type_to_gl(texture->type);
             const gl::GLenum gl_format    = texture_format_to_gl_format(texture->pixel_format);
             const gl::GLenum gl_data_type = texture_format_to_gl_data_type(texture->pixel_format);
 
-            gl::glBindTexture(gl::GL_TEXTURE, texture->base.gpu_handle32);
+            gl::glBindTexture(gl_type, texture->base.gpu_handle32);
             switch (texture->type) {
             case TextureType::Single2D:
                 gl::glTexImage2D(
@@ -490,7 +491,7 @@ namespace Gfx {
                     nullptr);
                 break;
             }
-            gl::glBindTexture(gl::GL_TEXTURE, 0);
+            gl::glBindTexture(gl_type, 0);
 
             texture->width  = new_resolution.x;
             texture->height = new_resolution.y;
