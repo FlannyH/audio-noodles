@@ -20,14 +20,16 @@ namespace Gfx {
         virtual void get_window_size(int& width, int& height) = 0;
 
         // Common rendering
-        virtual bool should_stay_open()                                = 0;
-        virtual void set_full_screen(bool full_screen)                 = 0;
-        virtual void begin_frame()                                     = 0;
-        virtual void end_frame()                                       = 0;
-        virtual void clear_framebuffer(glm::vec4 color)                = 0;
-        virtual void set_camera(const Transform& transform)            = 0;
-        virtual void set_clip_rect(glm::vec2 top_left, glm::vec2 size) = 0;
-        virtual float get_delta_time()                                 = 0;
+        virtual bool should_stay_open()                                  = 0;
+        virtual void set_full_screen(bool full_screen)                   = 0;
+        virtual void begin_frame()                                       = 0;
+        virtual void end_frame()                                         = 0;
+        virtual void clear_framebuffer(glm::vec4 color)                  = 0;
+        virtual void set_camera(const Transform& transform)              = 0;
+        virtual void set_clip_rect(glm::ivec2 top_left, glm::ivec2 size) = 0;
+        virtual void set_viewport(glm::ivec2 top_left, glm::ivec2 size)  = 0;
+        virtual void set_render_target(ResourceID render_target)         = 0;
+        virtual float get_delta_time()                                   = 0;
 
         // Rendering pipelines
         virtual ResourceID load_pipeline_raster(const char* shader_vs, const char* shader_ps) = 0;
@@ -43,9 +45,11 @@ namespace Gfx {
         virtual ResourceID create_buffer(const std::string_view& name, const size_t size_bytes, const void* data = nullptr) = 0;
         virtual void upload_data_to_buffer(
             const ResourceID buffer, const size_t offset_bytes, const size_t size_bytes, const void* data) = 0;
-        virtual ResourceID
-        create_texture(const glm::ivec3 resolution, const TextureType type, const PixelFormat format, const void* data) = 0;
-        virtual void bind_texture(int slot, const ResourceID texture)                                                   = 0;
+        virtual ResourceID create_texture(
+            const glm::ivec3 resolution, const TextureType type, const PixelFormat format, const void* data,
+            const bool is_framebuffer)                                        = 0;
+        virtual void bind_texture(int slot, const ResourceID texture)         = 0;
+        virtual void resize_texture(ResourceID id, glm::ivec3 new_resolution) = 0;
 
         // Input
         virtual void input_setup()                                = 0;

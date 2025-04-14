@@ -417,7 +417,7 @@ namespace UI {
             const glm::vec2 transform_rect_size    = transform_bottom_right - transform_top_left;
 
             const glm::vec2 anchored_top_left =
-                Gfx::anchor_offset_pixels(transform_top_left + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform_top_left, transform->anchor, scene.panel_size);
             const glm::vec2 ui_anchored_top_left =
                 Gfx::anchor_offset_pixels(anchored_top_left, text->ui_anchor, transform_rect_size);
 
@@ -446,9 +446,9 @@ namespace UI {
 
             // Draw the wheel
             const glm::vec2 top_left =
-                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
             const glm::vec2 bottom_right =
-                Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
             const glm::vec2 center = (top_left + bottom_right) / 2.0f;
             const glm::vec2 scale  = center - top_left;
             double& val            = value->get_as_ref<double>();
@@ -492,9 +492,9 @@ namespace UI {
 
             // Draw the slider
             glm::vec2 top_left =
-                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
             glm::vec2 bottom_right =
-                Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
             if (text && draggable) {
                 if (draggable->is_horizontal == false) {
                     bottom_right.y -= Gfx::get_font_height() * text->scale.y;
@@ -576,7 +576,7 @@ namespace UI {
             float margin           = 2.0f;
             float circle_size_max  = vertical_spacing / 2.0f - margin;
             glm::vec2 circle_base_offset =
-                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size) +
+                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size) +
                 glm::vec2(margin + circle_size_max);
             float outline_circle_radius  = 16;
             float selected_circle_radius = 12;
@@ -653,9 +653,9 @@ namespace UI {
 
             // Render the button
             glm::vec2 top_left =
-                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
             glm::vec2 bottom_right =
-                Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
             glm::vec2 box_top_left     = top_left;
             glm::vec2 box_bottom_right = {bottom_right.x, top_left.y + combobox->button_height};
             glm::vec2 arrow_center     = {bottom_right.x - 30.f, top_left.y + (combobox->button_height / 2) + 8};
@@ -807,9 +807,9 @@ namespace UI {
             }
 
             const glm::vec2 tl =
-                Gfx::anchor_offset_pixels(transform->top_left + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
             const glm::vec2 br =
-                Gfx::anchor_offset_pixels(transform->bottom_right + scene.top_left, transform->anchor, scene.panel_size);
+                Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
             Gfx::draw_rectangle_2d_pixels(
                 tl, br,
                 {
@@ -1099,8 +1099,6 @@ namespace UI {
     }
 
     inline void update_entities(Scene& scene, float delta_time, float window_bar_size) {
-        Gfx::set_clip_rect(scene.top_left - glm::vec2(0, window_bar_size), scene.panel_size + glm::vec2(0, window_bar_size));
-
         // Render sprites
         system_comp_sprite(scene);
         system_comp_special_render(scene);

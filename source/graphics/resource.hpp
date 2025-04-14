@@ -83,8 +83,10 @@ namespace Gfx {
 
     struct TextureResource {
         Resource base;
+        Resource fbo; // OpenGL specific
         uint32_t width, height;
         PixelFormat pixel_format;
+        TextureType type;
     };
 
     struct BufferResource {

@@ -79,6 +79,7 @@ int main() {
 
         Gfx::begin_frame();
         panel.update(Gfx::get_delta_time());
+        panel.render_window();
         Gfx::end_frame();
 
         // todo: move this to separate thread

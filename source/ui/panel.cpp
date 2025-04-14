@@ -2,14 +2,13 @@
 #include "components.hpp"
 #include "../graphics/renderer.hpp"
 namespace UI {
+    constexpr float window_bar_height  = 40.0f;
+    constexpr float snap_sensitivity   = 24.0f;
+    constexpr float unmax_distance     = 32.0f;
+    constexpr float resize_sensitivity = 16.0f;
+    constexpr float double_click_time  = 0.3f;
 
     void Panel::update(float delta_time) {
-        constexpr float window_bar_height  = 40.0f;
-        constexpr float snap_sensitivity   = 24.0f;
-        constexpr float unmax_distance     = 32.0f;
-        constexpr float resize_sensitivity = 16.0f;
-        constexpr float double_click_time  = 0.3f;
-
         const bool should_snap = Input::key_held(Input::Key::LeftShift) || Input::key_held(Input::Key::RightShift);
 
         // Window dragging
@@ -33,7 +32,7 @@ namespace UI {
         }
 
         if (this->being_dragged) {
-            const glm::vec2 parent_size = Gfx::get_window_size(); // todo: nested panels should reference the parent
+            const glm::vec2 parent_size = Gfx::get_viewport_size(); // todo: nested panels should reference the parent
             this->top_left += mouse_movement;
 
             // Unmaximize
@@ -81,8 +80,8 @@ namespace UI {
         // Update maximized locations every frame (the user might have resized the parent)
         if (this->maximized) {
             this->top_left = glm::vec2(0.0f, 0.0f);
-            this->size.x   = std::clamp(Gfx::get_window_size().x, min_size.x, max_size.x);
-            this->size.y   = std::clamp(Gfx::get_window_size().y, min_size.y, max_size.y);
+            this->size.x   = std::clamp(Gfx::get_viewport_size().x, min_size.x, max_size.x);
+            this->size.y   = std::clamp(Gfx::get_viewport_size().y, min_size.y, max_size.y);
         }
 
         // Resizing
@@ -195,9 +194,36 @@ namespace UI {
         }
 
         // Update panel size
+        if (size_prev != size) {
+            if (this->content_render_target.is_valid() == false) {
+                this->content_render_target = Gfx::create_texture_from_data({
+                    .format         = Gfx::PixelFormat::RGBA_8,
+                    .type           = Gfx::TextureType::Single2D,
+                    .width          = (size_t)this->size.x,
+                    .height         = (size_t)this->size.y,
+                    .depth          = 1,
+                    .is_framebuffer = 1,
+                    .data           = nullptr,
+                });
+            } else {
+                Gfx::resize_texture(this->content_render_target, glm::ivec3(this->size, 0));
+            }
+            size_prev = size;
+        }
         scene.update_extents(this->top_left, this->size, window_bar_height);
 
-        // Rendering
+        // Render content to separate render target
+        Gfx::set_render_target(this->content_render_target);
+        Gfx::set_viewport({0, 0}, this->size);
+        Gfx::set_clip_rect({0, 0}, this->size);
+        UI::update_entities(this->scene, delta_time, window_bar_height);
+        Gfx::set_render_target();
+    }
+
+    void Panel::render_window() {
+        Gfx::set_render_target();
+        Gfx::set_viewport({0, 0}, Gfx::get_window_size());
+        Gfx::set_clip_rect(this->top_left, this->top_left + this->size);
         Gfx::draw_text_pixels( // Panel name
             name,
             (Gfx::TextDrawParams){
@@ -214,6 +240,5 @@ namespace UI {
         Gfx::draw_rectangle_2d_pixels( // Content border
             this->top_left + glm::vec2(0, window_bar_height), this->top_left + this->size,
             (Gfx::DrawParams){.anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 2.0f});
-        UI::update_entities(this->scene, delta_time, window_bar_height); // Content
     }
 } // namespace UI

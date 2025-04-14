@@ -23,7 +23,9 @@ namespace Gfx {
         void end_frame() override;
         void clear_framebuffer(glm::vec4 color);
         void set_camera(const Transform& transform) override;
-        void set_clip_rect(glm::vec2 top_left, glm::vec2 size) override;
+        void set_clip_rect(glm::ivec2 top_left, glm::ivec2 size) override;
+        void set_viewport(glm::ivec2 top_left, glm::ivec2 size) override;
+        void set_render_target(ResourceID render_target) override;
         float get_delta_time() override;
 
         // Rendering pipelines
@@ -41,8 +43,10 @@ namespace Gfx {
         void upload_data_to_buffer(
             const ResourceID buffer, const size_t offset_bytes, const size_t size_bytes, const void* data) override;
         ResourceID create_texture(
-            const glm::ivec3 resolution, const TextureType type, const PixelFormat format, const void* data) override;
+            const glm::ivec3 resolution, const TextureType type, const PixelFormat format, const void* data,
+            const bool is_framebuffer) override;
         void bind_texture(int slot, const ResourceID texture) override;
+        void resize_texture(ResourceID id, glm::ivec3 new_resolution) override;
 
         // Input
         void input_setup() override;
@@ -59,6 +63,7 @@ namespace Gfx {
         uint32_t empty_vao;
         double delta_time = 0.0;
         std::vector<GLFWcursor*> cursors;
+        ResourceID active_framebuffer = ResourceID::invalid();
 
         ResourceID render_pass_active = ResourceID::invalid();
     };

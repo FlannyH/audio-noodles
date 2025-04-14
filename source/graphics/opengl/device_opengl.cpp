@@ -201,14 +201,47 @@ namespace Gfx {
 
     void DeviceOpenGL::set_camera(const Transform& transform) { TODO(); }
 
-    void DeviceOpenGL::set_clip_rect(glm::vec2 top_left, glm::vec2 size) {
+    void DeviceOpenGL::set_clip_rect(glm::ivec2 top_left, glm::ivec2 size) {
         int w, h;
-        this->get_window_size(w, h);
+        if (this->active_framebuffer.is_valid() == false) {
+            this->get_window_size(w, h);
+        } else {
+            auto* resource = (TextureResource*)(resources.at(this->active_framebuffer.id));
+            w = resource->width;
+            h = resource->height;
+        }
         const gl::GLint left   = (gl::GLint)top_left.x;
         const gl::GLint top    = h - (gl::GLint)top_left.y - size.y;
         const gl::GLint width  = (gl::GLint)size.x;
         const gl::GLint height = (gl::GLint)size.y;
         gl::glScissor(left, top, width, height);
+    }
+
+    void DeviceOpenGL::set_viewport(glm::ivec2 top_left, glm::ivec2 size) {
+        int w, h;
+        if (this->active_framebuffer.is_valid() == false) {
+            this->get_window_size(w, h);
+        } else {
+            auto* resource = (TextureResource*)(resources.at(this->active_framebuffer.id));
+            w = resource->width;
+            h = resource->height;
+        }
+        const gl::GLint left   = (gl::GLint)top_left.x;
+        const gl::GLint top    = h - (gl::GLint)top_left.y - size.y;
+        const gl::GLint width  = (gl::GLint)size.x;
+        const gl::GLint height = (gl::GLint)size.y;
+        gl::glViewport(left, top, width, height);
+    }
+
+    void DeviceOpenGL::set_render_target(ResourceID render_target) {
+        if (render_target.is_valid() && render_target.type == (uint32_t)ResourceType::Texture) {
+            auto* texture = (TextureResource*)resources.at(render_target.id);
+            gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, texture->fbo.gpu_handle32);
+            this->active_framebuffer = render_target;
+        } else {
+            gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, 0);
+            this->active_framebuffer = ResourceID::invalid();
+        }
     }
 
     float DeviceOpenGL::get_delta_time() { return (float)delta_time; }
@@ -373,7 +406,8 @@ namespace Gfx {
        resolution `data` may be null, in which case the texture is created but no data is uploaded to it.
     */
     ResourceID DeviceOpenGL::create_texture(
-        const glm::ivec3 resolution, const TextureType type, const PixelFormat format, const void* data) {
+        const glm::ivec3 resolution, const TextureType type, const PixelFormat format, const void* data,
+        const bool is_framebuffer) {
         assert((resolution.x > 0 && resolution.y > 0 && resolution.z > 0) && "Attempt to create GPU texture with size 0!");
         assert(type != TextureType::Invalid && "Attempt to create GPU texture with invalid type!");
         assert(format != PixelFormat::Invalid && "Attempt to create GPU texture with invalid format!");
@@ -416,6 +450,13 @@ namespace Gfx {
         resource->pixel_format               = format;
         resources.at(resource_id_pair.id.id) = (Resource*)resource;
 
+        if (is_framebuffer) {
+            gl::glGenFramebuffers(1, &resource->fbo.gpu_handle32);
+            gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, resource->fbo.gpu_handle32);
+            gl::glFramebufferTexture2D(gl::GL_FRAMEBUFFER, gl::GL_COLOR_ATTACHMENT0, gl::GL_TEXTURE_2D, gl_id, 0);
+            gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, 0);
+        }
+
         return resource_id_pair.id;
     }
 
@@ -426,6 +467,33 @@ namespace Gfx {
         } else {
             gl::glBindTextureUnit(slot, 0);
             gl::glUniform1i(0, 0); // texture_bound = 0
+        }
+    }
+
+    void DeviceOpenGL::resize_texture(ResourceID id, glm::ivec3 new_resolution) {
+        if (id.is_valid() && id.type == (uint32_t)ResourceType::Texture) {
+            auto* texture                 = (TextureResource*)(&resources.at(id.id));
+            const gl::GLenum gl_type      = texture_type_to_gl(texture->type);
+            const gl::GLenum gl_format    = texture_format_to_gl_format(texture->pixel_format);
+            const gl::GLenum gl_data_type = texture_format_to_gl_data_type(texture->pixel_format);
+
+            gl::glBindTexture(gl::GL_TEXTURE, texture->base.gpu_handle32);
+            switch (texture->type) {
+            case TextureType::Single2D:
+                gl::glTexImage2D(
+                    gl_type, 0, gl_format, new_resolution.x, new_resolution.y, 0, gl_format, gl_data_type, nullptr);
+                break;
+            case TextureType::Single3D: // Same as Array2D, so fall through
+            case TextureType::Array2D:
+                gl::glTexImage3D(
+                    gl_type, 0, gl_format, new_resolution.x, new_resolution.y, new_resolution.z, 0, gl_format, gl_data_type,
+                    nullptr);
+                break;
+            }
+            gl::glBindTexture(gl::GL_TEXTURE, 0);
+
+            texture->width  = new_resolution.x;
+            texture->height = new_resolution.y;
         }
     }
 

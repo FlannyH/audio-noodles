@@ -10,13 +10,26 @@
 #define CIRCLE_LUT_SIZE 24
 
 namespace Gfx {
+    struct RenderInfo {
+        std::vector<Vertex2D> vertices_to_render;
+        glm::ivec2 scissor_rect_top_left        = {0, 0};
+        glm::ivec2 scissor_rect_size            = {99999, 99999};
+        glm::ivec2 viewport_top_left            = {0, 0};
+        glm::ivec2 viewport_size                = {99999, 99999};
+        ResourceID target_framebuffer           = ResourceID::invalid();
+        ResourceID texture_to_bind              = ResourceID::invalid();
+        bool clear_framebuffer_before_rendering = false;
+    };
+
     Device* device        = nullptr; // Will be initialized to a child class of Device (e.g. DeviceOpenGL)
     glm::vec2 window_size = glm::vec2(0.0f);
     float aspect_ratio    = 1.0f;
+    RenderInfo curr_render_info;
+    bool render_info_dirty = false;
 
     // 2D rendering
     ResourceID pipeline_2d = {0, 0};
-    std::map<uint32_t, std::vector<Vertex2D>> render_queue_2d; // maps textures to vertex buffers
+    std::vector<RenderInfo> render_queue;
     ResourceID render_queue_2d_gpu_buffer = {0, 0};
     glm::vec2 circle_lut[CIRCLE_LUT_SIZE];
 
@@ -57,6 +70,8 @@ namespace Gfx {
 
     glm::vec2 get_window_size() { return window_size; }
 
+    glm::vec2 get_viewport_size() { return curr_render_info.viewport_size; }
+
     float get_delta_time() { return device->get_delta_time(); }
 
     float get_fps() { return 1.0f / get_delta_time(); }
@@ -65,27 +80,44 @@ namespace Gfx {
 
     void set_cursor_mode(CursorMode cursor_mode) { device->set_cursor_mode(cursor_mode); }
 
+    void set_render_target(ResourceID render_target) {
+        if (curr_render_info.target_framebuffer.as_u32() != render_target.as_u32()) {
+            curr_render_info.target_framebuffer = render_target;
+            render_info_dirty                   = true;
+        }
+    }
+
     void begin_frame() {
         // Update window size
         int w, h;
         device->get_window_size(w, h);
-        window_size  = {(float)w, (float)h};
-        aspect_ratio = window_size.x / window_size.y;
+        window_size.x = (float)w;
+        window_size.y = (float)h;
+        aspect_ratio = get_viewport_size().x / get_viewport_size().y;
 
-        render_queue_2d.clear();
-        device->handle_resize(w, h);
+        render_queue.clear();
         device->begin_frame();
+        device->set_render_target(ResourceID::invalid());
         device->clear_framebuffer(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     }
 
     void end_frame() {
-        if (!render_queue_2d.empty()) {
-            for (const auto& [key, value]: render_queue_2d) {
-                device->upload_data_to_buffer(render_queue_2d_gpu_buffer, 0, sizeof(Vertex2D) * value.size(), value.data());
+        render_queue.push_back(curr_render_info);
+
+        if (!render_queue.empty()) {
+            for (const auto& render_info: render_queue) {
+                if (render_info.vertices_to_render.empty()) continue;
+
+                device->upload_data_to_buffer(
+                    render_queue_2d_gpu_buffer, 0, sizeof(Vertex2D) * render_info.vertices_to_render.size(),
+                    render_info.vertices_to_render.data());
                 device->begin_raster_pass(pipeline_2d);
                 device->bind_resources({{render_queue_2d_gpu_buffer, 0}});
-                device->bind_texture(0, ResourceID::from_u32(key));
-                device->execute_raster(value.size());
+                device->bind_texture(0, render_info.texture_to_bind);
+                device->set_render_target(render_info.target_framebuffer);
+                device->set_viewport(render_info.viewport_top_left, render_info.viewport_size);
+                device->set_clip_rect(render_info.scissor_rect_top_left, render_info.scissor_rect_size);
+                device->execute_raster(render_info.vertices_to_render.size());
                 device->end_raster_pass();
             }
         }
@@ -93,11 +125,23 @@ namespace Gfx {
         device->end_frame();
     }
 
-    void set_clip_rect(glm::vec2 top_left, glm::vec2 size) { device->set_clip_rect(top_left, size); }
+    void set_clip_rect(glm::ivec2 top_left, glm::ivec2 size) {
+        if (curr_render_info.scissor_rect_top_left != top_left) render_info_dirty = true;
+        if (curr_render_info.scissor_rect_size != size) render_info_dirty = true;
+        curr_render_info.scissor_rect_top_left = top_left;
+        curr_render_info.scissor_rect_size     = size;
+    }
+
+    void set_viewport(glm::ivec2 top_left, glm::ivec2 size) {
+        if (curr_render_info.viewport_top_left != top_left) render_info_dirty = true;
+        if (curr_render_info.viewport_size != size) render_info_dirty = true;
+        curr_render_info.viewport_top_left = top_left;
+        curr_render_info.viewport_size     = size;
+    }
 
     void draw_line_2d(glm::vec2 a, glm::vec2 b, const DrawParams& draw_params) {
         float width = draw_params.line_width;
-        if (width * window_size.y < 0.5f) {
+        if (width * get_viewport_size().y < 0.5f) {
             width = 1.0f / window_size.y;
         }
 
@@ -113,13 +157,24 @@ namespace Gfx {
     }
 
     void draw_triangle_2d(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, const DrawParams& draw_params) {
-        render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
+        if (curr_render_info.texture_to_bind.as_u32() != draw_params.texture.as_u32()) {
+            curr_render_info.texture_to_bind = draw_params.texture;
+            render_info_dirty                = true;
+        }
+
+        if (render_queue.empty() || render_info_dirty) {
+            render_queue.push_back(curr_render_info);
+            render_info_dirty = false;
+        }
+        auto& render_info = render_queue.back();
+
+        render_info.vertices_to_render.push_back(Vertex2D(
             Gfx::anchor_offset(v0.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color, v0.texcoord,
             draw_params.texture));
-        render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
+        render_info.vertices_to_render.push_back(Vertex2D(
             Gfx::anchor_offset(v1.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color, v1.texcoord,
             draw_params.texture));
-        render_queue_2d[draw_params.texture.as_u32()].push_back(Vertex2D(
+        render_info.vertices_to_render.push_back(Vertex2D(
             Gfx::anchor_offset(v2.pos * 2.0f, draw_params.anchor_point), draw_params.depth, draw_params.color, v2.texcoord,
             draw_params.texture));
     }
@@ -165,28 +220,28 @@ namespace Gfx {
     }
 
     void draw_line_2d_pixels(glm::vec2 v0, glm::vec2 v1, DrawParams draw_params) {
-        draw_params.line_width /= window_size.y;
-        draw_line_2d(v0 / window_size, v1 / window_size, draw_params);
+        draw_params.line_width /= get_viewport_size().y;
+        draw_line_2d(v0 / get_viewport_size(), v1 / get_viewport_size(), draw_params);
     }
 
     void draw_triangle_2d_pixels(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, const DrawParams& draw_params) {
-        v0.pos /= window_size;
-        v1.pos /= window_size;
-        v2.pos /= window_size;
+        v0.pos /= get_viewport_size();
+        v1.pos /= get_viewport_size();
+        v2.pos /= get_viewport_size();
         draw_triangle_2d(v0, v1, v2, draw_params);
     }
 
     void draw_quad_2d_pixels(PosTexcoord v0, PosTexcoord v1, PosTexcoord v2, PosTexcoord v3, const DrawParams& draw_params) {
-        v0.pos /= window_size;
-        v1.pos /= window_size;
-        v2.pos /= window_size;
-        v3.pos /= window_size;
+        v0.pos /= get_viewport_size();
+        v1.pos /= get_viewport_size();
+        v2.pos /= get_viewport_size();
+        v3.pos /= get_viewport_size();
         draw_quad_2d(v0, v1, v2, v3, draw_params);
     }
 
     void draw_rectangle_2d_pixels(glm::vec2 top_left, glm::vec2 bottom_right, DrawParams draw_params) {
-        draw_params.shape_outline_width /= window_size.y;
-        draw_rectangle_2d(top_left / window_size, bottom_right / window_size, draw_params);
+        draw_params.shape_outline_width /= get_viewport_size().y;
+        draw_rectangle_2d(top_left / get_viewport_size(), bottom_right / get_viewport_size(), draw_params);
     }
 
     constexpr glm::vec2 anchor_offsets[] = {
@@ -204,7 +259,7 @@ namespace Gfx {
     glm::vec2 anchor_offset(glm::vec2 top_left, Gfx::AnchorPoint anchor) { return top_left + anchor_offsets[(size_t)anchor]; }
 
     glm::vec2 anchor_offset_pixels(glm::vec2 top_left, Gfx::AnchorPoint anchor, glm::vec2 anchor_size) {
-        if (anchor_size.x == 0.0f || anchor_size.y == 0.0f) anchor_size = window_size;
+        if (anchor_size.x == 0.0f || anchor_size.y == 0.0f) anchor_size = get_viewport_size();
         return top_left + anchor_offsets[(size_t)anchor] * anchor_size;
     }
 
@@ -224,8 +279,8 @@ namespace Gfx {
     }
 
     void draw_circle_2d_pixels(glm::vec2 center, glm::vec2 size, DrawParams draw_params) {
-        draw_params.shape_outline_width /= window_size.y;
-        draw_circle_2d(center / window_size, size / window_size, draw_params);
+        draw_params.shape_outline_width /= get_viewport_size().y;
+        draw_circle_2d(center / get_viewport_size(), size / get_viewport_size(), draw_params);
     }
 
     std::shared_ptr<Font> load_font(const std::string& path) {
@@ -426,7 +481,8 @@ namespace Gfx {
 
     ResourceID create_texture_from_data(TextureCreationParams params) {
         return device->create_texture(
-            glm::ivec3(params.width, params.height, params.depth), params.type, params.format, params.data);
+            glm::ivec3(params.width, params.height, params.depth), params.type, params.format, params.data,
+            params.is_framebuffer);
     }
 
     ResourceID create_texture2d_from_file(const std::string& path) {
@@ -444,4 +500,5 @@ namespace Gfx {
             .data   = data,
         });
     }
+    void resize_texture(ResourceID id, glm::ivec3 new_resolution) { device->resize_texture(id, new_resolution); }
 } // namespace Gfx

@@ -32,12 +32,13 @@ namespace Gfx {
     };
 
     struct TextureCreationParams {
-        PixelFormat format = PixelFormat::Invalid;
-        TextureType type   = TextureType::Invalid;
-        size_t width       = 0;
-        size_t height      = 0;
-        size_t depth       = 1; // Only applicable to 3D textures and texture arrays
-        void* data         = nullptr;
+        PixelFormat format  = PixelFormat::Invalid;
+        TextureType type    = TextureType::Invalid;
+        size_t width        = 0;
+        size_t height       = 0;
+        size_t depth        = 1; // Only applicable to 3D textures and texture arrays
+        bool is_framebuffer = false;
+        void* data          = nullptr;
     };
 
     struct PosTexcoord {
@@ -71,15 +72,18 @@ namespace Gfx {
         const char* title = "Audio Noodles");
     bool should_stay_open();
     glm::vec2 get_window_size();
+    glm::vec2 get_viewport_size();
     float get_delta_time();
     float get_fps();
     void set_mouse_visible(bool visible);
     void set_cursor_mode(CursorMode cursor_mode);
+    void set_render_target(ResourceID render_target = ResourceID::invalid());
 
     // Rendering
     void begin_frame();
     void end_frame();
-    void set_clip_rect(glm::vec2 top_left = {0.0f, 0.0f}, glm::vec2 size = {99999.0f, 99999.0f});
+    void set_clip_rect(glm::ivec2 top_left = {0.0f, 0.0f}, glm::ivec2 size = {99999.0f, 99999.0f});
+    void set_viewport(glm::ivec2 top_left = {0.0f, 0.0f}, glm::ivec2 size = {99999.0f, 99999.0f});
 
     // 2D rendering in normalized device coordinates (-1.0 to 1.0)
     void draw_line_2d(glm::vec2 v0, glm::vec2 v1, const DrawParams& draw_params = {});
@@ -110,4 +114,5 @@ namespace Gfx {
     ResourceID create_buffer(const std::string_view& name, const size_t size, const void* data = nullptr);
     ResourceID create_texture_from_data(TextureCreationParams params);
     ResourceID create_texture2d_from_file(const std::string& path);
+    void resize_texture(ResourceID id, glm::ivec3 new_resolution);
 } // namespace Gfx
