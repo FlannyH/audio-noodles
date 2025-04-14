@@ -240,5 +240,12 @@ namespace UI {
         Gfx::draw_rectangle_2d_pixels( // Content border
             this->top_left + glm::vec2(0, window_bar_height), this->top_left + this->size,
             (Gfx::DrawParams){.anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 2.0f});
+        Gfx::draw_rectangle_2d_pixels( // Content
+            this->top_left + glm::vec2(0, window_bar_height), this->top_left + this->size,
+            (Gfx::DrawParams){
+                .anchor_point = Gfx::AnchorPoint::TopLeft,
+                .texcoord_tl  = {0.0f, 1.0f},
+                .texcoord_br  = {1.0f, 0.0f},
+                .texture      = this->content_render_target});
     }
 } // namespace UI
