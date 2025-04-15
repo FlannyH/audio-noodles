@@ -1098,14 +1098,16 @@ namespace UI {
         }
     }
 
-    inline void update_entities(Scene& scene, float delta_time, float window_bar_size) {
+    inline void update_entities_render(Scene& scene) {
         // Render sprites
         system_comp_sprite(scene);
         system_comp_special_render(scene);
 
         // Render text
         system_comp_text(scene);
+    }
 
+    inline void update_entities_input(Scene& scene, float delta_time) {
         // Handle clickable components
         system_comp_mouse_interact(scene);
 

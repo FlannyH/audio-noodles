@@ -212,17 +212,18 @@ namespace UI {
             size_prev = size;
         }
         scene.update_extents(this->top_left + glm::vec2(1, window_bar_height + 1), content_size);
+        UI:update_entities_input(this->scene, delta_time);
+    }
 
+    void Panel::render_window() {
         // Render content to separate render target
+        const glm::ivec2 content_size = {(int)this->size.x - 2, (int)(this->size.y - window_bar_height - 2)};
         Gfx::set_render_target(this->content_render_target);
         Gfx::set_viewport({0, 0}, content_size);
         Gfx::set_clip_rect({0, 0}, content_size);
         Gfx::draw_rectangle_2d({-1, -1}, {1, 1}, {.color = this->bg_color, .shape_outline_width = 0.0f});
-        UI::update_entities(this->scene, delta_time, window_bar_height);
-        Gfx::set_render_target();
-    }
+        UI::update_entities_render(this->scene);
 
-    void Panel::render_window() {
         Gfx::set_render_target();
         Gfx::set_viewport({0, 0}, Gfx::get_window_size());
         Gfx::set_clip_rect(this->top_left, this->size);
