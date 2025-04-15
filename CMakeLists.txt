@@ -60,6 +60,8 @@ add_executable (AudioNoodles
   "source/ui/panel.hpp"
   "source/ui/components.hpp"
   "source/ui/value_system.hpp"
+  "source/ui/panel_manager.cpp"
+  "source/ui/panel_manager.hpp"
   "source/graphics/device.cpp"
   "source/graphics/device.hpp"
   "source/graphics/renderer.cpp"

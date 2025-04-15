@@ -5,6 +5,7 @@
 #include "ui/scene.hpp"
 #include "ui/panel.hpp"
 #include "ui/components.hpp"
+#include "ui/panel_manager.hpp"
 #include "graphics/renderer.hpp"
 
 int main() {
@@ -13,8 +14,8 @@ int main() {
     Gfx::init(Gfx::RenderAPI::OpenGL, 1280, 720, "Audio Noodles");
     Session::tracks().push_back(Track{});
 
-    UI::Panel panel{.top_left = {0, 0}, .min_size = {640, 600}, .max_size = {2048, 1024}, .size = {800, 600}};
-    UI::Panel panel2{.top_left = {32, 32}, .min_size = {640, 600}, .max_size = {2048, 1024}, .size = {800, 600}};
+    UI::Panel& panel = UI::new_panel({.top_left = {0, 0}, .size = {800, 600}, .min_size = {640, 600}, .max_size = {2048, 1024}});
+    UI::Panel& panel2 = UI::new_panel({.top_left = {32, 32}, .size = {800, 600}, .min_size = {640, 600}, .max_size = {2048, 1024}});
     auto& scene = panel.scene;
     auto& scene2 = panel2.scene;
     UI::create_button(
@@ -80,10 +81,8 @@ int main() {
         Input::update();
 
         Gfx::begin_frame();
-        panel.update(Gfx::get_delta_time());
-        panel2.update(Gfx::get_delta_time());
-        panel.render_window();
-        panel2.render_window();
+        UI::panel_input();
+        UI::panel_render();
         Gfx::end_frame();
 
         // todo: move this to separate thread

@@ -27,4 +27,9 @@ namespace UI {
         void update(float delta_time);
         void render_window();
     };
+    constexpr float window_bar_height  = 40.0f;
+    constexpr float snap_sensitivity   = 24.0f;
+    constexpr float unmax_distance     = 32.0f;
+    constexpr float resize_sensitivity = 16.0f;
+    constexpr float double_click_time  = 0.3f;
 } // namespace UI
