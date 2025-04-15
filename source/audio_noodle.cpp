@@ -14,18 +14,20 @@ int main() {
     Session::tracks().push_back(Track{});
 
     UI::Panel panel{.top_left = {0, 0}, .min_size = {640, 600}, .max_size = {2048, 1024}, .size = {800, 600}};
+    UI::Panel panel2{.top_left = {32, 32}, .min_size = {640, 600}, .max_size = {2048, 1024}, .size = {800, 600}};
     auto& scene = panel.scene;
+    auto& scene2 = panel2.scene;
     UI::create_button(
         scene, {{-75, 32}, {160, 100}, 0.0f, Gfx::AnchorPoint::Top}, []() { printf("hi1!\n"); },
         {L"Button1", {2, 2}, {1, 0, 0, 1}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Center});
     UI::create_text(
-        scene, "debug_text", {{0, 0}, {128, 128}, 0.5f, Gfx::AnchorPoint::TopLeft},
+        scene2, "debug_text", {{0, 0}, {128, 128}, 0.5f, Gfx::AnchorPoint::TopLeft},
         UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::TopLeft));
     UI::create_text(
-        scene, "debug_text", {{-128, 0}, {0, 128}, 0.5f, Gfx::AnchorPoint::TopRight},
+        scene2, "debug_text", {{-128, 0}, {0, 128}, 0.5f, Gfx::AnchorPoint::TopRight},
         UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::TopRight));
     UI::create_text(
-        scene, "debug_text", {{-128, -64}, {0, 64}, 0.5f, Gfx::AnchorPoint::Right},
+        scene2, "debug_text", {{-128, -64}, {0, 64}, 0.5f, Gfx::AnchorPoint::Right},
         UI::Text(L"Test\n123", {2.0f, 2.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, Gfx::AnchorPoint::Center, Gfx::AnchorPoint::Right));
     UI::create_text(
         scene, "debug_text", {{-128, -128}, {0, 0}, 0.5f, Gfx::AnchorPoint::BottomRight},
@@ -79,7 +81,9 @@ int main() {
 
         Gfx::begin_frame();
         panel.update(Gfx::get_delta_time());
+        panel2.update(Gfx::get_delta_time());
         panel.render_window();
+        panel2.render_window();
         Gfx::end_frame();
 
         // todo: move this to separate thread
