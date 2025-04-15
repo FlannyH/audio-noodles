@@ -199,6 +199,34 @@ namespace Gfx {
         gl::glEnable(gl::GL_SCISSOR_TEST);
     }
 
+    void DeviceOpenGL::blit_pixels(ResourceID src, ResourceID dest, glm::ivec2 size, glm::ivec2 dest_tl, glm::ivec2 src_tl) {
+        int w, h;
+        get_window_size(w, h);
+        gl::GLuint src_fbo  = 0;
+        gl::GLuint dest_fbo = 0;
+        glm::ivec2 src_res  = {w, h};
+        glm::ivec2 dest_res = {w, h};
+        if (src.is_valid() && src.type == (uint32_t)ResourceType::Texture) {
+            auto* src_tex = (TextureResource*)resources.at(src.id);
+            src_fbo       = src_tex->fbo.gpu_handle32;
+            src_res.x     = src_tex->width;
+            src_res.y     = src_tex->height;
+        }
+        if (dest.is_valid() && dest.type == (uint32_t)ResourceType::Texture) {
+            auto* dest_tex = (TextureResource*)resources.at(dest.id);
+            dest_fbo       = dest_tex->fbo.gpu_handle32;
+            dest_res.x     = dest_tex->width;
+            dest_res.y     = dest_tex->height;
+        }
+        src_tl.y  = src_res.y - src_tl.y - size.y;
+        dest_tl.y = dest_res.y - dest_tl.y - size.y;
+        gl::glBindFramebuffer(gl::GL_READ_FRAMEBUFFER, src_fbo);
+        gl::glBindFramebuffer(gl::GL_DRAW_FRAMEBUFFER, dest_fbo);
+        gl::glBlitFramebuffer(
+            src_tl.x, src_tl.y, src_tl.x + size.x, src_tl.y + size.y, dest_tl.x, dest_tl.y, dest_tl.x + size.x,
+            dest_tl.y + size.y, gl::GL_COLOR_BUFFER_BIT, gl::GL_LINEAR);
+    }
+
     void DeviceOpenGL::set_camera(const Transform& transform) { TODO(); }
 
     void DeviceOpenGL::set_clip_rect(glm::ivec2 top_left, glm::ivec2 size) {

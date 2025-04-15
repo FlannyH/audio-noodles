@@ -742,7 +742,7 @@ namespace UI {
                     }
 
                     // Create a hitbox for the current item
-                    Hitbox curr_item_hitbox{box_top_left, box_bottom_right};
+                    Hitbox curr_item_hitbox{box_top_left + scene.top_left, box_bottom_right + scene.top_left};
 
                     // If the mouse is over it, change the color based on the mouse
                     if (curr_item_hitbox.intersects(Input::mouse_position_pixels())) {

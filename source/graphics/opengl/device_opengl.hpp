@@ -22,6 +22,7 @@ namespace Gfx {
         void begin_frame() override;
         void end_frame() override;
         void clear_framebuffer(glm::vec4 color);
+        void blit_pixels(ResourceID src, ResourceID dest, glm::ivec2 size, glm::ivec2 dest_tl, glm::ivec2 src_tl) override;
         void set_camera(const Transform& transform) override;
         void set_clip_rect(glm::ivec2 top_left, glm::ivec2 size) override;
         void set_viewport(glm::ivec2 top_left, glm::ivec2 size) override;

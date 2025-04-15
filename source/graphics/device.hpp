@@ -20,16 +20,17 @@ namespace Gfx {
         virtual void get_window_size(int& width, int& height) = 0;
 
         // Common rendering
-        virtual bool should_stay_open()                                  = 0;
-        virtual void set_full_screen(bool full_screen)                   = 0;
-        virtual void begin_frame()                                       = 0;
-        virtual void end_frame()                                         = 0;
-        virtual void clear_framebuffer(glm::vec4 color)                  = 0;
-        virtual void set_camera(const Transform& transform)              = 0;
-        virtual void set_clip_rect(glm::ivec2 top_left, glm::ivec2 size) = 0;
-        virtual void set_viewport(glm::ivec2 top_left, glm::ivec2 size)  = 0;
-        virtual void set_render_target(ResourceID render_target)         = 0;
-        virtual float get_delta_time()                                   = 0;
+        virtual bool should_stay_open()                                                                                   = 0;
+        virtual void set_full_screen(bool full_screen)                                                                    = 0;
+        virtual void begin_frame()                                                                                        = 0;
+        virtual void end_frame()                                                                                          = 0;
+        virtual void clear_framebuffer(glm::vec4 color)                                                                   = 0;
+        virtual void blit_pixels(ResourceID src, ResourceID dest, glm::ivec2 size, glm::ivec2 dest_tl, glm::ivec2 src_tl) = 0;
+        virtual void set_camera(const Transform& transform)                                                               = 0;
+        virtual void set_clip_rect(glm::ivec2 top_left, glm::ivec2 size)                                                  = 0;
+        virtual void set_viewport(glm::ivec2 top_left, glm::ivec2 size)                                                   = 0;
+        virtual void set_render_target(ResourceID render_target)                                                          = 0;
+        virtual float get_delta_time()                                                                                    = 0;
 
         // Rendering pipelines
         virtual ResourceID load_pipeline_raster(const char* shader_vs, const char* shader_ps) = 0;

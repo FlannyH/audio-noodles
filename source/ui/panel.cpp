@@ -194,28 +194,30 @@ namespace UI {
         }
 
         // Update panel size
+        glm::ivec2 content_size = {(int)this->size.x - 2, (int)(this->size.y - window_bar_height - 2)};
         if (size_prev != size) {
             if (this->content_render_target.is_valid() == false) {
                 this->content_render_target = Gfx::create_texture_from_data({
                     .format         = Gfx::PixelFormat::RGBA_8,
                     .type           = Gfx::TextureType::Single2D,
-                    .width          = (size_t)this->size.x,
-                    .height         = (size_t)(this->size.y - window_bar_height),
+                    .width          = (size_t)content_size.x,
+                    .height         = (size_t)content_size.y,
                     .depth          = 1,
                     .is_framebuffer = true,
                     .data           = nullptr,
                 });
             } else {
-                Gfx::resize_texture(this->content_render_target, glm::ivec3(this->size, 0));
+                Gfx::resize_texture(this->content_render_target, glm::ivec3(content_size, 0));
             }
             size_prev = size;
         }
-        scene.update_extents(this->top_left, this->size, window_bar_height);
+        scene.update_extents(this->top_left + glm::vec2(1, window_bar_height + 1), content_size);
 
         // Render content to separate render target
         Gfx::set_render_target(this->content_render_target);
-        Gfx::set_viewport({0, 0}, this->size);
-        Gfx::set_clip_rect({0, 0}, this->size);
+        Gfx::set_viewport({0, 0}, content_size);
+        Gfx::set_clip_rect({0, 0}, content_size);
+        Gfx::draw_rectangle_2d({-1, -1}, {1, 1}, {.color = this->bg_color, .shape_outline_width = 0.0f});
         UI::update_entities(this->scene, delta_time, window_bar_height);
         Gfx::set_render_target();
     }
@@ -223,7 +225,7 @@ namespace UI {
     void Panel::render_window() {
         Gfx::set_render_target();
         Gfx::set_viewport({0, 0}, Gfx::get_window_size());
-        Gfx::set_clip_rect(this->top_left, this->top_left + this->size);
+        Gfx::set_clip_rect(this->top_left, this->size);
         Gfx::draw_text_pixels( // Panel name
             name,
             (Gfx::TextDrawParams){
@@ -234,18 +236,20 @@ namespace UI {
         Gfx::draw_rectangle_2d_pixels( // Title bar border
             this->top_left, this->top_left + glm::vec2(this->size.x, window_bar_height + 2),
             (Gfx::DrawParams){.anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 2.0f});
-        Gfx::draw_rectangle_2d_pixels( // Content background color
-            this->top_left + glm::vec2(0, window_bar_height), this->top_left + this->size,
-            {.color = this->bg_color, .anchor_point = Gfx::AnchorPoint::TopLeft});
         Gfx::draw_rectangle_2d_pixels( // Content border
             this->top_left + glm::vec2(0, window_bar_height), this->top_left + this->size,
             (Gfx::DrawParams){.anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 2.0f});
-        Gfx::draw_rectangle_2d_pixels( // Content
-            this->top_left + glm::vec2(0, window_bar_height), this->top_left + this->size,
-            (Gfx::DrawParams){
-                .anchor_point = Gfx::AnchorPoint::TopLeft,
-                .texcoord_tl  = {0.0f, 1.0f},
-                .texcoord_br  = {1.0f, 0.0f},
-                .texture      = this->content_render_target});
+
+        Gfx::blit_pixels(
+            this->content_render_target, Gfx::ResourceID::invalid(), this->size - glm::vec2(2, window_bar_height + 2),
+            {this->top_left + glm::vec2(1, 1 + window_bar_height)}, {0,0});
+
+        // Gfx::draw_rectangle_2d_pixels( // Content
+        //     this->top_left + glm::vec2(1, 1 + window_bar_height), this->top_left + this->size - glm::vec2(1),
+        //     (Gfx::DrawParams){
+        //         .anchor_point = Gfx::AnchorPoint::TopLeft,
+        //         .texcoord_tl  = {0.0f, 1.0f},
+        //         .texcoord_br  = {1.0f, 0.0f},
+        //         .texture      = this->content_render_target});
     }
 } // namespace UI

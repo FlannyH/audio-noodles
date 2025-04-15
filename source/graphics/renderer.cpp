@@ -11,14 +11,23 @@
 
 namespace Gfx {
     struct RenderInfo {
+        RenderInfoType type = RenderInfoType::None;
+
+        // Raster
         std::vector<Vertex2D> vertices_to_render;
-        glm::ivec2 scissor_rect_top_left        = {0, 0};
-        glm::ivec2 scissor_rect_size            = {99999, 99999};
-        glm::ivec2 viewport_top_left            = {0, 0};
-        glm::ivec2 viewport_size                = {99999, 99999};
-        ResourceID target_framebuffer           = ResourceID::invalid();
-        ResourceID texture_to_bind              = ResourceID::invalid();
-        bool clear_framebuffer_before_rendering = false;
+        glm::ivec2 scissor_rect_top_left = {0, 0};
+        glm::ivec2 scissor_rect_size     = {99999, 99999};
+        glm::ivec2 viewport_top_left     = {0, 0};
+        glm::ivec2 viewport_size         = {99999, 99999};
+        ResourceID target_framebuffer    = ResourceID::invalid();
+        ResourceID texture_to_bind       = ResourceID::invalid();
+
+        // Blit
+        ResourceID blit_src_texture;
+        ResourceID blit_dst_texture;
+        glm::ivec2 blit_src_top_left;
+        glm::ivec2 blit_dst_top_left;
+        glm::ivec2 blit_size;
     };
 
     Device* device        = nullptr; // Will be initialized to a child class of Device (e.g. DeviceOpenGL)
@@ -93,7 +102,7 @@ namespace Gfx {
         device->get_window_size(w, h);
         window_size.x = (float)w;
         window_size.y = (float)h;
-        aspect_ratio = get_viewport_size().x / get_viewport_size().y;
+        aspect_ratio  = get_viewport_size().x / get_viewport_size().y;
 
         render_queue.clear();
         device->begin_frame();
@@ -104,23 +113,32 @@ namespace Gfx {
     }
 
     void end_frame() {
-        render_queue.push_back(curr_render_info);
+        if (curr_render_info.type != RenderInfoType::None) render_queue.push_back(curr_render_info);
 
         if (!render_queue.empty()) {
             for (const auto& render_info: render_queue) {
-                if (render_info.vertices_to_render.empty()) continue;
+                if (render_info.type == RenderInfoType::None) continue;
+                if (render_info.type == RenderInfoType::Raster) {
+                    if (render_info.vertices_to_render.empty()) continue;
 
-                device->upload_data_to_buffer(
-                    render_queue_2d_gpu_buffer, 0, sizeof(Vertex2D) * render_info.vertices_to_render.size(),
-                    render_info.vertices_to_render.data());
-                device->begin_raster_pass(pipeline_2d);
-                device->bind_resources({{render_queue_2d_gpu_buffer, 0}});
-                device->bind_texture(0, render_info.texture_to_bind);
-                device->set_render_target(render_info.target_framebuffer);
-                device->set_viewport(render_info.viewport_top_left, render_info.viewport_size);
-                device->set_clip_rect(render_info.scissor_rect_top_left, render_info.scissor_rect_size);
-                device->execute_raster(render_info.vertices_to_render.size());
-                device->end_raster_pass();
+                    device->upload_data_to_buffer(
+                        render_queue_2d_gpu_buffer, 0, sizeof(Vertex2D) * render_info.vertices_to_render.size(),
+                        render_info.vertices_to_render.data());
+                    device->begin_raster_pass(pipeline_2d);
+                    device->bind_resources({{render_queue_2d_gpu_buffer, 0}});
+                    device->bind_texture(0, render_info.texture_to_bind);
+                    device->set_render_target(render_info.target_framebuffer);
+                    device->set_viewport(render_info.viewport_top_left, render_info.viewport_size);
+                    device->set_clip_rect(render_info.scissor_rect_top_left, render_info.scissor_rect_size);
+                    device->execute_raster(render_info.vertices_to_render.size());
+                    device->end_raster_pass();
+                    continue;
+                }
+                if (render_info.type == RenderInfoType::Blit) {
+                    device->blit_pixels(
+                        render_info.blit_src_texture, render_info.blit_dst_texture, render_info.blit_size,
+                        render_info.blit_dst_top_left, render_info.blit_src_top_left);
+                }
             }
         }
 
@@ -165,6 +183,7 @@ namespace Gfx {
         }
 
         if (render_queue.empty() || render_info_dirty) {
+            curr_render_info.type = RenderInfoType::Raster;
             render_queue.push_back(curr_render_info);
             render_info_dirty = false;
         }
@@ -283,6 +302,22 @@ namespace Gfx {
     void draw_circle_2d_pixels(glm::vec2 center, glm::vec2 size, DrawParams draw_params) {
         draw_params.shape_outline_width /= get_viewport_size().y;
         draw_circle_2d(center / get_viewport_size(), size / get_viewport_size(), draw_params);
+    }
+
+    void blit_pixels(ResourceID src, ResourceID dest, glm::ivec2 size, glm::ivec2 dest_tl, glm::ivec2 src_tl) {
+        if (curr_render_info.type == RenderInfoType::Raster && !curr_render_info.vertices_to_render.empty()) {
+            render_queue.push_back(curr_render_info);
+        }
+        curr_render_info.vertices_to_render.clear();
+        curr_render_info.type              = RenderInfoType::Blit;
+        curr_render_info.blit_src_texture  = src;
+        curr_render_info.blit_dst_texture  = dest;
+        curr_render_info.blit_src_top_left = src_tl;
+        curr_render_info.blit_dst_top_left = dest_tl;
+        curr_render_info.blit_size         = size;
+        render_queue.push_back(curr_render_info);
+
+        curr_render_info.type = RenderInfoType::None;
     }
 
     std::shared_ptr<Font> load_font(const std::string& path) {

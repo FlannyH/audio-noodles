@@ -12,6 +12,8 @@ namespace Gfx {
 
     enum class AnchorPoint { TopLeft = 0, Top, TopRight, Left, Center, Right, BottomLeft, Bottom, BottomRight };
 
+    enum class RenderInfoType { None = 0, Raster, Blit };
+
     struct DrawParams {
         glm::vec4 color          = {1, 1, 1, 1};
         float depth              = 0.0f;
@@ -102,6 +104,7 @@ namespace Gfx {
         glm::vec2 top_left, Gfx::AnchorPoint anchor,
         glm::vec2 anchor_size = glm::vec2(0.0f, 0.0f)); // if anchor_size == 0, it uses the window size
     void draw_circle_2d_pixels(glm::vec2 center, glm::vec2 size, DrawParams draw_params = {});
+    void blit_pixels(ResourceID src, ResourceID dest, glm::ivec2 size, glm::ivec2 dest_tl = {0, 0}, glm::ivec2 src_tl = {0, 0});
 
     // Text
     std::shared_ptr<Font> load_font(const std::string& path);
