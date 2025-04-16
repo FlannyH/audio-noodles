@@ -43,13 +43,13 @@ namespace UI {
         // If a panel is being dragged or resized, that's the one we should focus on. Otherwise, update whatever panels are
         // below the mouse
         size_t panel_to_focus_on = -1;
+        bool do_mouse_interact   = true;
 
         for (const auto& index: panel_order) {
             const auto& panel = panel_pool[index];
             if (panel.being_dragged || panel.being_resized) {
                 panel_to_focus_on = index;
-                printf("focusing on panel %i (drag/resize)\n", panel_to_focus_on);
-                panel_pool[index].update(Gfx::get_delta_time());
+                panel_pool[index].update(Gfx::get_delta_time(), do_mouse_interact);
             }
         }
 
@@ -59,8 +59,9 @@ namespace UI {
                 Hitbox panel_hitbox = {
                     .top_left     = panel.top_left - glm::vec2(resize_sensitivity),
                     .bottom_right = panel.top_left + panel.size + glm::vec2(resize_sensitivity)};
-                panel_pool[index].update(Gfx::get_delta_time());
-                if (panel_to_focus_on == -1 && panel_hitbox.intersects(Input::mouse_position_pixels())) {
+                if (panel_hitbox.intersects(Input::mouse_position_pixels())) {
+                    panel_pool[index].update(Gfx::get_delta_time(), do_mouse_interact);
+                    do_mouse_interact = false;
                     if (Input::mouse_button_pressed(Input::MouseButton::Left)) {
                         panel_to_focus_on = index;
                         break;
@@ -76,10 +77,9 @@ namespace UI {
                 if (value == panel_to_focus_on) continue;
                 panel_order_scratch.push_back(value);
             }
-            panel_order = panel_order_scratch;
+            panel_order            = panel_order_scratch;
             prev_panel_to_focus_on = panel_to_focus_on;
         }
-        
     }
 
     void panel_render() {

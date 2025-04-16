@@ -2,7 +2,7 @@
 #include "components.hpp"
 #include "../graphics/renderer.hpp"
 namespace UI {
-    void Panel::update(float delta_time) {
+    void Panel::update(float delta_time, bool do_mouse_interact) {
         const bool should_snap = Input::key_held(Input::Key::LeftShift) || Input::key_held(Input::Key::RightShift);
 
         // Window dragging
@@ -17,7 +17,7 @@ namespace UI {
         const bool is_mouse_inside_title_bar = title_bar.intersects(mouse_pos);
         const bool is_mouse_inside_panel     = panel_padded.intersects(mouse_pos);
 
-        if (is_mouse_inside_title_bar) {
+        if (do_mouse_interact && is_mouse_inside_title_bar) {
             Gfx::set_cursor_mode(Gfx::CursorMode::Hand);
         }
 
@@ -95,7 +95,7 @@ namespace UI {
         if (abs(mouse_pos.y - (this->top_left.y + this->size.y)) < resize_sensitivity) new_resize_flags |= resize_b;
         if (abs(mouse_pos.y - this->top_left.y) < resize_sensitivity) new_resize_flags |= resize_t;
 
-        if (is_mouse_inside_title_bar == false && is_mouse_inside_panel) { // Only show resize if not focused on the title bar
+        if (do_mouse_interact && is_mouse_inside_title_bar == false && is_mouse_inside_panel) { // Only show resize if not focused on the title bar
             if (new_resize_flags == (resize_l) || new_resize_flags == (resize_r))
                 Gfx::set_cursor_mode(Gfx::CursorMode::ResizeEW);
             if (new_resize_flags == (resize_t) || new_resize_flags == (resize_b))
@@ -212,7 +212,7 @@ namespace UI {
             size_prev = size;
         }
         scene.update_extents(this->top_left + glm::vec2(1, window_bar_height + 1), content_size);
-        UI::update_entities_input(this->scene, delta_time);
+        UI::update_entities_input(this->scene, delta_time, do_mouse_interact);
     }
 
     void Panel::render_window() {

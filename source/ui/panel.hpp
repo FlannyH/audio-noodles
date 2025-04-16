@@ -24,7 +24,7 @@ namespace UI {
         bool being_resized                    = false;
         bool maximized                        = false;
 
-        void update(float delta_time);
+        void update(float delta_time, bool do_mouse_interact);
         void render_window();
     };
     constexpr float window_bar_height  = 40.0f;

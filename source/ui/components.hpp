@@ -445,8 +445,7 @@ namespace UI {
             auto* range     = scene.get_component<NumberRange>(entity);
 
             // Draw the wheel
-            const glm::vec2 top_left =
-                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
+            const glm::vec2 top_left = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
             const glm::vec2 bottom_right =
                 Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
             const glm::vec2 center = (top_left + bottom_right) / 2.0f;
@@ -491,10 +490,8 @@ namespace UI {
             auto* draggable = scene.get_component<Draggable>(entity);
 
             // Draw the slider
-            glm::vec2 top_left =
-                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
-            glm::vec2 bottom_right =
-                Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
+            glm::vec2 top_left     = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
+            glm::vec2 bottom_right = Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
             if (text && draggable) {
                 if (draggable->is_horizontal == false) {
                     bottom_right.y -= Gfx::get_font_height() * text->scale.y;
@@ -571,13 +568,12 @@ namespace UI {
             radio_button->current_selected_index = static_cast<size_t>(value->get_as_ref<double>());
 
             // Get some information ready for the sake of my mental sanity in writing this code
-            size_t n_options       = radio_button->options.size();
-            float vertical_spacing = (transform->bottom_right.y - transform->top_left.y) / static_cast<float>(n_options);
-            float margin           = 2.0f;
-            float circle_size_max  = vertical_spacing / 2.0f - margin;
-            glm::vec2 circle_base_offset =
-                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size) +
-                glm::vec2(margin + circle_size_max);
+            size_t n_options             = radio_button->options.size();
+            float vertical_spacing       = (transform->bottom_right.y - transform->top_left.y) / static_cast<float>(n_options);
+            float margin                 = 2.0f;
+            float circle_size_max        = vertical_spacing / 2.0f - margin;
+            glm::vec2 circle_base_offset = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size) +
+                                           glm::vec2(margin + circle_size_max);
             float outline_circle_radius  = 16;
             float selected_circle_radius = 12;
             float text_margin            = 20;
@@ -652,11 +648,9 @@ namespace UI {
             }
 
             // Render the button
-            glm::vec2 top_left =
-                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
-            glm::vec2 bottom_right =
-                Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
-            glm::vec2 box_top_left     = top_left;
+            glm::vec2 top_left     = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
+            glm::vec2 bottom_right = Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
+            glm::vec2 box_top_left = top_left;
             glm::vec2 box_bottom_right = {bottom_right.x, top_left.y + combobox->button_height};
             glm::vec2 arrow_center     = {bottom_right.x - 30.f, top_left.y + (combobox->button_height / 2) + 8};
             glm::vec2 text_offset      = {8, (combobox->button_height / 2)};
@@ -748,8 +742,7 @@ namespace UI {
                     if (curr_item_hitbox.intersects(Input::mouse_position_pixels())) {
                         if (multi_hitbox->click_states[1] == ClickState::hover) {
                             color *= 0.9f;
-                        }
-                        else if (multi_hitbox->click_states[1] == ClickState::click) {
+                        } else if (multi_hitbox->click_states[1] == ClickState::click) {
                             // This is a bit cursed, but it'll have to do
                             // We will actually update the combobox selected index in the rendering code, since we already do a
                             // ton of logic here to figure out where the mouse is anyway
@@ -758,8 +751,7 @@ namespace UI {
                             combobox->is_list_open           = false;
                             value->set<double>(static_cast<double>(i));
                             break;
-                        }
-                        else {
+                        } else {
                             color = {1.0f, 0.0f, 1.0f, 1.0f};
                         }
                     }
@@ -806,10 +798,8 @@ namespace UI {
                 }
             }
 
-            const glm::vec2 tl =
-                Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
-            const glm::vec2 br =
-                Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
+            const glm::vec2 tl = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
+            const glm::vec2 br = Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
             Gfx::draw_rectangle_2d_pixels(
                 tl, br,
                 {
@@ -893,7 +883,7 @@ namespace UI {
                 }
             }
             // If we're hovering over the element, display grabby hand cursor
-            if (mouse_interact->state == ClickState::hover || mouse_interact->state == ClickState::click) {
+            if ((mouse_interact->state == ClickState::hover || mouse_interact->state == ClickState::click)) {
                 Gfx::set_cursor_mode(Gfx::CursorMode::Hand);
             }
         }
@@ -1107,9 +1097,9 @@ namespace UI {
         system_comp_text(scene);
     }
 
-    inline void update_entities_input(Scene& scene, float delta_time) {
+    inline void update_entities_input(Scene& scene, float delta_time, bool do_mouse_interact) {
         // Handle clickable components
-        system_comp_mouse_interact(scene);
+        if (do_mouse_interact) system_comp_mouse_interact(scene);
 
         // Handle comboboxes - special case: if a combobox is interacted with, don't handle any other ones
         bool combobox_handled = false;
