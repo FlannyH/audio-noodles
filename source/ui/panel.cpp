@@ -8,9 +8,14 @@ namespace UI {
         // Window dragging
         const glm::vec2 mouse_pos      = Input::mouse_position_pixels();
         const glm::vec2 mouse_movement = Input::mouse_movement_pixels();
-        const bool is_mouse_inside_title_bar =
-            mouse_pos.x > this->top_left.x && mouse_pos.x < this->top_left.x + this->size.x && mouse_pos.y > this->top_left.y &&
-            mouse_pos.y < this->top_left.y + window_bar_height;
+
+        const Hitbox title_bar = {
+            .top_left = this->top_left, .bottom_right = this->top_left + glm::vec2(this->size.x, window_bar_height)};
+        const Hitbox panel_padded = {
+            .top_left     = this->top_left - glm::vec2(resize_sensitivity),
+            .bottom_right = this->top_left + this->size + glm::vec2(resize_sensitivity)};
+        const bool is_mouse_inside_title_bar = title_bar.intersects(mouse_pos);
+        const bool is_mouse_inside_panel     = panel_padded.intersects(mouse_pos);
 
         if (is_mouse_inside_title_bar) {
             Gfx::set_cursor_mode(Gfx::CursorMode::Hand);
@@ -90,7 +95,7 @@ namespace UI {
         if (abs(mouse_pos.y - (this->top_left.y + this->size.y)) < resize_sensitivity) new_resize_flags |= resize_b;
         if (abs(mouse_pos.y - this->top_left.y) < resize_sensitivity) new_resize_flags |= resize_t;
 
-        if (is_mouse_inside_title_bar == false) { // Only show resize if not focused on the title bar
+        if (is_mouse_inside_title_bar == false && is_mouse_inside_panel) { // Only show resize if not focused on the title bar
             if (new_resize_flags == (resize_l) || new_resize_flags == (resize_r))
                 Gfx::set_cursor_mode(Gfx::CursorMode::ResizeEW);
             if (new_resize_flags == (resize_t) || new_resize_flags == (resize_b))
@@ -101,7 +106,8 @@ namespace UI {
                 Gfx::set_cursor_mode(Gfx::CursorMode::ResizeNWSE);
         }
 
-        if (is_mouse_inside_title_bar == false && Input::mouse_button_pressed(Input::MouseButton::Left)) {
+        if (is_mouse_inside_title_bar == false && is_mouse_inside_panel &&
+            Input::mouse_button_pressed(Input::MouseButton::Left)) {
             this->resize_flags  = new_resize_flags;
             this->being_resized = true;
         }

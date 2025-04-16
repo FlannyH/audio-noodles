@@ -10,6 +10,7 @@ namespace UI {
     bool panel_allocated[MAX_PANEL_COUNT] = {false};
     std::vector<size_t> panel_order;
     std::vector<size_t> panel_order_scratch;
+    size_t prev_panel_to_focus_on = -1;
 
     Panel& new_panel(PanelCreateInfo&& panel_create_info) {
         for (size_t i = 0; i < MAX_PANEL_COUNT; ++i) {
@@ -39,28 +40,46 @@ namespace UI {
     }
 
     void panel_input() {
+        // If a panel is being dragged or resized, that's the one we should focus on. Otherwise, update whatever panels are
+        // below the mouse
+        size_t panel_to_focus_on = -1;
+
         for (const auto& index: panel_order) {
-            const auto& panel   = panel_pool[index];
-            Hitbox panel_hitbox = {
-                .top_left     = panel.top_left - glm::vec2(resize_sensitivity),
-                .bottom_right = panel.top_left + panel.size + glm::vec2(resize_sensitivity)};
-            if (panel_hitbox.intersects(Input::mouse_position_pixels())) {
+            const auto& panel = panel_pool[index];
+            if (panel.being_dragged || panel.being_resized) {
+                panel_to_focus_on = index;
+                printf("focusing on panel %i (drag/resize)\n", panel_to_focus_on);
                 panel_pool[index].update(Gfx::get_delta_time());
-                if (Input::mouse_button_pressed(Input::MouseButton::Left)) {
-                    panel_order_scratch.clear();
-                    panel_order_scratch.push_back(index);
-                    for (const auto& value: panel_order) {
-                        if (value == index) continue;
-                        panel_order_scratch.push_back(value);
-                    }
-                    panel_order = panel_order_scratch;
-                    break;
-                }
-            } else {
-                panel_pool[index].being_dragged = false;
-                panel_pool[index].being_resized = false;
             }
         }
+
+        if (panel_to_focus_on == -1) {
+            for (const auto& index: panel_order) {
+                const auto& panel   = panel_pool[index];
+                Hitbox panel_hitbox = {
+                    .top_left     = panel.top_left - glm::vec2(resize_sensitivity),
+                    .bottom_right = panel.top_left + panel.size + glm::vec2(resize_sensitivity)};
+                panel_pool[index].update(Gfx::get_delta_time());
+                if (panel_to_focus_on == -1 && panel_hitbox.intersects(Input::mouse_position_pixels())) {
+                    if (Input::mouse_button_pressed(Input::MouseButton::Left)) {
+                        panel_to_focus_on = index;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (panel_to_focus_on != -1 && prev_panel_to_focus_on != panel_to_focus_on) {
+            panel_order_scratch.clear();
+            panel_order_scratch.push_back(panel_to_focus_on);
+            for (const auto& value: panel_order) {
+                if (value == panel_to_focus_on) continue;
+                panel_order_scratch.push_back(value);
+            }
+            panel_order = panel_order_scratch;
+            prev_panel_to_focus_on = panel_to_focus_on;
+        }
+        
     }
 
     void panel_render() {
