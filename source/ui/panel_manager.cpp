@@ -9,6 +9,7 @@ namespace UI {
     Panel panel_pool[MAX_PANEL_COUNT]{};
     bool panel_allocated[MAX_PANEL_COUNT] = {false};
     std::vector<size_t> panel_order;
+    std::vector<size_t> panel_order_scratch;
 
     Panel& new_panel(PanelCreateInfo&& panel_create_info) {
         for (size_t i = 0; i < MAX_PANEL_COUNT; ++i) {
@@ -40,17 +41,30 @@ namespace UI {
     void panel_input() {
         for (const auto& index: panel_order) {
             const auto& panel   = panel_pool[index];
-            Hitbox panel_hitbox = {.top_left = panel.top_left, .bottom_right = panel.top_left + panel.size};
+            Hitbox panel_hitbox = {
+                .top_left     = panel.top_left - glm::vec2(resize_sensitivity),
+                .bottom_right = panel.top_left + panel.size + glm::vec2(resize_sensitivity)};
             if (panel_hitbox.intersects(Input::mouse_position_pixels())) {
                 panel_pool[index].update(Gfx::get_delta_time());
-                break;
+                if (Input::mouse_button_pressed(Input::MouseButton::Left)) {
+                    panel_order_scratch.clear();
+                    panel_order_scratch.push_back(index);
+                    for (const auto& value: panel_order) {
+                        if (value == index) continue;
+                        panel_order_scratch.push_back(value);
+                    }
+                    panel_order = panel_order_scratch;
+                    break;
+                }
+            } else {
+                panel_pool[index].being_dragged = false;
+                panel_pool[index].being_resized = false;
             }
         }
     }
 
     void panel_render() {
         for (size_t i = panel_order.size(); i-- > 0;) {
-            printf("rendering %i\n", i);
             panel_pool[panel_order[i]].render_window();
         }
     }

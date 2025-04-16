@@ -206,7 +206,7 @@ namespace UI {
             size_prev = size;
         }
         scene.update_extents(this->top_left + glm::vec2(1, window_bar_height + 1), content_size);
-        UI:update_entities_input(this->scene, delta_time);
+        UI::update_entities_input(this->scene, delta_time);
     }
 
     void Panel::render_window() {
