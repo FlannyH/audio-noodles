@@ -84,7 +84,8 @@ namespace Gfx {
     // Rendering
     void begin_frame();
     void end_frame();
-    void set_clip_rect(glm::ivec2 top_left = {0.0f, 0.0f}, glm::ivec2 size = {99999.0f, 99999.0f});
+    void push_clip_rect(glm::ivec2 top_left = {0.0f, 0.0f}, glm::ivec2 size = {99999.0f, 99999.0f});
+    void pop_clip_rect();
     void set_viewport(glm::ivec2 top_left = {0.0f, 0.0f}, glm::ivec2 size = {99999.0f, 99999.0f});
 
     // 2D rendering in normalized device coordinates (-1.0 to 1.0)

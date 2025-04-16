@@ -35,6 +35,7 @@ namespace Gfx {
     float aspect_ratio    = 1.0f;
     RenderInfo curr_render_info;
     bool render_info_dirty = false;
+    std::vector<glm::ivec4> clip_rect_stack;
 
     // 2D rendering
     ResourceID pipeline_2d = {0, 0};
@@ -108,7 +109,8 @@ namespace Gfx {
         device->begin_frame();
         set_render_target(ResourceID::invalid());
         set_viewport({0, 0}, {w, h});
-        set_clip_rect({0, 0}, {w, h});
+        clip_rect_stack.clear();
+        push_clip_rect({0, 0}, {w, h});
         device->clear_framebuffer(glm::vec4(0.0f, 0.0f, 0.5f, 1.0f));
     }
 
@@ -145,11 +147,24 @@ namespace Gfx {
         device->end_frame();
     }
 
-    void set_clip_rect(glm::ivec2 top_left, glm::ivec2 size) {
+    void push_clip_rect(glm::ivec2 top_left, glm::ivec2 size) {
         if (curr_render_info.scissor_rect_top_left != top_left) render_info_dirty = true;
         if (curr_render_info.scissor_rect_size != size) render_info_dirty = true;
         curr_render_info.scissor_rect_top_left = top_left;
         curr_render_info.scissor_rect_size     = size;
+        clip_rect_stack.push_back({top_left, size});
+    }
+
+    void pop_clip_rect() {
+        clip_rect_stack.pop_back();
+        if (curr_render_info.scissor_rect_top_left.x != clip_rect_stack.back().x) render_info_dirty = true;
+        if (curr_render_info.scissor_rect_top_left.y != clip_rect_stack.back().y) render_info_dirty = true;
+        if (curr_render_info.scissor_rect_size.x     != clip_rect_stack.back().z) render_info_dirty = true;
+        if (curr_render_info.scissor_rect_size.y     != clip_rect_stack.back().w) render_info_dirty = true;
+        curr_render_info.scissor_rect_top_left.x = clip_rect_stack.back().x;
+        curr_render_info.scissor_rect_top_left.y = clip_rect_stack.back().y;
+        curr_render_info.scissor_rect_size.x     = clip_rect_stack.back().z;
+        curr_render_info.scissor_rect_size.y     = clip_rect_stack.back().w;
     }
 
     void set_viewport(glm::ivec2 top_left, glm::ivec2 size) {

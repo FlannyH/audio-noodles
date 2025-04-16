@@ -220,13 +220,14 @@ namespace UI {
         const glm::ivec2 content_size = {(int)this->size.x - 2, (int)(this->size.y - window_bar_height - 2)};
         Gfx::set_render_target(this->content_render_target);
         Gfx::set_viewport({0, 0}, content_size);
-        Gfx::set_clip_rect({0, 0}, content_size);
+        Gfx::push_clip_rect({0, 0}, content_size);
         Gfx::draw_rectangle_2d({-1, -1}, {1, 1}, {.color = this->bg_color, .shape_outline_width = 0.0f});
         UI::update_entities_render(this->scene);
+        Gfx::pop_clip_rect();
 
         Gfx::set_render_target();
         Gfx::set_viewport({0, 0}, Gfx::get_window_size());
-        Gfx::set_clip_rect(this->top_left, this->size);
+        Gfx::push_clip_rect(this->top_left, this->size);
         Gfx::draw_rectangle_2d_pixels( // Title bar background
             this->top_left, this->top_left + glm::vec2(this->size.x, window_bar_height + 2),
             (Gfx::DrawParams){
@@ -247,5 +248,6 @@ namespace UI {
         Gfx::blit_pixels( // Content
             this->content_render_target, Gfx::ResourceID::invalid(), this->size - glm::vec2(2, window_bar_height + 2),
             {this->top_left + glm::vec2(1, 1 + window_bar_height)}, {0, 0});
+        Gfx::pop_clip_rect();
     }
 } // namespace UI

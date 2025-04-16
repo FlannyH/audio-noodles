@@ -713,6 +713,9 @@ namespace UI {
 #endif
 
             // Render the list if necessary
+            Gfx::push_clip_rect(
+                top_left + glm::vec2(0, combobox->button_height),
+                bottom_right - top_left - glm::vec2(0, combobox->button_height));
             size_t start_index = 0 + static_cast<size_t>(combobox->current_scroll_position / combobox->item_height);
             size_t end_index   = start_index + static_cast<size_t>(combobox->list_height / combobox->item_height) + 1;
             if (abs(transform->bottom_right.y - transform->top_left.y - combobox->button_height) > 1.0f) {
@@ -742,7 +745,9 @@ namespace UI {
                     if (curr_item_hitbox.intersects(Input::mouse_position_pixels())) {
                         if (multi_hitbox->click_states[1] == ClickState::hover) {
                             color *= 0.9f;
-                        } else if (multi_hitbox->click_states[1] == ClickState::click) {
+                        } else if (
+                            multi_hitbox->click_states[1] == ClickState::click &&
+                            Input::mouse_button_pressed(Input::MouseButton::Left)) {
                             // This is a bit cursed, but it'll have to do
                             // We will actually update the combobox selected index in the rendering code, since we already do a
                             // ton of logic here to figure out where the mouse is anyway
@@ -750,9 +755,6 @@ namespace UI {
                             combobox->current_selected_index = static_cast<int>(i);
                             combobox->is_list_open           = false;
                             value->set<double>(static_cast<double>(i));
-                            break;
-                        } else {
-                            color = {1.0f, 0.0f, 1.0f, 1.0f};
                         }
                     }
 
@@ -780,6 +782,7 @@ namespace UI {
                         });
                 }
             }
+            Gfx::pop_clip_rect();
         }
 
         // Box
