@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <cstring>
 #include <utility>
 #include <algorithm>
 #include <functional>
@@ -402,11 +403,11 @@ namespace UI {
                     }
 
                     // If all parts of the range are a whole number, print as if it were an integer
-                    swprintf_s(text->text, 32, L"%.2f", val);
+                    swprintf(text->text, 32, L"%.2f", val);
                     if (range) {
                         wchar_t filter[] = L"%.xf";
                         filter[2]        = L'0' + static_cast<wchar_t>(range->visual_decimal_places);
-                        swprintf_s(text->text, 32, filter, val);
+                        swprintf(text->text, 32, filter, val);
                     }
                 }
             }
