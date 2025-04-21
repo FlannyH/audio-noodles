@@ -11,6 +11,7 @@ namespace UI {
         glm::vec4 bg_color                    = glm::vec4(0.1f, 0.1f, 0.2f, 1.0f);
         bool maximized                        = false;
     };
+    std::vector<Panel*>& get_panels();
     Panel& new_panel(PanelCreateInfo&& panel_create_info);
     void panel_input();
     void panel_render();

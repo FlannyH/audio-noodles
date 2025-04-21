@@ -10,7 +10,19 @@ namespace UI {
     bool panel_allocated[MAX_PANEL_COUNT] = {false};
     std::vector<size_t> panel_order;
     std::vector<size_t> panel_order_scratch;
+    std::vector<Panel*> panels;
     size_t prev_panel_to_focus_on = -1;
+    bool panels_dirty             = false;
+
+    std::vector<Panel*>& get_panels() {
+        if (panels_dirty) {
+            panels.clear();
+            for (const auto& index: panel_order) {
+                panels.push_back(&panel_pool[index]);
+            }
+        }
+        return panels;
+    }
 
     Panel& new_panel(PanelCreateInfo&& panel_create_info) {
         for (size_t i = 0; i < MAX_PANEL_COUNT; ++i) {
@@ -79,6 +91,7 @@ namespace UI {
             }
             panel_order            = panel_order_scratch;
             prev_panel_to_focus_on = panel_to_focus_on;
+            panels_dirty           = true;
         }
     }
 

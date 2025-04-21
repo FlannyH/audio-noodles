@@ -1,5 +1,6 @@
 #include "panel.hpp"
 #include "components.hpp"
+#include "panel_manager.hpp"
 #include "../graphics/renderer.hpp"
 namespace UI {
     void Panel::update(float delta_time, bool do_mouse_interact) {
@@ -95,7 +96,8 @@ namespace UI {
         if (abs(mouse_pos.y - (this->top_left.y + this->size.y)) < resize_sensitivity) new_resize_flags |= resize_b;
         if (abs(mouse_pos.y - this->top_left.y) < resize_sensitivity) new_resize_flags |= resize_t;
 
-        if (do_mouse_interact && is_mouse_inside_title_bar == false && is_mouse_inside_panel) { // Only show resize if not focused on the title bar
+        if (do_mouse_interact && is_mouse_inside_title_bar == false &&
+            is_mouse_inside_panel) { // Only show resize if not focused on the title bar
             if (new_resize_flags == (resize_l) || new_resize_flags == (resize_r))
                 Gfx::set_cursor_mode(Gfx::CursorMode::ResizeEW);
             if (new_resize_flags == (resize_t) || new_resize_flags == (resize_b))
@@ -127,11 +129,29 @@ namespace UI {
                     this->top_left.x += difference;
                     this->size.x -= difference;
                 }
+                for (const auto panel: UI::get_panels()) {
+                    if (panel == this) continue;
+                    if (this->top_left.y > (panel->top_left.y + panel->size.y)) continue;
+                    if ((this->top_left.y + this->size.y) < panel->top_left.y) continue;
+                    if (should_snap && abs(this->top_left.x - (panel->top_left.x + panel->size.x)) < snap_sensitivity) {
+                        auto old_tl = this->top_left.x;
+                        this->top_left.x = (panel->top_left.x + panel->size.x);
+                        this->size.x += old_tl - this->top_left.x;
+                    }
+                }
             }
             if (this->resize_flags & resize_l) {
                 this->size.x += mouse_movement.x;
                 if (this->size.x > this->max_size.x) this->size.x = this->max_size.x;
                 if (this->size.x < this->min_size.x) this->size.x = this->min_size.x;
+                for (const auto panel: UI::get_panels()) {
+                    if (panel == this) continue;
+                    if (this->top_left.y > (panel->top_left.y + panel->size.y)) continue;
+                    if ((this->top_left.y + this->size.y) < panel->top_left.y) continue;
+                    if (should_snap && abs(this->top_left.x + this->size.x - panel->top_left.x) < snap_sensitivity) {
+                        this->size.x = panel->top_left.x - this->top_left.x;
+                    }
+                }
             }
             if (this->resize_flags & resize_b) {
                 this->size.y += mouse_movement.y;
@@ -150,6 +170,16 @@ namespace UI {
                     const float difference = this->size.y - this->max_size.y;
                     this->top_left.y += difference;
                     this->size.y -= difference;
+                }
+                for (const auto panel: UI::get_panels()) {
+                    if (panel == this) continue;
+                    if (this->top_left.x > (panel->top_left.x + panel->size.x)) continue;
+                    if ((this->top_left.x + this->size.x) < panel->top_left.x) continue;
+                    if (should_snap && abs(this->top_left.y - (panel->top_left.y + panel->size.y)) < snap_sensitivity) {
+                        auto old_tl = this->top_left.y;
+                        this->top_left.y = (panel->top_left.y + panel->size.y);
+                        this->size.y += old_tl - this->top_left.y;
+                    }
                 }
             }
             if (Input::mouse_button_released(Input::MouseButton::Left)) this->being_resized = false;
@@ -188,6 +218,14 @@ namespace UI {
                     if (this->size.y < this->min_size.y) {
                         this->top_left.y -= this->min_size.y - this->size.y;
                         this->size.y = this->min_size.y;
+                    }
+                }
+                for (const auto panel: UI::get_panels()) {
+                    if (panel == this) continue;
+                    if (this->top_left.x > (panel->top_left.x + panel->size.x)) continue;
+                    if ((this->top_left.x + this->size.x) < panel->top_left.x) continue;
+                    if (should_snap && abs(this->top_left.y + this->size.y - panel->top_left.y) < snap_sensitivity) {
+                        this->size.y = panel->top_left.y - this->top_left.y;
                     }
                 }
             }

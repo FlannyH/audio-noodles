@@ -440,7 +440,8 @@ namespace UI {
 
     inline void system_comp_special_render(Scene& scene) {
         // Wheel knobs
-        for (const auto entity: scene.view<UI::Transform, Value, NumberRange, WheelKnob>()) {
+        auto view = scene.view<UI::Transform, Value, NumberRange, WheelKnob>();
+        for (const auto entity: view) {
             auto* transform = scene.get_component<UI::Transform>(entity);
             auto* value     = scene.get_component<Value>(entity);
             auto* range     = scene.get_component<NumberRange>(entity);
