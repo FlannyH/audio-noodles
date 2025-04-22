@@ -56,6 +56,22 @@ namespace UI {
                 if (mouse_movement.y > 0.0f && (parent_size.y - this->top_left.y - this->size.y) < snap_sensitivity) {
                     this->top_left.y = parent_size.y - this->size.y;
                 }
+
+                // Snap to other panels
+                for (const auto& panel: UI::get_panels()) {
+                    if (abs(this->top_left.x - (panel->top_left.x + panel->size.x)) < snap_sensitivity) {
+                        this->top_left.x = (panel->top_left.x + panel->size.x);
+                    }
+                    if (abs((this->top_left.x + this->size.x) - panel->top_left.x) < snap_sensitivity) {
+                        this->top_left.x = (panel->top_left.x - this->size.x);
+                    }
+                    if (abs(this->top_left.y - (panel->top_left.y + panel->size.y)) < snap_sensitivity) {
+                        this->top_left.y = (panel->top_left.y + panel->size.y);
+                    }
+                    if (abs((this->top_left.y + this->size.y) - panel->top_left.y) < snap_sensitivity) {
+                        this->top_left.y = (panel->top_left.y - this->size.y);
+                    }
+                }
             }
         }
 
