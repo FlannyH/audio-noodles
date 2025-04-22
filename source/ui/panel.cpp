@@ -120,12 +120,35 @@ namespace UI {
             if (this->resize_flags & resize_b) this->set_bottom(mouse_pos.y);
             if (this->resize_flags & resize_t) this->set_top(mouse_pos.y);
             if (should_snap) {
-                if (this->resize_flags & resize_r && abs(mouse_pos.x - (Gfx::get_viewport_size().x)) < snap_sensitivity)
+                if (this->resize_flags & resize_r && abs(mouse_pos.x - (Gfx::get_viewport_size().x)) < snap_sensitivity) {
                     this->set_right(Gfx::get_viewport_size().x);
-                if (this->resize_flags & resize_l && abs(mouse_pos.x - (0.0f)) < snap_sensitivity) this->set_left(0.0f);
-                if (this->resize_flags & resize_b && abs(mouse_pos.y - (Gfx::get_viewport_size().y)) < snap_sensitivity)
+                }
+                if (this->resize_flags & resize_l && abs(mouse_pos.x - (0.0f)) < snap_sensitivity) {
+                    this->set_left(0.0f);
+                }
+                if (this->resize_flags & resize_b && abs(mouse_pos.y - (Gfx::get_viewport_size().y)) < snap_sensitivity) {
                     this->set_bottom(Gfx::get_viewport_size().y);
-                if (this->resize_flags & resize_t && abs(mouse_pos.y - (0.0f)) < snap_sensitivity) this->set_top(0.0f);
+                }
+                if (this->resize_flags & resize_t && abs(mouse_pos.y - (0.0f)) < snap_sensitivity) {
+                    this->set_top(0.0f);
+                }
+
+                for (const auto& panel: UI::get_panels()) {
+                    if (this->resize_flags & resize_r && abs(mouse_pos.x - (panel->top_left.x)) < snap_sensitivity) {
+                        this->set_right(panel->top_left.x);
+                    }
+                    if (this->resize_flags & resize_l &&
+                        abs(mouse_pos.x - (panel->top_left.x + panel->size.x)) < snap_sensitivity) {
+                        this->set_left(panel->top_left.x + panel->size.x);
+                    }
+                    if (this->resize_flags & resize_b && abs(mouse_pos.y - (panel->top_left.y)) < snap_sensitivity) {
+                        this->set_bottom(panel->top_left.y);
+                    }
+                    if (this->resize_flags & resize_t &&
+                        abs(mouse_pos.y - (panel->top_left.y + panel->size.y)) < snap_sensitivity) {
+                        this->set_top(panel->top_left.y + panel->size.y);
+                    }
+                }
             }
             if (Input::mouse_button_released(Input::MouseButton::Left)) this->being_resized = false;
         }
