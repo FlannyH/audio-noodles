@@ -45,7 +45,7 @@ namespace Mixer {
 
         const int device_index = Pa_GetDefaultOutputDevice();
         if (device_index == paNoDevice) {
-            printf("Failed to get audio output device\n");
+            LOG(Error, "Failed to get audio output device\n");
             return;
         }
 
@@ -55,7 +55,7 @@ namespace Mixer {
 
         const PaDeviceInfo* device_info = Pa_GetDeviceInfo(device_index);
         if (device_info != NULL) {
-            printf("Audio output device: \"%s\"\n", device_info->name);
+            LOG(Info, "Audio output device: \"%s\"\n", device_info->name);
         }
 
         PaError error = Pa_OpenStream(
@@ -63,14 +63,14 @@ namespace Mixer {
             NULL // todo: userdata?
         );
         if (error != paNoError || stream == NULL) {
-            printf("Failed to open audio stream!\n");
+            LOG(Error, "Failed to open audio stream!\n");
             return;
         }
 
         // Set stream finished callback
         error = Pa_SetStreamFinishedCallback(stream, &pa_stream_finished);
         if (error != paNoError) {
-            printf("Error setting up audio stream!\n");
+            LOG(Error, "Error setting up audio stream!\n");
             Pa_CloseStream(stream);
             stream = NULL;
             return;
@@ -78,7 +78,7 @@ namespace Mixer {
 
         error = Pa_StartStream(stream);
         if (error != paNoError) {
-            printf("Error setting up audio stream!\n");
+            LOG(Error, "Error setting up audio stream!\n");
             Pa_CloseStream(stream);
             stream = NULL;
             return;
