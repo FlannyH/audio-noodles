@@ -1,3 +1,4 @@
+#include "log.hpp"
 #include "mixer.hpp"
 #include "processor.hpp"
 #include "processors/wav_osc.hpp"
