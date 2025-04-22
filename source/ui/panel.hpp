@@ -26,6 +26,10 @@ namespace UI {
 
         void update(float delta_time, bool do_mouse_interact);
         void render_window();
+        void set_top(float top);
+        void set_bottom(float bottom);
+        void set_left(float left);
+        void set_right(float right);
     };
     constexpr float window_bar_height  = 40.0f;
     constexpr float snap_sensitivity   = 24.0f;

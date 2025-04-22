@@ -91,8 +91,8 @@ namespace UI {
         constexpr int resize_t = 4;
         constexpr int resize_b = 8;
 
-        if (abs(mouse_pos.x - (this->top_left.x + this->size.x)) < resize_sensitivity) new_resize_flags |= resize_l;
-        if (abs(mouse_pos.x - this->top_left.x) < resize_sensitivity) new_resize_flags |= resize_r;
+        if (abs(mouse_pos.x - (this->top_left.x + this->size.x)) < resize_sensitivity) new_resize_flags |= resize_r;
+        if (abs(mouse_pos.x - this->top_left.x) < resize_sensitivity) new_resize_flags |= resize_l;
         if (abs(mouse_pos.y - (this->top_left.y + this->size.y)) < resize_sensitivity) new_resize_flags |= resize_b;
         if (abs(mouse_pos.y - this->top_left.y) < resize_sensitivity) new_resize_flags |= resize_t;
 
@@ -102,9 +102,9 @@ namespace UI {
                 Gfx::set_cursor_mode(Gfx::CursorMode::ResizeEW);
             if (new_resize_flags == (resize_t) || new_resize_flags == (resize_b))
                 Gfx::set_cursor_mode(Gfx::CursorMode::ResizeNS);
-            if (new_resize_flags == (resize_t | resize_l) || new_resize_flags == (resize_b | resize_r))
-                Gfx::set_cursor_mode(Gfx::CursorMode::ResizeNESW);
             if (new_resize_flags == (resize_t | resize_r) || new_resize_flags == (resize_b | resize_l))
+                Gfx::set_cursor_mode(Gfx::CursorMode::ResizeNESW);
+            if (new_resize_flags == (resize_t | resize_l) || new_resize_flags == (resize_b | resize_r))
                 Gfx::set_cursor_mode(Gfx::CursorMode::ResizeNWSE);
         }
 
@@ -115,120 +115,19 @@ namespace UI {
         }
 
         if (this->being_resized) {
-            if (this->resize_flags & resize_r) {
-                float movement = mouse_movement.x;
-                this->top_left.x += mouse_movement.x;
-                this->size.x -= mouse_movement.x;
-                if (this->size.x < this->min_size.x) {
-                    const float difference = this->min_size.x - this->size.x;
-                    this->top_left.x -= difference;
-                    this->size.x += difference;
-                }
-                if (this->size.x > this->max_size.x) {
-                    const float difference = this->size.x - this->max_size.x;
-                    this->top_left.x += difference;
-                    this->size.x -= difference;
-                }
-                for (const auto panel: UI::get_panels()) {
-                    if (panel == this) continue;
-                    if (this->top_left.y > (panel->top_left.y + panel->size.y)) continue;
-                    if ((this->top_left.y + this->size.y) < panel->top_left.y) continue;
-                    if (should_snap && abs(this->top_left.x - (panel->top_left.x + panel->size.x)) < snap_sensitivity) {
-                        auto old_tl = this->top_left.x;
-                        this->top_left.x = (panel->top_left.x + panel->size.x);
-                        this->size.x += old_tl - this->top_left.x;
-                    }
-                }
-            }
-            if (this->resize_flags & resize_l) {
-                this->size.x += mouse_movement.x;
-                if (this->size.x > this->max_size.x) this->size.x = this->max_size.x;
-                if (this->size.x < this->min_size.x) this->size.x = this->min_size.x;
-                for (const auto panel: UI::get_panels()) {
-                    if (panel == this) continue;
-                    if (this->top_left.y > (panel->top_left.y + panel->size.y)) continue;
-                    if ((this->top_left.y + this->size.y) < panel->top_left.y) continue;
-                    if (should_snap && abs(this->top_left.x + this->size.x - panel->top_left.x) < snap_sensitivity) {
-                        this->size.x = panel->top_left.x - this->top_left.x;
-                    }
-                }
-            }
-            if (this->resize_flags & resize_b) {
-                this->size.y += mouse_movement.y;
-                if (this->size.y > this->max_size.y) this->size.y = this->max_size.y;
-                if (this->size.y < this->min_size.y) this->size.y = this->min_size.y;
-            }
-            if (this->resize_flags & resize_t) {
-                this->top_left.y += mouse_movement.y;
-                this->size.y -= mouse_movement.y;
-                if (this->size.y < this->min_size.y) {
-                    const float difference = this->min_size.y - this->size.y;
-                    this->top_left.y -= difference;
-                    this->size.y += difference;
-                }
-                if (this->size.y > this->max_size.y) {
-                    const float difference = this->size.y - this->max_size.y;
-                    this->top_left.y += difference;
-                    this->size.y -= difference;
-                }
-                for (const auto panel: UI::get_panels()) {
-                    if (panel == this) continue;
-                    if (this->top_left.x > (panel->top_left.x + panel->size.x)) continue;
-                    if ((this->top_left.x + this->size.x) < panel->top_left.x) continue;
-                    if (should_snap && abs(this->top_left.y - (panel->top_left.y + panel->size.y)) < snap_sensitivity) {
-                        auto old_tl = this->top_left.y;
-                        this->top_left.y = (panel->top_left.y + panel->size.y);
-                        this->size.y += old_tl - this->top_left.y;
-                    }
-                }
+            if (this->resize_flags & resize_r) this->set_right(mouse_pos.x);
+            if (this->resize_flags & resize_l) this->set_left(mouse_pos.x);
+            if (this->resize_flags & resize_b) this->set_bottom(mouse_pos.y);
+            if (this->resize_flags & resize_t) this->set_top(mouse_pos.y);
+            if (should_snap) {
+                if (this->resize_flags & resize_r && abs(mouse_pos.x - (Gfx::get_viewport_size().x)) < snap_sensitivity)
+                    this->set_right(Gfx::get_viewport_size().x);
+                if (this->resize_flags & resize_l && abs(mouse_pos.x - (0.0f)) < snap_sensitivity) this->set_left(0.0f);
+                if (this->resize_flags & resize_b && abs(mouse_pos.y - (Gfx::get_viewport_size().y)) < snap_sensitivity)
+                    this->set_bottom(Gfx::get_viewport_size().y);
+                if (this->resize_flags & resize_t && abs(mouse_pos.y - (0.0f)) < snap_sensitivity) this->set_top(0.0f);
             }
             if (Input::mouse_button_released(Input::MouseButton::Left)) this->being_resized = false;
-        }
-
-        if ((this->being_dragged || this->being_resized) && should_snap) {
-            if (should_snap) {
-                if (this->top_left.x + this->size.x > Gfx::get_window_size().x) {
-                    const float difference = this->top_left.x + this->size.x - Gfx::get_window_size().x;
-                    this->size.x -= difference;
-                    if (this->size.x < this->min_size.x) {
-                        this->top_left.x -= this->min_size.x - this->size.x;
-                        this->size.x = this->min_size.x;
-                    }
-                }
-                if (this->top_left.y + this->size.y > Gfx::get_window_size().y) {
-                    const float difference = this->top_left.y + this->size.y - Gfx::get_window_size().y;
-                    this->size.y -= difference;
-                    if (this->size.y < this->min_size.y) {
-                        this->top_left.y -= this->min_size.y - this->size.y;
-                        this->size.y = this->min_size.y;
-                    }
-                }
-
-                if (this->top_left.x < 0.0f) {
-                    this->size.x += this->top_left.x;
-                    this->top_left.x = 0.0f;
-                    if (this->size.x < this->min_size.x) {
-                        this->top_left.x -= this->min_size.x - this->size.x;
-                        this->size.x = this->min_size.x;
-                    }
-                }
-                if (this->top_left.y < 0.0f) {
-                    this->size.y += this->top_left.y;
-                    this->top_left.y = 0.0f;
-                    if (this->size.y < this->min_size.y) {
-                        this->top_left.y -= this->min_size.y - this->size.y;
-                        this->size.y = this->min_size.y;
-                    }
-                }
-                for (const auto panel: UI::get_panels()) {
-                    if (panel == this) continue;
-                    if (this->top_left.x > (panel->top_left.x + panel->size.x)) continue;
-                    if ((this->top_left.x + this->size.x) < panel->top_left.x) continue;
-                    if (should_snap && abs(this->top_left.y + this->size.y - panel->top_left.y) < snap_sensitivity) {
-                        this->size.y = panel->top_left.y - this->top_left.y;
-                    }
-                }
-            }
         }
 
         // Update panel size
@@ -288,4 +187,35 @@ namespace UI {
             {this->top_left + glm::vec2(1, 1 + window_bar_height)}, {0, 0});
         Gfx::pop_clip_rect();
     }
+
+    void Panel::set_top(float top) {
+        float new_size = this->size.y + this->top_left.y - top;
+        if (new_size > max_size.y) new_size = max_size.y;
+        if (new_size < min_size.y) new_size = min_size.y;
+        float difference_in_size = this->size.y - new_size;
+        this->size.y -= difference_in_size;
+        this->top_left.y += difference_in_size;
+    }
+
+    void Panel::set_bottom(float bottom) {
+        this->size.y = bottom - this->top_left.y;
+        if (this->size.y > this->max_size.y) this->size.y = this->max_size.y;
+        if (this->size.y < this->min_size.y) this->size.y = this->min_size.y;
+    }
+
+    void Panel::set_left(float left) {
+        float new_size = this->size.x + this->top_left.x - left;
+        if (new_size > max_size.x) new_size = max_size.x;
+        if (new_size < min_size.x) new_size = min_size.x;
+        float difference_in_size = this->size.x - new_size;
+        this->size.x -= difference_in_size;
+        this->top_left.x += difference_in_size;
+    }
+
+    void Panel::set_right(float right) {
+        this->size.x = right - this->top_left.x;
+        if (this->size.x > this->max_size.x) this->size.x = this->max_size.x;
+        if (this->size.x < this->min_size.x) this->size.x = this->min_size.x;
+    }
+
 } // namespace UI
