@@ -16,6 +16,7 @@ namespace UI {
         glm::vec2 pre_max_top_left;
         glm::vec2 pre_max_size;
         glm::vec2 begin_drag_mouse_pos;
+        glm::vec2 begin_drag_top_left;
         glm::vec4 bg_color                    = glm::vec4(0.1f, 0.1f, 0.2f, 1.0f);
         Gfx::ResourceID content_render_target = Gfx::ResourceID::invalid();
         float double_click_timer              = 0.0f;

@@ -25,6 +25,7 @@ namespace UI {
         if (Input::mouse_button_pressed(Input::MouseButton::Left) && is_mouse_inside_title_bar) {
             this->being_dragged        = true;
             this->begin_drag_mouse_pos = mouse_pos;
+            this->begin_drag_top_left  = this->top_left;
         }
 
         if (this->being_dragged && Input::mouse_button_released(Input::MouseButton::Left)) {
@@ -33,7 +34,7 @@ namespace UI {
 
         if (this->being_dragged) {
             const glm::vec2 parent_size = Gfx::get_viewport_size(); // todo: nested panels should reference the parent
-            this->top_left += mouse_movement;
+            this->top_left              = (this->begin_drag_top_left - this->begin_drag_mouse_pos) + mouse_pos;
 
             // Unmaximize
             if (this->maximized && glm::distance(mouse_pos, this->begin_drag_mouse_pos) > unmax_distance) {
@@ -44,16 +45,18 @@ namespace UI {
 
             // Snap to sides when holding shift
             if (should_snap) {
-                if (mouse_movement.x < 0.0f && this->top_left.x < snap_sensitivity) {
+                if ((mouse_movement.x < 0.0f && this->top_left.x < snap_sensitivity) || this->top_left.x < 0.0f) {
                     this->top_left.x = 0.0f;
                 }
-                if (mouse_movement.x > 0.0f && (parent_size.x - this->top_left.x - this->size.x) < snap_sensitivity) {
+                if ((mouse_movement.x > 0.0f && (parent_size.x - this->top_left.x - this->size.x) < snap_sensitivity) ||
+                    (this->top_left.x > (parent_size.x - this->size.x))) {
                     this->top_left.x = parent_size.x - this->size.x;
                 }
-                if (mouse_movement.y < 0.0f && this->top_left.y < snap_sensitivity) {
+                if ((mouse_movement.y < 0.0f && this->top_left.y < snap_sensitivity) || this->top_left.y < 0.0f) {
                     this->top_left.y = 0.0f;
                 }
-                if (mouse_movement.y > 0.0f && (parent_size.y - this->top_left.y - this->size.y) < snap_sensitivity) {
+                if ((mouse_movement.y > 0.0f && (parent_size.y - this->top_left.y - this->size.y) < snap_sensitivity) ||
+                    (this->top_left.y > (parent_size.y - this->size.y))) {
                     this->top_left.y = parent_size.y - this->size.y;
                 }
 
