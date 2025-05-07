@@ -14,9 +14,11 @@ int main() {
     Gfx::init(Gfx::RenderAPI::OpenGL, 1280, 720, "Audio Noodles");
     Session::tracks().push_back(Track{});
 
-    UI::Panel& panel = UI::new_panel({.top_left = {0, 0}, .size = {800, 600}, .min_size = {640, 600}, .max_size = {2048, 1024}});
-    UI::Panel& panel2 = UI::new_panel({.top_left = {32, 32}, .size = {800, 600}, .min_size = {640, 600}, .max_size = {2048, 1024}});
-    auto& scene = panel.scene;
+    UI::Panel& panel =
+        UI::new_panel({.top_left = {0, 0}, .size = {800, 600}, .min_size = {640, 600}, .max_size = {2048, 1024}});
+    UI::Panel& panel2 =
+        UI::new_panel({.top_left = {32, 32}, .size = {800, 600}, .min_size = {640, 600}, .max_size = {2048, 1024}});
+    auto& scene  = panel.scene;
     auto& scene2 = panel2.scene;
     UI::create_button(
         scene, {{-75, 32}, {160, 100}, 0.0f, Gfx::AnchorPoint::Top}, []() { printf("hi1!\n"); },

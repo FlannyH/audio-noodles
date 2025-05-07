@@ -159,8 +159,8 @@ namespace Gfx {
         clip_rect_stack.pop_back();
         if (curr_render_info.scissor_rect_top_left.x != clip_rect_stack.back().x) render_info_dirty = true;
         if (curr_render_info.scissor_rect_top_left.y != clip_rect_stack.back().y) render_info_dirty = true;
-        if (curr_render_info.scissor_rect_size.x     != clip_rect_stack.back().z) render_info_dirty = true;
-        if (curr_render_info.scissor_rect_size.y     != clip_rect_stack.back().w) render_info_dirty = true;
+        if (curr_render_info.scissor_rect_size.x != clip_rect_stack.back().z) render_info_dirty = true;
+        if (curr_render_info.scissor_rect_size.y != clip_rect_stack.back().w) render_info_dirty = true;
         curr_render_info.scissor_rect_top_left.x = clip_rect_stack.back().x;
         curr_render_info.scissor_rect_top_left.y = clip_rect_stack.back().y;
         curr_render_info.scissor_rect_size.x     = clip_rect_stack.back().z;
