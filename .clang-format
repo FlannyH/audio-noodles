@@ -42,6 +42,7 @@ ColumnLimit: 128
 IndentPPDirectives: BeforeHash
 IndentWidth: 4
 Language: Cpp
+LineEnding: DeriveCRLF
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 PointerAlignment: Left
