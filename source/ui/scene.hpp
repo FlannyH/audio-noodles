@@ -194,7 +194,7 @@ namespace UI {
     }
 
     inline void Scene::update_extents(glm::vec2 top_left, glm::vec2 size) {
-        this->top_left = top_left;
+        this->top_left   = top_left;
         this->panel_size = size;
     }
 } // namespace UI
