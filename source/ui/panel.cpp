@@ -209,21 +209,21 @@ namespace UI {
         Gfx::push_clip_rect(this->top_left, this->size);
         Gfx::draw_rectangle_2d_pixels( // Title bar background
             this->top_left, this->top_left + glm::vec2(this->size.x, window_bar_height + 2),
-            (Gfx::DrawParams){
+            Gfx::DrawParams{
                 .color = Colors::DARK_BLUE, .anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 0.0f});
         Gfx::draw_text_pixels( // Panel name
             name,
-            (Gfx::TextDrawParams){
+            Gfx::TextDrawParams{
                 .transform = {.position = glm::vec3(this->top_left + glm::vec2(4.0f, 6.0f), 0.0f), .scale = {2.0f, 2.0f, 1.0f}},
                 .position_anchor = Gfx::AnchorPoint::TopLeft,
                 .color           = Colors::WHITE,
             });
         Gfx::draw_rectangle_2d_pixels( // Title bar border
             this->top_left, this->top_left + glm::vec2(this->size.x, window_bar_height + 2),
-            (Gfx::DrawParams){.anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 2.0f});
+            Gfx::DrawParams{.anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 2.0f});
         Gfx::draw_rectangle_2d_pixels( // Content border
             this->top_left + glm::vec2(0, window_bar_height), this->top_left + this->size,
-            (Gfx::DrawParams){.anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 2.0f});
+            Gfx::DrawParams{.anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 2.0f});
         Gfx::blit_pixels( // Content
             this->content_render_target, Gfx::ResourceID::invalid(), this->size - glm::vec2(2, window_bar_height + 2),
             {this->top_left + glm::vec2(1, 1 + window_bar_height)}, {0, 0});

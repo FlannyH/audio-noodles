@@ -424,7 +424,7 @@ namespace UI {
 
             Gfx::draw_text_pixels(
                 text->text,
-                (Gfx::TextDrawParams){
+                Gfx::TextDrawParams{
                     .transform =
                         {.position = glm::vec3(ui_anchored_top_left, transform->depth), .scale = glm::vec3(text->scale, 1.0f)},
                     .position_anchor = Gfx::AnchorPoint::TopLeft,
@@ -609,7 +609,7 @@ namespace UI {
                 // Draw the text
                 Gfx::draw_text_pixels(
                     radio_button->options[i].c_str(),
-                    (Gfx::TextDrawParams){
+                    Gfx::TextDrawParams{
                         .transform =
                             {.position = glm::vec3(
                                  circle_base_offset + glm::vec2(0, vertical_spacing * static_cast<float>(i)) +
@@ -774,7 +774,7 @@ namespace UI {
                         });
                     Gfx::draw_text_pixels(
                         combobox->list_items[i].c_str(),
-                        (Gfx::TextDrawParams){
+                        Gfx::TextDrawParams{
                             .transform =
                                 {.position = glm::vec3(box_top_left + text_offset, transform->depth + 0.02f),
                                  .scale    = {2.0f, 2.0f, 1.0f}},
