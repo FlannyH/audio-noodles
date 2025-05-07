@@ -1,11 +1,14 @@
 #include "renderer.hpp"
 #include "resource.hpp"
+#include "../common.hpp"
 #include "../log.hpp"
 #include "opengl/device_opengl.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <glm/geometric.hpp>
+
+#include <array>
 
 #define CIRCLE_LUT_SIZE 24
 

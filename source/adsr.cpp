@@ -1,6 +1,7 @@
 #include "adsr.hpp"
 #include <cmath>
 #include <cstdio>
+#include <algorithm>
 
 void VolEnv::tick(double delta_time, const VolEnvParams& params) {
     this->stage_time += delta_time;

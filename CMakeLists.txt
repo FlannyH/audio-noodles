@@ -85,6 +85,10 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET AudioNoodles PROPERTY CXX_STANDARD 20)
 endif()
 
+set(RTMIDI_BUILD_TESTING OFF)
+set(OPTION_BUILD_TOOLS OFF)
+set(OPTION_BUILD_EXAMPLES OFF)
+
 # todo: only compile on windows and linux on x86/64 CPUs
 add_subdirectory(external/glfw)
 add_subdirectory(external/glbinding)
@@ -93,7 +97,7 @@ add_subdirectory(external/portaudio)
 add_subdirectory(external/rtmidi)
 target_link_libraries(AudioNoodles 
   glfw
-  glbinding
+  glbinding::glbinding
   glm::glm
   portaudio
   rtmidi
