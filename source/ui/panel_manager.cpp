@@ -119,7 +119,7 @@ namespace UI {
                     }
 
                     auto top_left         = (*node_tbl)["top_left"].as_array();
-                    auto bottom_right     = (*node_tbl)["top_left"].as_array();
+                    auto bottom_right     = (*node_tbl)["bottom_right"].as_array();
                     auto depth            = (*node_tbl)["depth"].value_or<float>(0.0f);
                     auto panel_anchor     = (*node_tbl)["panel_anchor"].value_or<std::string>("");
                     auto text_ui_anchor   = (*node_tbl)["text_ui_anchor"].value_or<std::string>("");
