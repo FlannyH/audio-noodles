@@ -188,6 +188,23 @@ namespace UI {
                             .default_value         = default_value,
                             .visual_decimal_places = visual_decimal_places};
                         UI::create_slider(scene, variable_string.empty() ? name_str : variable_string, trans, range);
+                    } else if (*type == "numberbox") {
+                        auto min                   = (*node_tbl)["min"].value_or<float>(0.0f);
+                        auto max                   = (*node_tbl)["max"].value_or<float>(100.0f);
+                        auto step                  = (*node_tbl)["step"].value_or<float>(1.0f);
+                        auto default_value         = (*node_tbl)["default_value"].value_or<float>(0.0f);
+                        auto visual_decimal_places = (*node_tbl)["visual_decimal_places"].value_or<uint32_t>(1);
+                        auto text                  = (*node_tbl)["text"].value_or<std::string>("");
+                        auto variable              = (*node_tbl)["variable"].value_or<std::string>("");
+                        auto text_string           = std::wstring(text.begin(), text.end());
+                        auto variable_string       = std::string(variable.begin(), variable.end());
+                        UI::NumberRange range{
+                            .min                   = min,
+                            .max                   = max,
+                            .step                  = step,
+                            .default_value         = default_value,
+                            .visual_decimal_places = visual_decimal_places};
+                        UI::create_numberbox(scene, variable_string.empty() ? name_str : variable_string, trans, range);
                     } else {
                         LOG(Warning, "%s: unknown element type \"%s\"", path, (*type)->c_str());
                     }

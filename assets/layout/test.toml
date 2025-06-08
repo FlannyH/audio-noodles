@@ -67,3 +67,11 @@ step = 1.0
 default_value = 0.0
 visual_decimal_places = 2
 variable = "v_slider1"
+
+[elements.test_numberbox]
+type = "numberbox"
+panel_anchor = "center"
+top_left = [128, -96]
+bottom_right = [192, -32]
+depth = 0.1
+variable = "v_numberbox"
