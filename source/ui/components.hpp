@@ -942,10 +942,13 @@ namespace UI {
                 const double old_val = val;
 
                 // Map the mouse movement to the value
-                if (draggable && draggable->is_horizontal) {
-                    val += static_cast<double>(Input::mouse_movement_pixels().x) * number_range->step;
-                } else {
-                    val -= static_cast<double>(Input::mouse_movement_pixels().y) * number_range->step;
+                // todo: mouse movement feels too fast for high step values
+                if (draggable) {
+                    if (draggable->is_horizontal) {
+                        val += static_cast<double>(Input::mouse_movement_pixels().x) * number_range->step;
+                    } else {
+                        val -= static_cast<double>(Input::mouse_movement_pixels().y) * number_range->step;
+                    }
                 }
 
                 // Clamp the value to the bounds
