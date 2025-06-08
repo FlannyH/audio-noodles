@@ -1,6 +1,6 @@
 [panel_meta]
 name = "Test layout :3"
-default_size = [512, 256]
+default_size = [768, 512]
 min_size = [512, 256]
 max_size = [99999, 99999]
 bg_color = [0.1, 0.1, 0.2, 1.0]
@@ -12,7 +12,7 @@ top_left = [16, 16]
 bottom_right = [128, 128]
 depth = 0.1
 text = "test1 yippee"
-text_scale = 2.0
+text_scale = [2.0, 2.0]
 text_color = [0.0, 1.0, 1.0, 1.0]
 text_ui_anchor = "top left"
 text_text_anchor = "top left"
@@ -20,11 +20,50 @@ text_text_anchor = "top left"
 [elements.test_label2]
 type = "text"
 panel_anchor = "bottom right"
-top_left = [-128, -128]
+top_left = [-64, -32]
 bottom_right = [-16, -16]
 depth = 0.1
 text = "test2 yippee"
-text_scale = 1.0
+text_scale = [1.0, 1.0]
 text_color = [1.0, 0.0, 0.0, 1.0]
-text_ui_anchor = "bottom right"
+text_ui_anchor = "top left"
 text_text_anchor = "bottom right"
+
+[elements.test_slider]
+type = "slider"
+panel_anchor = "center"
+top_left = [-200, -16]
+bottom_right = [200, 16]
+depth = 0.1
+min = 0.0
+max = 100.0
+step = 1.0
+default_value = 0.0
+visual_decimal_places = 2
+variable = "v_slider1"
+
+[elements.test_slider2]
+type = "slider"
+panel_anchor = "center"
+top_left = [-200, 32]
+bottom_right = [200, 64]
+depth = 0.1
+min = 0.0
+max = 100.0
+step = 1.0
+default_value = 0.0
+visual_decimal_places = 2
+variable = "v_slider2"
+
+[elements.test_slider3]
+type = "slider"
+panel_anchor = "center"
+top_left = [-200, 80]
+bottom_right = [200, 112]
+depth = 0.1
+min = 0.0
+max = 100.0
+step = 1.0
+default_value = 0.0
+visual_decimal_places = 2
+variable = "v_slider1"
