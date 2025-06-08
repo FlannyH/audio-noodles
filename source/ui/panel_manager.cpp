@@ -172,16 +172,17 @@ namespace UI {
                         auto default_value         = (*node_tbl)["default_value"].value_or<float>(0.0f);
                         auto visual_decimal_places = (*node_tbl)["visual_decimal_places"].value_or<uint32_t>(0.0f);
                         auto text                  = (*node_tbl)["text"].value_or<std::string>("");
+                        auto variable              = (*node_tbl)["variable"].value_or<std::string>("");
                         auto text_string           = std::wstring(text.begin(), text.end());
+                        auto variable_string       = std::string(variable.begin(), variable.end());
                         UI::NumberRange range{
                             .min                   = min,
                             .max                   = max,
                             .step                  = step,
                             .default_value         = default_value,
                             .visual_decimal_places = visual_decimal_places};
-                        UI::create_slider(scene, name_str, trans, range);
+                        UI::create_slider(scene, variable_string.empty() ? name_str : variable_string, trans, range);
                     }
-                    LOG(Info, "Element \"%.*s\" is of type \"%s\"", name.length(), name.data(), (*type)->c_str());
                 }
             }
         }
