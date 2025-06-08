@@ -124,6 +124,7 @@ namespace UI {
                     auto panel_anchor     = (*node_tbl)["panel_anchor"].value_or<std::string>("");
                     auto text_ui_anchor   = (*node_tbl)["text_ui_anchor"].value_or<std::string>("");
                     auto text_text_anchor = (*node_tbl)["text_text_anchor"].value_or<std::string>("");
+                    auto name_str         = std::string(name.begin(), name.end());
 
                     Transform trans      = {};
                     trans.top_left.x     = (*top_left)[0].value_or(0.0f);
@@ -160,10 +161,25 @@ namespace UI {
 
                         auto text_string = std::wstring(text.begin(), text.end());
                         UI::create_text(
-                            scene, std::string(name.begin(), name.end()), trans,
+                            scene, name_str, trans,
                             Text(
                                 text_string, scale, color, string_to_anchor(text_ui_anchor),
                                 string_to_anchor(text_text_anchor)));
+                    } else if (*type == "slider") {
+                        auto min                   = (*node_tbl)["min"].value_or<float>(0.0f);
+                        auto max                   = (*node_tbl)["max"].value_or<float>(0.0f);
+                        auto step                  = (*node_tbl)["step"].value_or<float>(0.0f);
+                        auto default_value         = (*node_tbl)["default_value"].value_or<float>(0.0f);
+                        auto visual_decimal_places = (*node_tbl)["visual_decimal_places"].value_or<uint32_t>(0.0f);
+                        auto text                  = (*node_tbl)["text"].value_or<std::string>("");
+                        auto text_string           = std::wstring(text.begin(), text.end());
+                        UI::NumberRange range{
+                            .min                   = min,
+                            .max                   = max,
+                            .step                  = step,
+                            .default_value         = default_value,
+                            .visual_decimal_places = visual_decimal_places};
+                        UI::create_slider(scene, name_str, trans, range);
                     }
                     LOG(Info, "Element \"%.*s\" is of type \"%s\"", name.length(), name.data(), (*type)->c_str());
                 }
