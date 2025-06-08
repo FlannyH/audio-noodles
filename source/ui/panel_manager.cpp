@@ -121,7 +121,7 @@ namespace UI {
                     auto top_left         = (*node_tbl)["top_left"].as_array();
                     auto bottom_right     = (*node_tbl)["bottom_right"].as_array();
                     auto depth            = (*node_tbl)["depth"].value_or<float>(0.0f);
-                    auto panel_anchor     = (*node_tbl)["panel_anchor"].value_or<std::string>("");
+                    auto panel_anchor     = (*node_tbl)["panel_anchor"].value_or<std::string>("center");
                     auto text_ui_anchor   = (*node_tbl)["text_ui_anchor"].value_or<std::string>("");
                     auto text_text_anchor = (*node_tbl)["text_text_anchor"].value_or<std::string>("");
                     auto name_str         = std::string(name.begin(), name.end());
@@ -167,10 +167,10 @@ namespace UI {
                                 string_to_anchor(text_text_anchor)));
                     } else if (*type == "slider") {
                         auto min                   = (*node_tbl)["min"].value_or<float>(0.0f);
-                        auto max                   = (*node_tbl)["max"].value_or<float>(0.0f);
-                        auto step                  = (*node_tbl)["step"].value_or<float>(0.0f);
+                        auto max                   = (*node_tbl)["max"].value_or<float>(100.0f);
+                        auto step                  = (*node_tbl)["step"].value_or<float>(1.0f);
                         auto default_value         = (*node_tbl)["default_value"].value_or<float>(0.0f);
-                        auto visual_decimal_places = (*node_tbl)["visual_decimal_places"].value_or<uint32_t>(0.0f);
+                        auto visual_decimal_places = (*node_tbl)["visual_decimal_places"].value_or<uint32_t>(1);
                         auto text                  = (*node_tbl)["text"].value_or<std::string>("");
                         auto variable              = (*node_tbl)["variable"].value_or<std::string>("");
                         auto text_string           = std::wstring(text.begin(), text.end());
