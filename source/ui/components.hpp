@@ -15,6 +15,7 @@ namespace UI {
     template <typename T> T sign(T v) { return (v > 0) ? +1 : -1; }
 
     struct Transform {
+        Transform() {}
         Transform(
             const glm::vec2 tl, const glm::vec2 br, const float dpth = 0.5f,
             const Gfx::AnchorPoint anch = Gfx::AnchorPoint::TopLeft) {
@@ -183,7 +184,7 @@ namespace UI {
     }
 
     inline EntityID
-    create_text(Scene& scene, const std::string& name, const UI::Transform& transform, Text&& text, bool has_box = false) {
+    create_text(Scene& scene, const std::string& name, const UI::Transform& transform, const Text& text, bool has_box = false) {
         // Create entity and add components
         const EntityID entity = scene.new_entity();
         scene.add_component<UI::Transform>(entity, transform);

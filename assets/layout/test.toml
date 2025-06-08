@@ -6,15 +6,25 @@ max_size = [99999, 99999]
 bg_color = [0.1, 0.1, 0.2, 1.0]
 
 [elements.test_label1]
-type = "label"
-text = "test1 yippee"
+type = "text"
+panel_anchor = "top left"
 top_left = [16, 16]
 bottom_right = [128, 128]
-panel_anchor = "top left"
+depth = 0.1
+text = "test1 yippee"
+text_scale = 2.0
+text_color = [0.0, 1.0, 1.0, 1.0]
+text_ui_anchor = "top left"
+text_text_anchor = "top left"
 
 [elements.test_label2]
-type = "label"
-text = "test2 yippee"
+type = "text"
+panel_anchor = "bottom right"
 top_left = [-128, -128]
 bottom_right = [-16, -16]
-panel_anchor = "bottom right"
+depth = 0.1
+text = "test2 yippee"
+text_scale = 1.0
+text_color = [1.0, 0.0, 0.0, 1.0]
+text_ui_anchor = "bottom right"
+text_text_anchor = "bottom right"

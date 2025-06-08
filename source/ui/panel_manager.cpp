@@ -53,6 +53,19 @@ namespace UI {
         return panel_pool[0]; // we can't get here so this one's just for the compiler, as a treat :3
     }
 
+    Gfx::AnchorPoint string_to_anchor(const std::string& str) {
+        if (str == "top left") return Gfx::AnchorPoint::TopLeft;
+        if (str == "top") return Gfx::AnchorPoint::Top;
+        if (str == "top right") return Gfx::AnchorPoint::TopRight;
+        if (str == "right") return Gfx::AnchorPoint::Right;
+        if (str == "bottom right") return Gfx::AnchorPoint::BottomRight;
+        if (str == "bottom") return Gfx::AnchorPoint::Bottom;
+        if (str == "bottom left") return Gfx::AnchorPoint::BottomLeft;
+        if (str == "left") return Gfx::AnchorPoint::Left;
+        if (str == "center") return Gfx::AnchorPoint::Center;
+        return Gfx::AnchorPoint::TopLeft;
+    }
+
     // Load panel layout from disk, then create a panel from it
     Panel& load_panel(const char* path, const glm::vec2 top_left) {
         auto layout = toml::parse_file(path);
@@ -62,7 +75,7 @@ namespace UI {
         assert(panel_meta);
 
         PanelCreateInfo create_info = {.top_left = top_left};
-        const auto name             = panel_meta["name"].value<std::string_view>().value_or("untitled panel");
+        const auto name             = panel_meta["name"].value_or<std::string_view>("untitled panel");
         const auto default_size     = panel_meta["default_size"].as_array();
         const auto min_size         = panel_meta["min_size"].as_array();
         const auto max_size         = panel_meta["max_size"].as_array();
@@ -91,6 +104,9 @@ namespace UI {
             create_info.size = create_info.min_size;
         }
 
+        auto& panel = new_panel(create_info);
+        auto& scene = panel.scene;
+
         // Parse UI elements
         if (auto elements = layout["elements"].as_table()) {
             for (auto& [name, node]: *elements) {
@@ -102,13 +118,58 @@ namespace UI {
                         continue;
                     }
 
+                    auto top_left         = (*node_tbl)["top_left"].as_array();
+                    auto bottom_right     = (*node_tbl)["top_left"].as_array();
+                    auto depth            = (*node_tbl)["depth"].value_or<float>(0.0f);
+                    auto panel_anchor     = (*node_tbl)["panel_anchor"].value_or<std::string>("");
+                    auto text_ui_anchor   = (*node_tbl)["text_ui_anchor"].value_or<std::string>("");
+                    auto text_text_anchor = (*node_tbl)["text_text_anchor"].value_or<std::string>("");
+
+                    Transform trans      = {};
+                    trans.top_left.x     = (*top_left)[0].value_or(0.0f);
+                    trans.top_left.y     = (*top_left)[1].value_or(0.0f);
+                    trans.bottom_right.x = (*bottom_right)[0].value_or(0.0f);
+                    trans.bottom_right.y = (*bottom_right)[1].value_or(0.0f);
+                    trans.depth          = depth;
+                    trans.anchor         = string_to_anchor(panel_anchor);
+
                     auto type = (*node_tbl)["type"].as_string();
+                    if (*type == "text") {
+                        auto text       = (*node_tbl)["text"].value_or<std::string>("");
+                        auto text_scale = (*node_tbl)["text_scale"].as_array();
+                        auto text_color = (*node_tbl)["text_color"].as_array();
+
+                        const glm::vec2 scale = {
+                            text_scale ? (*text_scale)[0].value_or(2.0f) : 2.0f,
+                            text_scale ? (*text_scale)[1].value_or(2.0f) : 2.0f,
+                        };
+
+                        const glm::vec4 color = {
+                            text_color ? (*text_color)[0].value_or(1.0f) : 1.0f,
+                            text_color ? (*text_color)[1].value_or(1.0f) : 1.0f,
+                            text_color ? (*text_color)[2].value_or(1.0f) : 1.0f,
+                            text_color ? (*text_color)[3].value_or(1.0f) : 1.0f,
+                        };
+
+                        if (!top_left || !bottom_right) {
+                            LOG(Warning,
+                                "Panel layout from file \"%s\" has text element \"%.*s\" with no transform! Skipping element",
+                                path, name.length(), name.data());
+                            continue;
+                        }
+
+                        auto text_string = std::wstring(text.begin(), text.end());
+                        UI::create_text(
+                            scene, std::string(name.begin(), name.end()), trans,
+                            Text(
+                                text_string, scale, color, string_to_anchor(text_ui_anchor),
+                                string_to_anchor(text_text_anchor)));
+                    }
                     LOG(Info, "Element \"%.*s\" is of type \"%s\"", name.length(), name.data(), (*type)->c_str());
                 }
             }
-
-            return new_panel(create_info);
         }
+        return panel;
     }
 
     void panel_input() {
