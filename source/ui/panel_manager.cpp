@@ -113,8 +113,8 @@ namespace UI {
                 if (auto node_tbl = node.as_table()) {
                     // Skip the element if it has no type node. Every node should have this type
                     if (node_tbl->find("type") == node_tbl->end()) {
-                        LOG(Warning, "Panel layout from file \"%s\" has element \"%.*s\" with no type! Skipping element", path,
-                            name.length(), name.data());
+                        LOG(Warning, "%s: layout has element \"%.*s\" with no type, skipping element", path, name.length(),
+                            name.data());
                         continue;
                     }
 
@@ -160,9 +160,8 @@ namespace UI {
                         };
 
                         if (!top_left || !bottom_right) {
-                            LOG(Warning,
-                                "Panel layout from file \"%s\" has text element \"%.*s\" with no transform! Skipping element",
-                                path, name.length(), name.data());
+                            LOG(Warning, "%s: layout has text element \"%.*s\" with no transform, skipping element", path,
+                                name.length(), name.data());
                             continue;
                         }
 
