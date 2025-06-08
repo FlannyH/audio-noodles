@@ -4,3 +4,17 @@ default_size = [512, 256]
 min_size = [512, 256]
 max_size = [99999, 99999]
 bg_color = [0.1, 0.1, 0.2, 1.0]
+
+[elements.test_label1]
+type = "label"
+text = "test1 yippee"
+top_left = [16, 16]
+bottom_right = [128, 128]
+panel_anchor = "top left"
+
+[elements.test_label2]
+type = "label"
+text = "test2 yippee"
+top_left = [-128, -128]
+bottom_right = [-16, -16]
+panel_anchor = "bottom right"

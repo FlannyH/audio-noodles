@@ -53,10 +53,11 @@ namespace UI {
         return panel_pool[0]; // we can't get here so this one's just for the compiler, as a treat :3
     }
 
+    // Load panel layout from disk, then create a panel from it
     Panel& load_panel(const char* path, const glm::vec2 top_left) {
-        // Load panel layout from disk, then create a panel from it
         auto layout = toml::parse_file(path);
 
+        // Parse metadata
         auto panel_meta = layout["panel_meta"];
         assert(panel_meta);
 
@@ -90,7 +91,24 @@ namespace UI {
             create_info.size = create_info.min_size;
         }
 
-        return new_panel(create_info);
+        // Parse UI elements
+        if (auto elements = layout["elements"].as_table()) {
+            for (auto& [name, node]: *elements) {
+                if (auto node_tbl = node.as_table()) {
+                    // Skip the element if it has no type node. Every node should have this type
+                    if (node_tbl->find("type") == node_tbl->end()) {
+                        LOG(Warning, "Panel layout from file \"%s\" has element \"%.*s\" with no type! Skipping element", path,
+                            name.length(), name.data());
+                        continue;
+                    }
+
+                    auto type = (*node_tbl)["type"].as_string();
+                    LOG(Info, "Element \"%.*s\" is of type \"%s\"", name.length(), name.data(), (*type)->c_str());
+                }
+            }
+
+            return new_panel(create_info);
+        }
     }
 
     void panel_input() {
