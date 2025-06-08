@@ -108,6 +108,7 @@ target_include_directories(AudioNoodles PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/portaudio/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/rtmidi/
+  ${CMAKE_CURRENT_SOURCE_DIR}/external/tomlplusplus/include/
 )
 
 # Copy runtime files to build output
