@@ -189,6 +189,8 @@ namespace UI {
                             .default_value         = default_value,
                             .visual_decimal_places = visual_decimal_places};
                         UI::create_slider(scene, variable_string.empty() ? name_str : variable_string, trans, range);
+                    } else {
+                        LOG(Warning, "%s: unknown element type \"%s\"", path, (*type)->c_str());
                     }
                 }
             }
