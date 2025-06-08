@@ -12,7 +12,8 @@ namespace UI {
         bool maximized     = false;
     };
     std::vector<Panel*>& get_panels();
-    Panel& new_panel(PanelCreateInfo&& panel_create_info);
+    Panel& new_panel(const PanelCreateInfo& panel_create_info);
+    Panel& load_panel(const char* path, const glm::vec2 top_left = {0.0f, 0.0f});
     void panel_input();
     void panel_render();
 } // namespace UI

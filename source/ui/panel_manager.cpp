@@ -2,6 +2,8 @@
 #include "../graphics/renderer.hpp"
 #include "components.hpp"
 #include <stdexcept>
+#include <toml++/toml.hpp>
+#include <iostream>
 
 #define MAX_PANEL_COUNT 256
 
@@ -24,7 +26,7 @@ namespace UI {
         return panels;
     }
 
-    Panel& new_panel(PanelCreateInfo&& panel_create_info) {
+    Panel& new_panel(const PanelCreateInfo& panel_create_info) {
         for (size_t i = 0; i < MAX_PANEL_COUNT; ++i) {
             if (panel_allocated[i] == false) {
                 panel_allocated[i] = true;
@@ -49,6 +51,46 @@ namespace UI {
         }
         std::runtime_error("Ran out of UI panels!");
         return panel_pool[0]; // we can't get here so this one's just for the compiler, as a treat :3
+    }
+
+    Panel& load_panel(const char* path, const glm::vec2 top_left) {
+        // Load panel layout from disk, then create a panel from it
+        auto layout = toml::parse_file(path);
+
+        auto panel_meta = layout["panel_meta"];
+        assert(panel_meta);
+
+        PanelCreateInfo create_info = {.top_left = top_left};
+        const auto name             = panel_meta["name"].value<std::string_view>().value_or("untitled panel");
+        const auto default_size     = panel_meta["default_size"].as_array();
+        const auto min_size         = panel_meta["min_size"].as_array();
+        const auto max_size         = panel_meta["max_size"].as_array();
+        const auto bg_color         = panel_meta["bg_color"].as_array();
+        create_info.name            = name;
+        if (min_size && min_size->is_array() && min_size->size() >= 2) {
+            create_info.min_size.x = (*min_size)[0].value_or<float>(128.0f);
+            create_info.min_size.y = (*min_size)[1].value_or<float>(128.0f);
+        }
+        if (max_size && max_size->is_array() && max_size->size() >= 2) {
+            create_info.max_size.x = (*max_size)[0].value_or<float>(99999.0f);
+            create_info.max_size.y = (*max_size)[1].value_or<float>(99999.0f);
+        }
+        if (bg_color && bg_color->is_array() && bg_color->size() >= 3) {
+            create_info.bg_color.r = (*bg_color)[0].value_or<float>(0.1f);
+            create_info.bg_color.g = (*bg_color)[1].value_or<float>(0.1f);
+            create_info.bg_color.b = (*bg_color)[2].value_or<float>(0.2f);
+            if (bg_color->size() >= 4) {
+                create_info.bg_color.a = (*bg_color)[3].value_or<float>(1.0f);
+            }
+        }
+        if (default_size && default_size->is_array() && default_size->size() >= 2) {
+            create_info.size.x = (*default_size)[0].value_or<float>(128.0f);
+            create_info.size.y = (*default_size)[1].value_or<float>(128.0f);
+        } else {
+            create_info.size = create_info.min_size;
+        }
+
+        return new_panel(create_info);
     }
 
     void panel_input() {

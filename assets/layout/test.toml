@@ -1,0 +1,6 @@
+[panel_meta]
+name = "Test layout :3"
+default_size = [512, 256]
+min_size = [512, 256]
+max_size = [99999, 99999]
+bg_color = [0.1, 0.1, 0.2, 1.0]
