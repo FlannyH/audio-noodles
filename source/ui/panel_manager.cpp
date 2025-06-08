@@ -126,13 +126,20 @@ namespace UI {
                     auto text_text_anchor = (*node_tbl)["text_text_anchor"].value_or<std::string>("");
                     auto name_str         = std::string(name.begin(), name.end());
 
-                    Transform trans      = {};
-                    trans.top_left.x     = (*top_left)[0].value_or(0.0f);
-                    trans.top_left.y     = (*top_left)[1].value_or(0.0f);
-                    trans.bottom_right.x = (*bottom_right)[0].value_or(0.0f);
-                    trans.bottom_right.y = (*bottom_right)[1].value_or(0.0f);
-                    trans.depth          = depth;
-                    trans.anchor         = string_to_anchor(panel_anchor);
+                    Transform trans    = {};
+                    trans.top_left     = {0.0f, 0.0f};
+                    trans.bottom_right = {256.0f, 128.0f};
+                    if (top_left) {
+                        trans.top_left.x = (*top_left)[0].value_or(0.0f);
+                        trans.top_left.y = (*top_left)[1].value_or(0.0f);
+                        trans.bottom_right += trans.top_left; // in case we don't have a bottom right
+                    }
+                    if (bottom_right) {
+                        trans.bottom_right.x = (*bottom_right)[0].value_or(create_info.min_size.x);
+                        trans.bottom_right.y = (*bottom_right)[1].value_or(create_info.min_size.y);
+                    }
+                    trans.depth  = depth;
+                    trans.anchor = string_to_anchor(panel_anchor);
 
                     auto type = (*node_tbl)["type"].as_string();
                     if (*type == "text") {
