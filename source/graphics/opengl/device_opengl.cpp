@@ -487,6 +487,7 @@ namespace Gfx {
         resource->height                     = resolution.y;
         resource->pixel_format               = format;
         resource->type                       = type;
+        resource->is_framebuffer             = is_framebuffer;
         resources.at(resource_id_pair.id.id) = (Resource*)resource;
 
         if (is_framebuffer) {
@@ -545,6 +546,25 @@ namespace Gfx {
                 break;
             }
             gl::glBindTexture(gl_type, 0);
+
+            if (texture->is_framebuffer) {
+                // Depth
+                gl::glBindTexture(gl::GL_TEXTURE_2D, texture->fb_depth.gpu_handle32);
+                switch (texture->type) {
+                case TextureType::Single2D:
+                    gl::glTexImage2D(
+                        gl::GL_TEXTURE_2D, 0, gl::GL_DEPTH24_STENCIL8, new_resolution.x, new_resolution.y, 0,
+                        gl::GL_DEPTH_STENCIL, gl::GL_UNSIGNED_INT_24_8, nullptr);
+                    break;
+                case TextureType::Single3D: // Same as Array2D, so fall through
+                case TextureType::Array2D:
+                    gl::glTexImage3D(
+                        gl::GL_TEXTURE_2D, 0, gl::GL_DEPTH24_STENCIL8, new_resolution.x, new_resolution.y, new_resolution.z, 0,
+                        gl::GL_DEPTH_STENCIL, gl::GL_UNSIGNED_INT_24_8, nullptr);
+                    break;
+                }
+                gl::glBindTexture(gl::GL_TEXTURE_2D, 0);
+            }
 
             texture->width  = new_resolution.x;
             texture->height = new_resolution.y;

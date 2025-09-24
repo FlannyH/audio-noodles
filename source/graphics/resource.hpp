@@ -88,6 +88,7 @@ namespace Gfx {
         uint32_t width, height;
         PixelFormat pixel_format;
         TextureType type;
+        bool is_framebuffer;
     };
 
     struct BufferResource {

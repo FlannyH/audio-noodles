@@ -174,7 +174,7 @@ namespace UI {
 
         // Update panel size
         glm::ivec2 content_size = {(int)this->size.x - 2, (int)(this->size.y - window_bar_height - 2)};
-        if (size_prev != size) {
+        if (this->size_prev != this->size) {
             if (this->content_render_target.is_valid() == false) {
                 this->content_render_target = Gfx::create_texture_from_data({
                     .format         = Gfx::PixelFormat::RGBA_8,
@@ -188,7 +188,7 @@ namespace UI {
             } else {
                 Gfx::resize_texture(this->content_render_target, glm::ivec3(content_size, 0));
             }
-            size_prev = size;
+            this->size_prev = this->size;
         }
         scene.update_extents(this->top_left + glm::vec2(1, window_bar_height + 1), content_size);
         UI::update_entities_input(this->scene, delta_time, do_mouse_interact);
