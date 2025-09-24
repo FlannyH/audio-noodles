@@ -75,3 +75,11 @@ top_left = [128, -96]
 bottom_right = [192, -32]
 depth = 0.1
 variable = "v_numberbox"
+
+
+[elements.test_box]
+type = "box"
+panel_anchor = "center"
+top_left = [-248, -130]
+bottom_right = [248, 130]
+depth = 0.2
