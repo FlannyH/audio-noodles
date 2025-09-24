@@ -32,7 +32,7 @@ namespace UI {
                 panel_allocated[i] = true;
                 panel_order.push_back(i);
                 panel_pool[i].scene              = Scene();
-                panel_pool[i].name               = panel_create_info.name;
+                panel_pool[i].title              = panel_create_info.title;
                 panel_pool[i].top_left           = panel_create_info.top_left;
                 panel_pool[i].min_size           = panel_create_info.min_size;
                 panel_pool[i].max_size           = panel_create_info.max_size;
@@ -49,7 +49,7 @@ namespace UI {
                 return panel_pool[i];
             }
         }
-        std::runtime_error("Ran out of UI panels!");
+        std::runtime_error("Ran out of UI panels!"); // todo: figure out how to do this properly
         return panel_pool[0]; // we can't get here so this one's just for the compiler, as a treat :3
     }
 
@@ -75,12 +75,12 @@ namespace UI {
         assert(panel_meta);
 
         PanelCreateInfo create_info = {.top_left = top_left};
-        const auto name             = panel_meta["name"].value_or<std::string_view>("untitled panel");
+        const auto title             = panel_meta["title"].value_or<std::string_view>("untitled panel");
         const auto default_size     = panel_meta["default_size"].as_array();
         const auto min_size         = panel_meta["min_size"].as_array();
         const auto max_size         = panel_meta["max_size"].as_array();
         const auto bg_color         = panel_meta["bg_color"].as_array();
-        create_info.name            = name;
+        create_info.title            = title;
         if (min_size && min_size->is_array() && min_size->size() >= 2) {
             create_info.min_size.x = (*min_size)[0].value_or<float>(128.0f);
             create_info.min_size.y = (*min_size)[1].value_or<float>(128.0f);

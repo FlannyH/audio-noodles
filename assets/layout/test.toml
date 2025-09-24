@@ -1,5 +1,5 @@
 [panel_meta]
-name = "Test layout :3"
+title = "Test layout :3"
 default_size = [768, 512]
 min_size = [512, 256]
 max_size = [99999, 99999]

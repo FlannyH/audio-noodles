@@ -219,7 +219,7 @@ namespace UI {
             Gfx::DrawParams{
                 .color = Colors::DARK_BLUE, .anchor_point = Gfx::AnchorPoint::TopLeft, .shape_outline_width = 0.0f});
         Gfx::draw_text_pixels( // Panel name
-            name,
+            this->title,
             Gfx::TextDrawParams{
                 .transform = {.position = glm::vec3(this->top_left + glm::vec2(4.0f, 6.0f), 0.0f), .scale = {2.0f, 2.0f, 1.0f}},
                 .position_anchor = Gfx::AnchorPoint::TopLeft,
