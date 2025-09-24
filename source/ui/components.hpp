@@ -709,9 +709,14 @@ namespace UI {
             // Debug
 #ifdef _DEBUG
             for (size_t i = 0; i < multi_hitbox->n_hitboxes; ++i) {
-                renderer.draw_box_line(
-                    *transform, transform->top_left + multi_hitbox->hitboxes[i].top_left,
-                    transform->top_left + multi_hitbox->hitboxes[i].bottom_right, {1, 1, 0, 1}, 2.0f);
+                Gfx::draw_rectangle_2d_pixels(
+                    transform->top_left + multi_hitbox->hitboxes[i].top_left,
+                    transform->top_left + multi_hitbox->hitboxes[i].bottom_right, 
+                    {
+                        .color = {1, 1, 0, 1},
+                        .shape_outline_width = 2.0f,
+                    }
+                );
             }
 #endif
 

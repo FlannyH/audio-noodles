@@ -193,11 +193,20 @@ namespace Gfx {
 
     void DeviceOpenGL::end_frame() { glfwSwapBuffers(window); }
 
-    void DeviceOpenGL::clear_framebuffer(glm::vec4 color) {
+    void DeviceOpenGL::clear_framebuffer(const ClearParams& clear_params) {
+        gl::glDisable(gl::GL_DEPTH_TEST);
         gl::glDisable(gl::GL_SCISSOR_TEST);
-        gl::glClearColor(color.r, color.g, color.b, color.a);
-        gl::glClear(gl::ClearBufferMask::GL_COLOR_BUFFER_BIT);
+        gl::glClearColor(clear_params.color.r, clear_params.color.g, clear_params.color.b, clear_params.color.a);
+        gl::glClearDepth(1.0);
+        gl::glClearStencil(clear_params.stencil);
+        gl::ClearBufferMask mask = gl::ClearBufferMask::GL_NONE_BIT;
+        if (clear_params.do_clear_color) mask |= gl::ClearBufferMask::GL_COLOR_BUFFER_BIT;
+        if (clear_params.do_clear_depth) mask |= gl::ClearBufferMask::GL_DEPTH_BUFFER_BIT;
+        if (clear_params.do_clear_stencil) mask |= gl::ClearBufferMask::GL_STENCIL_BUFFER_BIT;
+        gl::glClear(mask);
         gl::glEnable(gl::GL_SCISSOR_TEST);
+        gl::glEnable(gl::GL_DEPTH_TEST);
+        gl::glDepthFunc(gl::GL_LEQUAL);
     }
 
     void DeviceOpenGL::blit_pixels(ResourceID src, ResourceID dest, glm::ivec2 size, glm::ivec2 dest_tl, glm::ivec2 src_tl) {
@@ -481,9 +490,24 @@ namespace Gfx {
         resources.at(resource_id_pair.id.id) = (Resource*)resource;
 
         if (is_framebuffer) {
+            // Color
             gl::glGenFramebuffers(1, &resource->fbo.gpu_handle32);
             gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, resource->fbo.gpu_handle32);
             gl::glFramebufferTexture2D(gl::GL_FRAMEBUFFER, gl::GL_COLOR_ATTACHMENT0, gl::GL_TEXTURE_2D, gl_id, 0);
+
+            // Depth
+            gl::glGenTextures(1, &resource->fb_depth.gpu_handle32);
+            gl::glBindTexture(gl::GL_TEXTURE_2D, resource->fb_depth.gpu_handle32);
+            gl::glTexImage2D(
+                gl::GL_TEXTURE_2D, 0, gl::GL_DEPTH24_STENCIL8, resolution.x, resolution.y, 0, gl::GL_DEPTH_STENCIL,
+                gl::GL_UNSIGNED_INT_24_8, NULL);
+            gl::glTexParameteri(gl::GL_TEXTURE_2D, gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
+            gl::glTexParameteri(gl::GL_TEXTURE_2D, gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
+            gl::glFramebufferTexture2D(
+                gl::GL_FRAMEBUFFER, gl::GL_DEPTH_ATTACHMENT, gl::GL_TEXTURE_2D, resource->fb_depth.gpu_handle32, 0);
+            gl::glFramebufferTexture2D(
+                gl::GL_FRAMEBUFFER, gl::GL_STENCIL_ATTACHMENT, gl::GL_TEXTURE_2D, resource->fb_depth.gpu_handle32, 0);
+            gl::glBindTexture(gl::GL_TEXTURE_2D, 0);
             gl::glBindFramebuffer(gl::GL_FRAMEBUFFER, 0);
         }
 

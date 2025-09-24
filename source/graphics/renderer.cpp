@@ -26,11 +26,20 @@ namespace Gfx {
         ResourceID texture_to_bind       = ResourceID::invalid();
 
         // Blit
-        ResourceID blit_src_texture;
-        ResourceID blit_dst_texture;
-        glm::ivec2 blit_src_top_left;
-        glm::ivec2 blit_dst_top_left;
-        glm::ivec2 blit_size;
+        ResourceID blit_src_texture  = ResourceID::invalid();
+        ResourceID blit_dst_texture  = ResourceID::invalid();
+        glm::ivec2 blit_src_top_left = {0.0f, 0.0f};
+        glm::ivec2 blit_dst_top_left = {0.0f, 0.0f};
+        glm::ivec2 blit_size         = {0.0f, 0.0f};
+
+        // Clear
+        ResourceID clear_target   = ResourceID::invalid();
+        bool clear_color_enable   = false;
+        bool clear_depth_enable   = false;
+        bool clear_stencil_enable = false;
+        glm::vec4 clear_color     = {0.0f, 0.0f, 0.0f, 0.0f};
+        float clear_depth         = 1.0f;
+        int clear_stencil         = 0;
     };
 
     Device* device        = nullptr; // Will be initialized to a child class of Device (e.g. DeviceOpenGL)
@@ -100,6 +109,21 @@ namespace Gfx {
         }
     }
 
+    void clear_framebuffer(const ClearParams& clear_params) {
+        if (curr_render_info.type == RenderInfoType::Raster && !curr_render_info.vertices_to_render.empty()) {
+            render_queue.push_back(curr_render_info);
+        }
+        curr_render_info.type                 = RenderInfoType::Clear;
+        curr_render_info.clear_color          = clear_params.color;
+        curr_render_info.clear_depth          = clear_params.depth;
+        curr_render_info.clear_stencil        = clear_params.stencil;
+        curr_render_info.clear_color_enable   = clear_params.do_clear_color;
+        curr_render_info.clear_depth_enable   = clear_params.do_clear_depth;
+        curr_render_info.clear_stencil_enable = clear_params.do_clear_stencil;
+        curr_render_info.clear_target         = curr_render_info.target_framebuffer;
+        render_queue.push_back(curr_render_info);
+    }
+
     void begin_frame() {
         // Update window size
         int w, h;
@@ -114,7 +138,9 @@ namespace Gfx {
         set_viewport({0, 0}, {w, h});
         clip_rect_stack.clear();
         push_clip_rect({0, 0}, {w, h});
-        device->clear_framebuffer(glm::vec4(0.0f, 0.0f, 0.5f, 1.0f));
+        device->clear_framebuffer({
+            .color = glm::vec4(0.0f, 0.0f, 0.5f, 1.0f),
+        });
     }
 
     void end_frame() {
@@ -143,6 +169,18 @@ namespace Gfx {
                     device->blit_pixels(
                         render_info.blit_src_texture, render_info.blit_dst_texture, render_info.blit_size,
                         render_info.blit_dst_top_left, render_info.blit_src_top_left);
+                    continue;
+                }
+                if (render_info.type == RenderInfoType::Clear) {
+                    device->set_render_target(render_info.clear_target);
+                    device->clear_framebuffer({
+                        .do_clear_color   = render_info.clear_color_enable,
+                        .do_clear_depth   = render_info.clear_depth_enable,
+                        .do_clear_stencil = render_info.clear_stencil_enable,
+                        .color            = render_info.clear_color,
+                        .depth            = render_info.clear_depth,
+                        .stencil          = render_info.clear_stencil,
+                    });
                 }
             }
         }

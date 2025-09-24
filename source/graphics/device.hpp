@@ -1,6 +1,5 @@
 #pragma once
 #include "resource.hpp"
-#include "renderer.hpp"
 #include <string_view>
 #include "../input.hpp"
 
@@ -10,6 +9,15 @@ namespace Gfx {
     struct ResourceWithOffset {
         ResourceID id;
         uint32_t offset;
+    };
+
+    struct ClearParams {
+        bool do_clear_color   = true;
+        bool do_clear_depth   = true;
+        bool do_clear_stencil = true;
+        glm::vec4 color       = {0.0f, 0.0f, 0.0f, 0.0f};
+        float depth           = 1.0f;
+        int stencil           = 0;
     };
 
     class Device {
@@ -24,7 +32,7 @@ namespace Gfx {
         virtual void set_full_screen(bool full_screen)                                                                    = 0;
         virtual void begin_frame()                                                                                        = 0;
         virtual void end_frame()                                                                                          = 0;
-        virtual void clear_framebuffer(glm::vec4 color)                                                                   = 0;
+        virtual void clear_framebuffer(const ClearParams& clear_params)                                                          = 0;
         virtual void blit_pixels(ResourceID src, ResourceID dest, glm::ivec2 size, glm::ivec2 dest_tl, glm::ivec2 src_tl) = 0;
         virtual void set_camera(const Transform& transform)                                                               = 0;
         virtual void set_clip_rect(glm::ivec2 top_left, glm::ivec2 size)                                                  = 0;

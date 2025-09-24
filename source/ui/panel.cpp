@@ -200,7 +200,14 @@ namespace UI {
         Gfx::set_render_target(this->content_render_target);
         Gfx::set_viewport({0, 0}, content_size);
         Gfx::push_clip_rect({0, 0}, content_size);
-        Gfx::draw_rectangle_2d({-1, -1}, {1, 1}, {.color = this->bg_color, .shape_outline_width = 0.0f});
+        Gfx::clear_framebuffer({});
+        Gfx::draw_rectangle_2d(
+            {-1, -1}, {1, 1},
+            {
+                .color               = this->bg_color,
+                .depth               = 1.0f,
+                .shape_outline_width = 0.0f,
+            });
         UI::update_entities_render(this->scene);
         Gfx::pop_clip_rect();
 

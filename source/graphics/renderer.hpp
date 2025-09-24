@@ -12,7 +12,7 @@ namespace Gfx {
 
     enum class AnchorPoint { TopLeft = 0, Top, TopRight, Left, Center, Right, BottomLeft, Bottom, BottomRight };
 
-    enum class RenderInfoType { None = 0, Raster, Blit };
+    enum class RenderInfoType { None = 0, Raster, Blit, Clear };
 
     struct DrawParams {
         glm::vec4 color          = {1, 1, 1, 1};
@@ -80,6 +80,7 @@ namespace Gfx {
     void set_mouse_visible(bool visible);
     void set_cursor_mode(CursorMode cursor_mode);
     void set_render_target(ResourceID render_target = ResourceID::invalid());
+    void clear_framebuffer(const ClearParams& clear_params);
 
     // Rendering
     void begin_frame();
