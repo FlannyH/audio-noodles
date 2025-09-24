@@ -78,7 +78,7 @@ add_executable (AudioNoodles
 # Set debug working directory
 set_target_properties(
     AudioNoodles PROPERTIES
-    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
@@ -112,4 +112,8 @@ target_include_directories(AudioNoodles PRIVATE
 )
 
 # Copy runtime files to build output
-file(COPY assets/ DESTINATION ${CMAKE_BINARY_DIR}/assets)
+add_custom_command(TARGET AudioNoodles POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets
+    $<TARGET_FILE_DIR:AudioNoodles>/assets
+)
