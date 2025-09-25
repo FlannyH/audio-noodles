@@ -711,12 +711,11 @@ namespace UI {
             for (size_t i = 0; i < multi_hitbox->n_hitboxes; ++i) {
                 Gfx::draw_rectangle_2d_pixels(
                     transform->top_left + multi_hitbox->hitboxes[i].top_left,
-                    transform->top_left + multi_hitbox->hitboxes[i].bottom_right, 
+                    transform->top_left + multi_hitbox->hitboxes[i].bottom_right,
                     {
-                        .color = {1, 1, 0, 1},
+                        .color               = {1, 1, 0, 1},
                         .shape_outline_width = 2.0f,
-                    }
-                );
+                    });
             }
 #endif
 

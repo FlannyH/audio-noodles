@@ -50,7 +50,7 @@ namespace UI {
             }
         }
         std::runtime_error("Ran out of UI panels!"); // todo: figure out how to do this properly
-        return panel_pool[0]; // we can't get here so this one's just for the compiler, as a treat :3
+        return panel_pool[0];                        // we can't get here so this one's just for the compiler, as a treat :3
     }
 
     Gfx::AnchorPoint string_to_anchor(const std::string& str) {
@@ -75,12 +75,12 @@ namespace UI {
         assert(panel_meta);
 
         PanelCreateInfo create_info = {.top_left = top_left};
-        const auto title             = panel_meta["title"].value_or<std::string_view>("untitled panel");
+        const auto title            = panel_meta["title"].value_or<std::string_view>("untitled panel");
         const auto default_size     = panel_meta["default_size"].as_array();
         const auto min_size         = panel_meta["min_size"].as_array();
         const auto max_size         = panel_meta["max_size"].as_array();
         const auto bg_color         = panel_meta["bg_color"].as_array();
-        create_info.title            = title;
+        create_info.title           = title;
         if (min_size && min_size->is_array() && min_size->size() >= 2) {
             create_info.min_size.x = (*min_size)[0].value_or<float>(128.0f);
             create_info.min_size.y = (*min_size)[1].value_or<float>(128.0f);
