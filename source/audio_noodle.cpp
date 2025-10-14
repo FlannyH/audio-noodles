@@ -14,8 +14,6 @@ int main() {
     Gfx::init(Gfx::RenderAPI::OpenGL, 1280, 720, "Audio Noodles");
     Session::tracks().push_back(Track{});
 
-    auto& panel = UI::load_panel("assets/layout/test.toml");
-
     while (Gfx::should_stay_open()) {
         Gfx::set_cursor_mode(Gfx::CursorMode::Arrow);
         Input::update();

@@ -61,7 +61,7 @@ namespace UI {
                 }
 
                 // Snap to other panels
-                for (const auto& panel: UI::get_panels()) {
+                for (const auto& panel: UI::get_panels_in_order()) {
                     if (abs(this->top_left.x - (panel->top_left.x + panel->size.x)) < snap_sensitivity) {
                         this->top_left.x = (panel->top_left.x + panel->size.x);
                     }
@@ -152,7 +152,7 @@ namespace UI {
                     this->set_top(0.0f);
                 }
 
-                for (const auto& panel: UI::get_panels()) {
+                for (const auto& panel: UI::get_panels_in_order()) {
                     if (this->resize_flags & resize_r && abs(mouse_pos.x - (panel->top_left.x)) < snap_sensitivity) {
                         this->set_right(panel->top_left.x);
                     }

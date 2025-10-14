@@ -16,7 +16,7 @@ namespace UI {
     size_t prev_panel_to_focus_on = -1;
     bool panels_dirty             = false;
 
-    std::vector<Panel*>& get_panels() {
+    std::vector<Panel*>& get_panels_in_order() {
         if (panels_dirty) {
             panels.clear();
             for (const auto& index: panel_order) {
@@ -26,7 +26,9 @@ namespace UI {
         return panels;
     }
 
-    Panel& new_panel(const PanelCreateInfo& panel_create_info) {
+    Panel& get_panel(const size_t id) { return panel_pool[id]; }
+
+    size_t new_panel(const PanelCreateInfo& panel_create_info) {
         for (size_t i = 0; i < MAX_PANEL_COUNT; ++i) {
             if (panel_allocated[i] == false) {
                 panel_allocated[i] = true;
@@ -46,11 +48,11 @@ namespace UI {
                 panel_pool[i].being_dragged      = false;
                 panel_pool[i].being_resized      = false;
                 panel_pool[i].maximized          = panel_create_info.maximized;
-                return panel_pool[i];
+                return i;
             }
         }
         std::runtime_error("Ran out of UI panels!"); // todo: figure out how to do this properly
-        return panel_pool[0];                        // we can't get here so this one's just for the compiler, as a treat :3
+        return 0;                                    // we can't get here so this one's just for the compiler, as a treat :3
     }
 
     Gfx::AnchorPoint string_to_anchor(const std::string& str) {
@@ -67,7 +69,7 @@ namespace UI {
     }
 
     // Load panel layout from disk, then create a panel from it
-    Panel& load_panel(const char* path, const glm::vec2 top_left) {
+    size_t load_panel(const char* path, const glm::vec2 top_left) {
         auto layout = toml::parse_file(path);
 
         // Parse metadata
@@ -104,8 +106,9 @@ namespace UI {
             create_info.size = create_info.min_size;
         }
 
-        auto& panel = new_panel(create_info);
-        auto& scene = panel.scene;
+        size_t panel_id = new_panel(create_info);
+        auto& panel     = get_panel(panel_id);
+        auto& scene     = panel.scene;
 
         // Parse UI elements
         if (auto elements = layout["elements"].as_table()) {
@@ -213,7 +216,7 @@ namespace UI {
                 }
             }
         }
-        return panel;
+        return panel_id;
     }
 
     void panel_input() {
