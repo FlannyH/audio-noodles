@@ -1,0 +1,181 @@
+[panel_meta]
+title = "WavOsc"
+default_size = [800, 512]
+min_size = [800, 512]
+max_size = [800, 512]
+bg_color = [0.1, 0.1, 0.2, 1.0]
+
+# WAVE TYPE BOX
+[elements.wave_type_box]
+type = "box"
+panel_anchor = "top left"
+top_left = [8, 8]
+bottom_right = [776, 136]
+color_inner = [1.0, 1.0, 0.0, 0.0]
+color_outer = [1.0, 1.0, 0.0, 1.0]
+thickness = 2.0
+
+# WAVE TYPE
+[elements.wave_type_combobox]
+type = "combobox"
+panel_anchor = "top left"
+top_left = [320, 16]
+bottom_right = [768, 64]
+depth = 0.1
+entries = ["Sine", "Square", "Triangle", "Sawtooth", "Noise"]
+item_height = 40.0
+list_height = 420.0
+default_index = 0
+variable = "wave_type"
+
+[elements.wave_type_label]
+type = "text"
+panel_anchor = "top left"
+top_left = [16, 16]
+bottom_right = [256, 64]
+depth = 0.1
+text = "Wave type"
+text_scale = [2.0, 2.0]
+text_color = [1.0, 1.0, 0.0, 1.0]
+text_ui_anchor = "top left"
+text_text_anchor = "top left"
+
+# SQUARE PULSE WIDTH
+[elements.square_pulse_width_slider]
+type = "slider"
+panel_anchor = "top left"
+top_left = [320, 80]
+bottom_right = [768, 128]
+depth = 0.1
+min = 0.0
+max = 1.0
+step = 0.001
+default_value = 0.5
+visual_decimal_places = 3
+variable = "square_pulse_width"
+
+[elements.square_pulse_width_label]
+type = "text"
+panel_anchor = "top left"
+top_left = [16, 80]
+bottom_right = [256, 128]
+depth = 0.1
+text = "Square pulse width"
+text_scale = [2.0, 2.0]
+text_color = [1.0, 1.0, 0.0, 1.0]
+text_ui_anchor = "top left"
+text_text_anchor = "top left"
+
+# UNISON BOX
+[elements.unison_box]
+type = "box"
+panel_anchor = "top left"
+top_left = [8, 144]
+bottom_right = [776, 384]
+color_inner = [0.0, 1.0, 1.0, 0.0]
+color_outer = [0.0, 1.0, 1.0, 1.0]
+thickness = 2.0
+
+# UNISON COUNT
+[elements.unison_count_slider]
+type = "numberbox"
+panel_anchor = "top left"
+top_left = [320, 144]
+bottom_right = [768, 192]
+depth = 0.1
+min = 0.0
+max = 9.0
+step = 1.0
+default_value = 1.0
+visual_decimal_places = 0
+variable = "unison_count"
+
+[elements.unison_count_label]
+type = "text"
+panel_anchor = "top left"
+top_left = [16, 144]
+bottom_right = [256, 192]
+depth = 0.1
+text = "Unison count"
+text_scale = [2.0, 2.0]
+text_color = [0.0, 1.0, 1.0, 1.0]
+text_ui_anchor = "top left"
+text_text_anchor = "top left"
+
+# UNISON DEPTH
+[elements.unison_depth_slider]
+type = "slider"
+panel_anchor = "top left"
+top_left = [320, 208]
+bottom_right = [768, 256]
+depth = 0.1
+min = 0.0
+max = 1.0
+step = 0.001
+default_value = 0.0
+visual_decimal_places = 3
+variable = "unison_depth"
+
+[elements.unison_depth_label]
+type = "text"
+panel_anchor = "top left"
+top_left = [16, 208]
+bottom_right = [256, 256]
+depth = 0.1
+text = "Unison depth"
+text_scale = [2.0, 2.0]
+text_color = [0.0, 1.0, 1.0, 1.0]
+text_ui_anchor = "top left"
+text_text_anchor = "top left"
+
+# UNISON WIDENESS
+[elements.unison_wideness_slider]
+type = "slider"
+panel_anchor = "top left"
+top_left = [320, 272]
+bottom_right = [768, 320]
+depth = 0.1
+min = 0.0
+max = 1.0
+step = 0.001
+default_value = 0.0
+visual_decimal_places = 3
+variable = "unison_wideness"
+
+[elements.unison_wideness_label]
+type = "text"
+panel_anchor = "top left"
+top_left = [16, 272]
+bottom_right = [256, 320]
+depth = 0.1
+text = "Unison wideness"
+text_scale = [2.0, 2.0]
+text_color = [0.0, 1.0, 1.0, 1.0]
+text_ui_anchor = "top left"
+text_text_anchor = "top left"
+
+# UNISON PHASE SHIFT
+[elements.unison_phase_shift_slider]
+type = "slider"
+panel_anchor = "top left"
+top_left = [320, 336]
+bottom_right = [768, 384]
+depth = 0.1
+min = 0.0
+max = 1.0
+step = 0.001
+default_value = 0.0
+visual_decimal_places = 3
+variable = "unison_phase_shift"
+
+[elements.unison_phase_shift_label]
+type = "text"
+panel_anchor = "top left"
+top_left = [16, 336]
+bottom_right = [256, 384]
+depth = 0.1
+text = "Unison phase shift"
+text_scale = [2.0, 2.0]
+text_color = [0.0, 1.0, 1.0, 1.0]
+text_ui_anchor = "top left"
+text_text_anchor = "top left"

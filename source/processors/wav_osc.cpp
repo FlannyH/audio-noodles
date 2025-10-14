@@ -1,6 +1,7 @@
 #include "wav_osc.hpp"
 #include "../mixer.hpp"
 #include "../common.hpp"
+#include "../ui/panel_manager.hpp"
 
 #include <cmath>
 
@@ -17,10 +18,20 @@ double poly_blep(double t, double dt) {
     return 0.0;
 }
 
-WavOsc::WavOsc() { this->voice_pool.resize(128); }
+WavOsc::WavOsc() {
+    this->voice_pool.resize(128);
+    this->ui_panel_index = UI::load_panel("assets/layout/wav_osc.toml");
+}
 
 void WavOsc::process_block(const size_t n_frames, float* output) {
     const double sample_length_sec = 1.0 / Mixer::sample_rate();
+
+    auto& panel              = UI::get_panel(this->ui_panel_index);
+    this->square_pulse_width = (float)panel.scene.value_pool.get<double>("square_pulse_width");
+    this->unison_depth       = (float)panel.scene.value_pool.get<double>("unison_depth");
+    this->unison_wideness    = (float)panel.scene.value_pool.get<double>("unison_wideness");
+    this->unison_phase_shift = (float)panel.scene.value_pool.get<double>("unison_phase_shift");
+    this->unison_count       = (float)panel.scene.value_pool.get<double>("unison_count");
 
     for (size_t i = 0; i < n_frames; ++i) {
         for (auto& voice: this->voice_pool) {
@@ -77,6 +88,10 @@ void WavOsc::process_block(const size_t n_frames, float* output) {
 }
 
 void WavOsc::key_on(uint8_t key, uint8_t velocity) {
+    auto& panel     = UI::get_panel(this->ui_panel_index);
+    this->wave_type = (WaveType)round(panel.scene.value_pool.get<double>("wave_type") + 1.0);
+    LOG(Debug, "wave_type = %i", (int)this->wave_type);
+
     float fkey              = (float)key - (this->unison_depth / 2.0f);
     float fphase            = -this->unison_phase_shift / 2.0f;
     float fpan              = -this->unison_wideness;
@@ -92,6 +107,8 @@ void WavOsc::key_on(uint8_t key, uint8_t velocity) {
             voice.phase         = wrapped_phase;
             voice.actual_note   = fkey;
             voice.panning       = fpan;
+            LOG(Info, "voice.panning = %f", voice.panning);
+            LOG(Info, "pan_delta = %f", pan_delta);
             voice.key           = key;
             voice.velocity      = ((float)velocity / 127.0f) / sqrtf((float)this->unison_count);
             voice.vol_env.stage = VolEnvStage::delay;
