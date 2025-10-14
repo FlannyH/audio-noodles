@@ -706,19 +706,6 @@ namespace UI {
                     .line_width   = 2.0f,
                 });
 
-            // Debug
-#ifdef _DEBUG
-            for (size_t i = 0; i < multi_hitbox->n_hitboxes; ++i) {
-                Gfx::draw_rectangle_2d_pixels(
-                    transform->top_left + multi_hitbox->hitboxes[i].top_left,
-                    transform->top_left + multi_hitbox->hitboxes[i].bottom_right,
-                    {
-                        .color               = {1, 1, 0, 1},
-                        .shape_outline_width = 2.0f,
-                    });
-            }
-#endif
-
             // Render the list if necessary
             Gfx::push_clip_rect(
                 top_left + glm::vec2(0, combobox->button_height),
@@ -768,12 +755,12 @@ namespace UI {
                     // Draw the boxes
                     Gfx::draw_rectangle_2d_pixels(
                         box_top_left + glm::vec2(+1, 0), box_bottom_right + glm::vec2(-1, -1),
-                        {.color = color, .depth = transform->depth + 0.003f, .anchor_point = Gfx::AnchorPoint::TopLeft});
+                        {.color = color, .depth = transform->depth - 0.003f, .anchor_point = Gfx::AnchorPoint::TopLeft});
                     Gfx::draw_rectangle_2d_pixels(
                         box_top_left, box_bottom_right,
                         {
                             .color               = Colors::BLACK,
-                            .depth               = transform->depth + 0.003f,
+                            .depth               = transform->depth - 0.003f,
                             .anchor_point        = Gfx::AnchorPoint::TopLeft,
                             .shape_outline_width = 1.0f,
                         });
@@ -781,7 +768,7 @@ namespace UI {
                         combobox->list_items[i].c_str(),
                         Gfx::TextDrawParams{
                             .transform =
-                                {.position = glm::vec3(box_top_left + text_offset, transform->depth + 0.02f),
+                                {.position = glm::vec3(box_top_left + text_offset, transform->depth - 0.004f),
                                  .scale    = {2.0f, 2.0f, 1.0f}},
                             .position_anchor = Gfx::AnchorPoint::TopLeft,
                             .text_anchor     = Gfx::AnchorPoint::Left,
@@ -810,22 +797,26 @@ namespace UI {
 
             const glm::vec2 tl = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
             const glm::vec2 br = Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
-            Gfx::draw_rectangle_2d_pixels(
-                tl, br,
-                {
-                    .color               = box->color_inner * multiply,
-                    .depth               = transform->depth + 0.001f,
-                    .anchor_point        = Gfx::AnchorPoint::TopLeft,
-                    .shape_outline_width = 0.0f,
-                });
-            Gfx::draw_rectangle_2d_pixels(
-                tl, br,
-                {
-                    .color               = box->color_outer * multiply,
-                    .depth               = transform->depth,
-                    .anchor_point        = Gfx::AnchorPoint::TopLeft,
-                    .shape_outline_width = 1.0f,
-                });
+            if (box->color_inner.a > 0.0f) {
+                Gfx::draw_rectangle_2d_pixels(
+                    tl, br,
+                    {
+                        .color               = box->color_inner * multiply,
+                        .depth               = transform->depth + 0.001f,
+                        .anchor_point        = Gfx::AnchorPoint::TopLeft,
+                        .shape_outline_width = 0.0f,
+                    });
+            }
+            if (box->color_outer.a > 0.0f) {
+                Gfx::draw_rectangle_2d_pixels(
+                    tl, br,
+                    {
+                        .color               = box->color_outer * multiply,
+                        .depth               = transform->depth,
+                        .anchor_point        = Gfx::AnchorPoint::TopLeft,
+                        .shape_outline_width = 1.0f,
+                    });
+            }
         }
     }
 
