@@ -221,6 +221,30 @@ namespace UI {
                         UI::create_box(
                             scene, trans,
                             {.color_inner = color_inner_vec4, .color_outer = color_outer_vec4, .thickness = thickness});
+                    } else if (*type == "combobox") {
+                        auto entries         = (*node_tbl)["entries"].as_array();
+                        auto default_index   = (*node_tbl)["step"].value_or<uint32_t>(0);
+                        auto variable        = (*node_tbl)["variable"].value_or<std::string>("");
+                        auto item_height     = (*node_tbl)["item_height"].value_or<float>(40.0f);
+                        auto list_height     = (*node_tbl)["list_height"].value_or<float>(420.0f);
+                        auto variable_string = std::string(variable.begin(), variable.end());
+
+                        if (!entries) {
+                            LOG(Warning, "%s: invalid combobox: no entries provided", path);
+                            continue;
+                        }
+
+                        std::vector<std::wstring> entries_ws_vec;
+
+                        for (size_t i = 0; i < entries->size(); ++i) {
+                            const auto& entry = (*entries)[i].value_or<std::wstring>(L"(parsing error, expected string)");
+                            entries_ws_vec.push_back(entry);
+                        }
+
+                        UI::create_combobox(
+                            scene, variable_string.empty() ? name_str : variable_string, trans, entries_ws_vec, default_index,
+                            item_height, list_height);
+
                     } else {
                         LOG(Warning, "%s: unknown element type \"%s\"", path, (*type)->c_str());
                     }
