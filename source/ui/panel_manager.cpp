@@ -209,7 +209,18 @@ namespace UI {
                             .visual_decimal_places = visual_decimal_places};
                         UI::create_numberbox(scene, variable_string.empty() ? name_str : variable_string, trans, range);
                     } else if (*type == "box") {
-                        UI::create_box(scene, trans, {});
+                        auto ci               = (*node_tbl)["color_inner"].as_array();
+                        auto co               = (*node_tbl)["color_outer"].as_array();
+                        auto color_inner_vec4 = glm::vec4(
+                            (*ci)[0].value_or<double>(1.0), (*ci)[1].value_or<double>(1.0), (*ci)[2].value_or<double>(1.0),
+                            (*ci)[3].value_or<double>(1.0));
+                        auto color_outer_vec4 = glm::vec4(
+                            (*co)[0].value_or<double>(1.0), (*co)[1].value_or<double>(1.0), (*co)[2].value_or<double>(1.0),
+                            (*co)[3].value_or<double>(1.0));
+                        auto thickness = (*node_tbl)["thickness"].value_or<float>(2.0f);
+                        UI::create_box(
+                            scene, trans,
+                            {.color_inner = color_inner_vec4, .color_outer = color_outer_vec4, .thickness = thickness});
                     } else {
                         LOG(Warning, "%s: unknown element type \"%s\"", path, (*type)->c_str());
                     }
