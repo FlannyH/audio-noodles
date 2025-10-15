@@ -119,13 +119,11 @@ void WavOsc::key_on(uint8_t key, uint8_t velocity) {
         for (auto& voice: this->voice_pool) {
             if (voice.vol_env.stage != VolEnvStage::idle) continue;
 
-            float wrapped_phase = (fphase < 0.0f) ? (fphase + 1.0f) : (fphase);
-            wrapped_phase       = (wrapped_phase >= 1.0f) ? (wrapped_phase - 1.0f) : (wrapped_phase);
-            voice.phase         = wrapped_phase;
-            voice.actual_note   = fkey;
-            voice.panning       = fpan;
-            LOG(Info, "voice.panning = %f", voice.panning);
-            LOG(Info, "pan_delta = %f", pan_delta);
+            float wrapped_phase      = (fphase < 0.0f) ? (fphase + 1.0f) : (fphase);
+            wrapped_phase            = (wrapped_phase >= 1.0f) ? (wrapped_phase - 1.0f) : (wrapped_phase);
+            voice.phase              = wrapped_phase;
+            voice.actual_note        = fkey;
+            voice.panning            = fpan;
             voice.key                = key;
             voice.velocity           = ((float)velocity / 127.0f) / sqrtf((float)this->unison_count);
             voice.vol_env.stage      = VolEnvStage::delay;
