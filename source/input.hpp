@@ -88,6 +88,12 @@ namespace Input {
         ButtonCount,
     };
 
+    enum class MoveMouseMode {
+        None     = 0,
+        Relative = 1,
+        Absolute = 2,
+    };
+
     struct InputData {
         double mouse_x                                       = 0.0;
         double mouse_y                                       = 0.0;
@@ -95,6 +101,8 @@ namespace Input {
         double mouse_scroll_y                                = 0.0;
         bool mouse_buttons[(size_t)MouseButton::ButtonCount] = {0};
         bool keys[(size_t)Key::KeyCount]                     = {0};
+        glm::vec2 mouse_move_amount                          = {0.0f, 0.0f};
+        MoveMouseMode move_mouse_mode                        = MoveMouseMode::None;
     };
 
     void update();
@@ -113,6 +121,7 @@ namespace Input {
     glm::vec2 mouse_position_pixels();
     glm::vec2 mouse_movement();
     glm::vec2 mouse_movement_pixels();
+    void move_mouse(const glm::vec2& amount, MoveMouseMode mode);
 
     std::shared_ptr<Input::InputData> get_ptr_incoming();
 }; // namespace Input

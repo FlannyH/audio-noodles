@@ -867,6 +867,11 @@ namespace UI {
                 }
             }
             // If we're hovering over the element and we click, set the ClickState to clicking
+            auto* value     = scene.get_component<Value>(entity);
+            auto* slider    = scene.get_component<Slider>(entity);
+            auto* draggable = scene.get_component<Draggable>(entity);
+            auto* range     = scene.get_component<NumberRange>(entity);
+
             if (Input::mouse_button_held(Input::MouseButton::Left)) {
                 if (mouse_interact->state == ClickState::hover) {
                     mouse_interact->state = ClickState::click;
@@ -882,10 +887,24 @@ namespace UI {
                 // Reset the MouseInteract state back to idle
                 mouse_interact->state = ClickState::idle;
                 Gfx::set_mouse_visible(true);
+
+                if (value && slider && draggable) {
+                    const double value_normalized = (value->get_as_ref<double>() - range->min) / (range->max - range->min);
+                    const double slider_pos       = (value_normalized * std::max(slider->curr_bar_length, 1.0f));
+
+                    if (draggable->is_horizontal) {
+                        Input::move_mouse(
+                            {slider_pos + br.x - slider->curr_bar_length, Input::mouse_position_pixels().y},
+                            Input::MoveMouseMode::Absolute);
+                    } else {
+                        Input::move_mouse(
+                            {Input::mouse_position_pixels().x, slider_pos + br.y - slider->curr_bar_length},
+                            Input::MoveMouseMode::Absolute);
+                    }
+                }
             }
 
             // If we're hovering over the element and we middle click, AND the component has a value, set that value to default
-            const auto* range = scene.get_component<NumberRange>(entity);
             if (Input::mouse_button_pressed(Input::MouseButton::Middle) && value && range &&
                 mouse_interact->state == ClickState::hover) {
                 if (value->type == VarType::float64) {

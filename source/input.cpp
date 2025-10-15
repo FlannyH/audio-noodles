@@ -1,6 +1,7 @@
 #include "input.hpp"
 #include <cstring>
 #include "graphics/renderer.hpp"
+#include "log.hpp"
 
 namespace Input {
     // State
@@ -78,6 +79,11 @@ namespace Input {
 
     glm::vec2 mouse_movement_pixels() {
         return glm::vec2(current.mouse_x - previous.mouse_x, current.mouse_y - previous.mouse_y);
+    }
+
+    void move_mouse(const glm::vec2& amount, MoveMouseMode mode) {
+        incoming->mouse_move_amount += amount;
+        incoming->move_mouse_mode = mode;
     }
 
     std::shared_ptr<Input::InputData> get_ptr_incoming() {

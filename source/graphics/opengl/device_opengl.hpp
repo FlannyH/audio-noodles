@@ -67,5 +67,8 @@ namespace Gfx {
         ResourceID active_framebuffer = ResourceID::invalid();
         ResourceID render_pass_active = ResourceID::invalid();
         std::shared_ptr<Input::InputData> input_data = nullptr;
+        bool queue_mouse_visible = false;
+        Gfx::CursorMode curr_cursor_mode = Gfx::CursorMode::Arrow;
+        Gfx::CursorMode desired_cursor_mode = Gfx::CursorMode::Arrow;
     };
 } // namespace Gfx

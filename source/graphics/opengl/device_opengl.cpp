@@ -191,7 +191,38 @@ namespace Gfx {
         glfwPollEvents();
     }
 
-    void DeviceOpenGL::end_frame() { glfwSwapBuffers(window); }
+    void DeviceOpenGL::end_frame() {
+        glfwSwapBuffers(window);
+
+        auto incoming_input_data = Input::get_ptr_incoming();
+        if (incoming_input_data) {
+            if (incoming_input_data->move_mouse_mode != Input::MoveMouseMode::None) {
+                double pos_x = 0.0;
+                double pos_y = 0.0;
+
+                if (incoming_input_data->move_mouse_mode == Input::MoveMouseMode::Relative) {
+                    glfwGetCursorPos(this->window, &pos_x, &pos_y);
+                }
+
+                glfwSetCursorPos(
+                    this->window, pos_x + (double)incoming_input_data->mouse_move_amount.x,
+                    pos_y + (double)incoming_input_data->mouse_move_amount.y);
+
+                incoming_input_data->mouse_move_amount = glm::vec2(0.0f);
+                incoming_input_data->move_mouse_mode   = Input::MoveMouseMode::None;
+            }
+        };
+
+        if (queue_mouse_visible) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            queue_mouse_visible = false;
+        }
+
+        if (desired_cursor_mode != curr_cursor_mode) {
+            glfwSetCursor(this->window, this->cursors[(size_t)desired_cursor_mode]);
+            curr_cursor_mode = desired_cursor_mode;
+        }
+    }
 
     void DeviceOpenGL::clear_framebuffer(const ClearParams& clear_params) {
         gl::glDisable(gl::GL_DEPTH_TEST);
@@ -655,11 +686,15 @@ namespace Gfx {
     }
 
     void DeviceOpenGL::set_mouse_visible(bool visible) {
-        glfwSetInputMode(window, GLFW_CURSOR, visible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+        if (!visible) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        else {
+            this->queue_mouse_visible = true;
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        }
     }
 
     void DeviceOpenGL::set_cursor_mode(Gfx::CursorMode cursor_mode) {
-        glfwSetCursor(this->window, this->cursors[(size_t)cursor_mode]);
+        this->desired_cursor_mode = cursor_mode;
     }
 
     PairResourceID DeviceOpenGL::allocate_resource_slot(const ResourceType type) {
