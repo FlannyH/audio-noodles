@@ -41,7 +41,7 @@ void WavOsc::process_block(const size_t n_frames, float* output) {
     this->params.hold    = panel.scene.value_pool.get<double>("adsr_hold");
     this->params.decay   = panel.scene.value_pool.get<double>("adsr_decay");
     this->params.sustain = panel.scene.value_pool.get<double>("adsr_sustain");
-    this->params.release = panel.scene.value_pool.get<double>("adsr_release");
+    this->params.release = 1.0 / panel.scene.value_pool.get<double>("adsr_release");
 
     for (size_t i = 0; i < n_frames; ++i) {
         for (auto& voice: this->voice_pool) {
