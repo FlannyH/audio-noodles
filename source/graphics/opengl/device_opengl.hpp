@@ -65,7 +65,7 @@ namespace Gfx {
         double delta_time = 0.0;
         std::vector<GLFWcursor*> cursors;
         ResourceID active_framebuffer = ResourceID::invalid();
-
         ResourceID render_pass_active = ResourceID::invalid();
+        std::shared_ptr<Input::InputData> input_data = nullptr;
     };
 } // namespace Gfx

@@ -603,7 +603,9 @@ namespace Gfx {
     }
 
     static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        Input::InputData* incoming_input_data = (Input::InputData*)glfwGetWindowUserPointer(window);
+        auto incoming_input_data = Input::get_ptr_incoming();
+        if (!incoming_input_data) return;
+
         switch (action) {
         case GLFW_PRESS: incoming_input_data->keys[(size_t)glfw_to_key(key)] = true; break;
         case GLFW_RELEASE: incoming_input_data->keys[(size_t)glfw_to_key(key)] = false; break;
@@ -612,14 +614,18 @@ namespace Gfx {
     }
 
     static void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
-        Input::InputData* incoming_input_data = (Input::InputData*)glfwGetWindowUserPointer(window);
-        incoming_input_data->mouse_x          = xpos;
-        incoming_input_data->mouse_y          = ypos;
+        auto incoming_input_data = Input::get_ptr_incoming();
+        if (!incoming_input_data) return;
+
+        incoming_input_data->mouse_x = xpos;
+        incoming_input_data->mouse_y = ypos;
     }
 
     static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-        Input::InputData* incoming_input_data = (Input::InputData*)glfwGetWindowUserPointer(window);
-        Input::MouseButton mouse_button       = Input::MouseButton::Left;
+        auto incoming_input_data = Input::get_ptr_incoming();
+        if (!incoming_input_data) return;
+
+        Input::MouseButton mouse_button = Input::MouseButton::Left;
         switch (button) {
         case GLFW_MOUSE_BUTTON_LEFT: mouse_button = Input::MouseButton::Left; break;
         case GLFW_MOUSE_BUTTON_RIGHT: mouse_button = Input::MouseButton::Right; break;
@@ -633,13 +639,15 @@ namespace Gfx {
     }
 
     static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-        Input::InputData* incoming_input_data = (Input::InputData*)glfwGetWindowUserPointer(window);
+        auto incoming_input_data = Input::get_ptr_incoming();
+        if (!incoming_input_data) return;
+
         incoming_input_data->mouse_scroll_x += xoffset;
         incoming_input_data->mouse_scroll_y += yoffset;
     }
 
     void DeviceOpenGL::input_setup() {
-        glfwSetWindowUserPointer(window, Device::fetch_incoming_input_data_pointer());
+        this->input_data = Device::fetch_incoming_input_data_pointer();
         glfwSetKeyCallback(window, key_callback);
         glfwSetCursorPosCallback(window, cursor_callback);
         glfwSetMouseButtonCallback(window, mouse_button_callback);

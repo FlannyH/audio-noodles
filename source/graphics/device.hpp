@@ -1,6 +1,7 @@
 #pragma once
 #include "resource.hpp"
 #include <string_view>
+#include <memory>
 #include "../input.hpp"
 
 namespace Gfx {
@@ -64,6 +65,6 @@ namespace Gfx {
         virtual void input_setup()                                = 0;
         virtual void set_mouse_visible(bool visible)              = 0;
         virtual void set_cursor_mode(Gfx::CursorMode cursor_mode) = 0;
-        Input::InputData* fetch_incoming_input_data_pointer();
+        std::shared_ptr<Input::InputData> fetch_incoming_input_data_pointer();
     };
 } // namespace Gfx

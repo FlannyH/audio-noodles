@@ -1,6 +1,7 @@
 #pragma once
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
+#include <memory>
 
 namespace Gfx {
     class Device;
@@ -113,5 +114,5 @@ namespace Input {
     glm::vec2 mouse_movement();
     glm::vec2 mouse_movement_pixels();
 
-    InputData* get_ptr_incoming();
+    std::shared_ptr<Input::InputData> get_ptr_incoming();
 }; // namespace Input

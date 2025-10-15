@@ -8,23 +8,27 @@ namespace Input {
     InputData current{};
 
     // Will be written to from the renderer
-    InputData incoming{};
+    std::shared_ptr<InputData> incoming{};
 
     void update() {
+        if (!incoming) {
+            incoming = std::make_shared<InputData>();
+        }
+
         // Copy new state to curr, and curr to prev - this way curr and prev are stable across the entire frame, while
         // new is being updated by the callback
         memcpy(previous.keys, current.keys, sizeof(previous.keys));
-        memcpy(current.keys, incoming.keys, sizeof(previous.keys));
+        memcpy(current.keys, incoming->keys, sizeof(previous.keys));
         memcpy(previous.mouse_buttons, current.mouse_buttons, sizeof(previous.mouse_buttons));
-        memcpy(current.mouse_buttons, incoming.mouse_buttons, sizeof(previous.mouse_buttons));
+        memcpy(current.mouse_buttons, incoming->mouse_buttons, sizeof(previous.mouse_buttons));
         previous.mouse_x        = current.mouse_x;
-        current.mouse_x         = incoming.mouse_x;
+        current.mouse_x         = incoming->mouse_x;
         previous.mouse_y        = current.mouse_y;
-        current.mouse_y         = incoming.mouse_y;
+        current.mouse_y         = incoming->mouse_y;
         previous.mouse_scroll_x = current.mouse_scroll_x;
-        current.mouse_scroll_x  = incoming.mouse_scroll_x;
+        current.mouse_scroll_x  = incoming->mouse_scroll_x;
         previous.mouse_scroll_y = current.mouse_scroll_y;
-        current.mouse_scroll_y  = incoming.mouse_scroll_y;
+        current.mouse_scroll_y  = incoming->mouse_scroll_y;
     }
 
     bool key_held(Key key) { return current.keys[(size_t)key]; }
@@ -76,5 +80,8 @@ namespace Input {
         return glm::vec2(current.mouse_x - previous.mouse_x, current.mouse_y - previous.mouse_y);
     }
 
-    InputData* get_ptr_incoming() { return &incoming; }
+    std::shared_ptr<Input::InputData> get_ptr_incoming() {
+        if (!incoming) incoming = std::make_shared<InputData>();
+        return incoming;
+    }
 } // namespace Input
