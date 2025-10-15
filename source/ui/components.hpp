@@ -495,11 +495,14 @@ namespace UI {
             // Draw the slider
             glm::vec2 top_left     = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
             glm::vec2 bottom_right = Gfx::anchor_offset_pixels(transform->bottom_right, transform->anchor, scene.panel_size);
+
             if (text && draggable) {
                 if (draggable->is_horizontal == false) {
                     bottom_right.y -= Gfx::get_font_height() * text->scale.y;
+                    bottom_right.y -= 4;
                 } else {
-                    top_left.x += Gfx::get_font_max_width() * 3.2f * text->scale.x;
+                    top_left.x += Gfx::get_font_max_width() * (range->visual_decimal_places + 3) * text->scale.x;
+                    bottom_right.x -= 4;
                 }
             }
             const glm::vec2 center = (top_left + bottom_right) / 2.0f;
@@ -755,12 +758,12 @@ namespace UI {
                     // Draw the boxes
                     Gfx::draw_rectangle_2d_pixels(
                         box_top_left + glm::vec2(+1, 0), box_bottom_right + glm::vec2(-1, -1),
-                        {.color = color, .depth = transform->depth - 0.003f, .anchor_point = Gfx::AnchorPoint::TopLeft});
+                        {.color = color, .depth = -0.999f, .anchor_point = Gfx::AnchorPoint::TopLeft});
                     Gfx::draw_rectangle_2d_pixels(
                         box_top_left, box_bottom_right,
                         {
                             .color               = Colors::BLACK,
-                            .depth               = transform->depth - 0.003f,
+                            .depth               = -0.999f,
                             .anchor_point        = Gfx::AnchorPoint::TopLeft,
                             .shape_outline_width = 1.0f,
                         });
@@ -768,7 +771,7 @@ namespace UI {
                         combobox->list_items[i].c_str(),
                         Gfx::TextDrawParams{
                             .transform =
-                                {.position = glm::vec3(box_top_left + text_offset, transform->depth - 0.004f),
+                                {.position = glm::vec3(box_top_left + text_offset, -1.0f),
                                  .scale    = {2.0f, 2.0f, 1.0f}},
                             .position_anchor = Gfx::AnchorPoint::TopLeft,
                             .text_anchor     = Gfx::AnchorPoint::Left,

@@ -4,6 +4,7 @@
 #include "../ui/panel_manager.hpp"
 
 #include <cmath>
+#include <time.h>
 
 thread_local uint32_t noise_state = 0x796C694C;
 
@@ -19,7 +20,7 @@ double poly_blep(double t, double dt) {
 }
 
 WavOsc::WavOsc() {
-    this->voice_pool.resize(128);
+    this->voice_pool.resize(2048);
     this->ui_panel_index = UI::load_panel("assets/layout/wav_osc.toml");
 }
 
@@ -107,6 +108,13 @@ void WavOsc::key_on(uint8_t key, uint8_t velocity) {
     const float key_delta   = this->unison_depth / (float)(this->unison_count - 1);
     const float phase_delta = this->unison_phase_shift / (float)(this->unison_count - 1);
     const float pan_delta   = this->unison_wideness * 2.0f / (float)(this->unison_count - 1);
+
+    if (this->unison_count == 1) {
+        fkey   = (float)key;
+        fphase = this->unison_phase_shift;
+        fpan   = 0.0f;
+    }
+
     for (int i = 0; i < this->unison_count; ++i) {
         for (auto& voice: this->voice_pool) {
             if (voice.vol_env.stage != VolEnvStage::idle) continue;
@@ -118,12 +126,13 @@ void WavOsc::key_on(uint8_t key, uint8_t velocity) {
             voice.panning       = fpan;
             LOG(Info, "voice.panning = %f", voice.panning);
             LOG(Info, "pan_delta = %f", pan_delta);
-            voice.key           = key;
-            voice.velocity      = ((float)velocity / 127.0f) / sqrtf((float)this->unison_count);
-            voice.vol_env.stage = VolEnvStage::delay;
+            voice.key                = key;
+            voice.velocity           = ((float)velocity / 127.0f) / sqrtf((float)this->unison_count);
+            voice.vol_env.stage      = VolEnvStage::delay;
             voice.vol_env.stage_time = 0.0;
             break;
         }
+
         fkey += key_delta;
         fphase += phase_delta;
         fpan += pan_delta;
