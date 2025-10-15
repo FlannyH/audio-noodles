@@ -2,8 +2,10 @@
 #include "../graphics/renderer.hpp"
 #include "components.hpp"
 #include <stdexcept>
-#include <toml++/toml.hpp>
 #include <iostream>
+
+#define TOML_EXCEPTIONS 0
+#include <toml++/toml.hpp>
 
 #define MAX_PANEL_COUNT 256
 
@@ -71,10 +73,16 @@ namespace UI {
     // Load panel layout from disk, then create a panel from it
     size_t load_panel(const char* path, const glm::vec2 top_left) {
         auto layout = toml::parse_file(path);
+        if (layout.failed()) {
+            const auto& msg = layout.error().description();
+            const std::string msg_str = std::string(msg);
+            LOG(Error, "Failed to load panel \"%s\":", path);
+            LOG(Error, "\t%s", msg_str.c_str());
+            return -1;
+        }
 
         // Parse metadata
         auto panel_meta = layout["panel_meta"];
-        assert(panel_meta);
 
         PanelCreateInfo create_info = {.top_left = top_left};
         const auto title            = panel_meta["title"].value_or<std::string_view>("untitled panel");
