@@ -1,8 +1,8 @@
 [panel_meta]
 title = "WavOsc"
-default_size = [1280, 512]
-min_size = [1280, 512]
-max_size = [1280, 512]
+default_size = [1280, 440]
+min_size = [1280, 440]
+max_size = [1280, 440]
 bg_color = [0.1, 0.1, 0.2, 1.0]
 
 # WAVE TYPE BOX
@@ -83,7 +83,7 @@ panel_anchor = "top left"
 top_left = [320, 144]
 bottom_right = [768, 192]
 depth = 0.1
-min = 0.0
+min = 1.0
 max = 9.0
 step = 1.0
 default_value = 1.0
@@ -239,7 +239,7 @@ min = 0.0
 max = 15.0
 step = 0.01
 default_value = 0.0
-visual_decimal_places = 2
+visual_decimal_places = 3
 variable = "adsr_attack"
 
 # HOLD
@@ -265,7 +265,7 @@ min = 0.0
 max = 10.0
 step = 0.01
 default_value = 0.0
-visual_decimal_places = 2
+visual_decimal_places = 3
 variable = "adsr_hold"
 
 # DECAY
@@ -291,7 +291,7 @@ min = 0.0
 max = 15.0
 step = 0.01
 default_value = 0.0
-visual_decimal_places = 2
+visual_decimal_places = 3
 variable = "adsr_decay"
 
 # SUSTAIN
