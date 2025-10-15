@@ -26,12 +26,21 @@ WavOsc::WavOsc() {
 void WavOsc::process_block(const size_t n_frames, float* output) {
     const double sample_length_sec = 1.0 / Mixer::sample_rate();
 
+    if (this->ui_panel_index == -1) return;
+
     auto& panel              = UI::get_panel(this->ui_panel_index);
     this->square_pulse_width = (float)panel.scene.value_pool.get<double>("square_pulse_width");
     this->unison_depth       = (float)panel.scene.value_pool.get<double>("unison_depth");
     this->unison_wideness    = (float)panel.scene.value_pool.get<double>("unison_wideness");
     this->unison_phase_shift = (float)panel.scene.value_pool.get<double>("unison_phase_shift");
     this->unison_count       = (float)panel.scene.value_pool.get<double>("unison_count");
+
+    this->params.delay   = panel.scene.value_pool.get<double>("adsr_delay");
+    this->params.attack  = panel.scene.value_pool.get<double>("adsr_attack");
+    this->params.hold    = panel.scene.value_pool.get<double>("adsr_hold");
+    this->params.decay   = panel.scene.value_pool.get<double>("adsr_decay");
+    this->params.sustain = panel.scene.value_pool.get<double>("adsr_sustain");
+    this->params.release = panel.scene.value_pool.get<double>("adsr_release");
 
     for (size_t i = 0; i < n_frames; ++i) {
         for (auto& voice: this->voice_pool) {
@@ -112,6 +121,7 @@ void WavOsc::key_on(uint8_t key, uint8_t velocity) {
             voice.key           = key;
             voice.velocity      = ((float)velocity / 127.0f) / sqrtf((float)this->unison_count);
             voice.vol_env.stage = VolEnvStage::delay;
+            voice.vol_env.stage_time = 0.0;
             break;
         }
         fkey += key_delta;
