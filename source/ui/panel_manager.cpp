@@ -74,7 +74,7 @@ namespace UI {
     size_t load_panel(const char* path, const glm::vec2 top_left) {
         auto layout = toml::parse_file(path);
         if (layout.failed()) {
-            const auto& msg = layout.error().description();
+            const auto& msg           = layout.error().description();
             const std::string msg_str = std::string(msg);
             LOG(Error, "Failed to load panel \"%s\":", path);
             LOG(Error, "\t%s", msg_str.c_str());
@@ -186,6 +186,7 @@ namespace UI {
                         auto min                   = (*node_tbl)["min"].value_or<float>(0.0f);
                         auto max                   = (*node_tbl)["max"].value_or<float>(100.0f);
                         auto step                  = (*node_tbl)["step"].value_or<float>(1.0f);
+                        auto step_fine             = (*node_tbl)["step_fine"].value_or<float>(step / 10.0f);
                         auto default_value         = (*node_tbl)["default_value"].value_or<float>(0.0f);
                         auto visual_decimal_places = (*node_tbl)["visual_decimal_places"].value_or<uint32_t>(1);
                         auto text                  = (*node_tbl)["text"].value_or<std::string>("");
@@ -196,6 +197,7 @@ namespace UI {
                             .min                   = min,
                             .max                   = max,
                             .step                  = step,
+                            .step_fine             = step_fine,
                             .default_value         = default_value,
                             .visual_decimal_places = visual_decimal_places};
                         UI::create_slider(scene, variable_string.empty() ? name_str : variable_string, trans, range);

@@ -108,6 +108,7 @@ namespace UI {
         double min;
         double max;
         double step;
+        double step_fine;
         double default_value           = 0.0;
         uint32_t visual_decimal_places = 2;
     };
@@ -156,7 +157,10 @@ namespace UI {
     struct NumberBox {};  // This is a tag without data
     struct Button {};     // This is a tag without data
     struct WheelKnob {};  // This is a tag without data
-    struct Slider {};
+
+    struct Slider {
+        float curr_bar_length;
+    };
     struct Box {
         glm::vec4 color_inner = {0.25f, 0.25f, 0.25f, 1.0f};
         glm::vec4 color_outer = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -491,6 +495,7 @@ namespace UI {
             auto* range     = scene.get_component<NumberRange>(entity);
             auto* text      = scene.get_component<Text>(entity);
             auto* draggable = scene.get_component<Draggable>(entity);
+            auto* slider    = scene.get_component<Slider>(entity);
 
             // Draw the slider
             glm::vec2 top_left     = Gfx::anchor_offset_pixels(transform->top_left, transform->anchor, scene.panel_size);
@@ -500,9 +505,11 @@ namespace UI {
                 if (draggable->is_horizontal == false) {
                     bottom_right.y -= Gfx::get_font_height() * text->scale.y;
                     bottom_right.y -= 4;
+                    slider->curr_bar_length = bottom_right.y - top_left.y;
                 } else {
                     top_left.x += Gfx::get_font_max_width() * (range->visual_decimal_places + 3) * text->scale.x;
                     bottom_right.x -= 4;
+                    slider->curr_bar_length = bottom_right.x - top_left.x;
                 }
             }
             const glm::vec2 center = (top_left + bottom_right) / 2.0f;
@@ -771,8 +778,7 @@ namespace UI {
                         combobox->list_items[i].c_str(),
                         Gfx::TextDrawParams{
                             .transform =
-                                {.position = glm::vec3(box_top_left + text_offset, -1.0f),
-                                 .scale    = {2.0f, 2.0f, 1.0f}},
+                                {.position = glm::vec3(box_top_left + text_offset, -1.0f), .scale = {2.0f, 2.0f, 1.0f}},
                             .position_anchor = Gfx::AnchorPoint::TopLeft,
                             .text_anchor     = Gfx::AnchorPoint::Left,
                             .color           = Colors::BLACK,
@@ -877,8 +883,8 @@ namespace UI {
                 mouse_interact->state = ClickState::idle;
                 Gfx::set_mouse_visible(true);
             }
+
             // If we're hovering over the element and we middle click, AND the component has a value, set that value to default
-            auto* value       = scene.get_component<Value>(entity);
             const auto* range = scene.get_component<NumberRange>(entity);
             if (Input::mouse_button_pressed(Input::MouseButton::Middle) && value && range &&
                 mouse_interact->state == ClickState::hover) {
@@ -932,6 +938,7 @@ namespace UI {
             auto* value                = scene.get_component<Value>(entity);
             const auto* number_range   = scene.get_component<NumberRange>(entity);
             const auto* draggable      = scene.get_component<Draggable>(entity);
+            const auto* slider         = scene.get_component<Slider>(entity);
 
             // If the component is being dragged
             if (mouse_interact->state == ClickState::click) {
@@ -940,12 +947,16 @@ namespace UI {
                 const double old_val = val;
 
                 // Map the mouse movement to the value
-                // todo: mouse movement feels too fast for high step values
+                const auto step =
+                    (slider && (Input::key_held(Input::Key::LeftControl) || Input::key_held(Input::Key::RightControl)))
+                        ? number_range->step_fine
+                        : number_range->step;
+
                 if (draggable) {
                     if (draggable->is_horizontal) {
-                        val += static_cast<double>(Input::mouse_movement_pixels().x) * number_range->step;
+                        val += static_cast<double>(Input::mouse_movement_pixels().x) * step;
                     } else {
-                        val -= static_cast<double>(Input::mouse_movement_pixels().y) * number_range->step;
+                        val -= static_cast<double>(Input::mouse_movement_pixels().y) * step;
                     }
                 }
 
@@ -974,7 +985,11 @@ namespace UI {
                 const double old_val = val;
 
                 // Map the vertical mouse scroll to the value
-                val += static_cast<double>(Input::mouse_scroll().y) * number_range->step;
+                const auto step = (Input::key_held(Input::Key::LeftControl) || Input::key_held(Input::Key::RightControl))
+                                    ? number_range->step_fine
+                                    : number_range->step;
+
+                val += static_cast<double>(Input::mouse_scroll().y) * step;
 
                 // Clamp the value to the bounds
                 val = std::max(val, number_range->min);
