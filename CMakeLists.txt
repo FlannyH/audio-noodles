@@ -1,4 +1,5 @@
-﻿cmake_minimum_required (VERSION 3.10)
+﻿set(CMAKE_POLICY_VERSION_MINIMUM "3.5" CACHE STRING "" FORCE)
+cmake_minimum_required (VERSION 3.10)
 
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
@@ -40,8 +41,6 @@ add_executable (AudioNoodles
   "source/adsr.hpp"
   "source/midi.cpp"
   "source/midi.hpp"
-  "source/input.cpp"
-  "source/input.hpp"
   "source/mixer.cpp"
   "source/mixer.hpp"
   "source/track.cpp"
@@ -51,23 +50,6 @@ add_executable (AudioNoodles
   "source/session.hpp"
   "source/processor.cpp"
   "source/processor.hpp"
-  "source/ui/scene.cpp"
-  "source/ui/scene.hpp"
-  "source/ui/panel.cpp"
-  "source/ui/panel.hpp"
-  "source/ui/components.hpp"
-  "source/ui/value_system.hpp"
-  "source/ui/panel_manager.cpp"
-  "source/ui/panel_manager.hpp"
-  "source/graphics/device.cpp"
-  "source/graphics/device.hpp"
-  "source/graphics/renderer.cpp"
-  "source/graphics/renderer.hpp"
-  "source/graphics/resource.hpp"
-  "source/graphics/transform.cpp"
-  "source/graphics/transform.hpp"
-  "source/graphics/opengl/device_opengl.cpp"
-  "source/graphics/opengl/device_opengl.hpp"
   "source/processors/wav_osc.cpp"
   "source/processors/wav_osc.hpp"
 )
@@ -92,12 +74,14 @@ add_subdirectory(external/glbinding)
 add_subdirectory(external/glm)
 add_subdirectory(external/portaudio)
 add_subdirectory(external/rtmidi)
+add_subdirectory(external/flangui)
 target_link_libraries(AudioNoodles 
   glfw
   glbinding::glbinding
   glm::glm
   portaudio
   rtmidi
+  flangui
 )
 target_include_directories(AudioNoodles PRIVATE 
   ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include/
@@ -106,6 +90,7 @@ target_include_directories(AudioNoodles PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/external/portaudio/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/rtmidi/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/tomlplusplus/include/
+  ${CMAKE_CURRENT_SOURCE_DIR}/external/flangui/source/
 )
 
 # Copy runtime files to build output

@@ -1,7 +1,7 @@
 #include "wav_osc.hpp"
 #include "../mixer.hpp"
 #include "../common.hpp"
-#include "../ui/panel_manager.hpp"
+#include <ui/panel_manager.hpp>
 
 #include <cmath>
 #include <time.h>

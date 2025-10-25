@@ -2,11 +2,10 @@
 #include "midi.hpp"
 #include "mixer.hpp"
 #include "session.hpp"
-#include "ui/scene.hpp"
-#include "ui/panel.hpp"
-#include "ui/components.hpp"
-#include "ui/panel_manager.hpp"
-#include "graphics/renderer.hpp"
+#include <ui/panel.hpp>
+#include <ui/components.hpp>
+#include <ui/panel_manager.hpp>
+#include <graphics/renderer.hpp>
 
 int main() {
     Midi::init();
