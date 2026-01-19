@@ -48,16 +48,17 @@ void WavOsc::process_block(const size_t n_frames, float* output) {
             if (voice.vol_env.stage == VolEnvStage::idle) continue;
 
             voice.vol_env.tick(sample_length_sec, this->params);
-            const double key_relative_to_a4 = ((double)voice.actual_note) - 69.0;          // nice
-            const double frequency          = 440.0 * pow(2.0, key_relative_to_a4 / 12.0); // todo: non-440 hz tuning, pitch
-                                                                                           // wheel, mod vibrato, microtonality
+            const double key_relative_to_a4 = ((double)voice.actual_note) + (this->pitch_wheel / 100.0) - 69.0;  // nice
+            const double frequency          = 440.0 * pow(2.0, key_relative_to_a4 / 12.0); // todo: non-440 hz tuning,
+                                                                                                // mod vibrato, microtonality
             double sample = 0.0;
+
+            const double wave_time = voice.phase;
 
             if (this->wave_type == WaveType::sine) {
                 // todo: use a LUT
-                sample = sin(voice.phase * frequency * 2.0 * 3.14159265);
+                sample = sin(wave_time * 2.0 * 3.14159265);
             } else if (this->wave_type == WaveType::square) {
-                const double wave_time = (voice.phase * frequency);
                 const double phase     = wave_time - trunc(wave_time);
                 double raw_sample      = (phase < this->square_pulse_width) ? (+1.0) : (-1.0);
                 raw_sample += poly_blep(phase, frequency * sample_length_sec);
@@ -66,12 +67,10 @@ void WavOsc::process_block(const size_t n_frames, float* output) {
                 raw_sample -= poly_blep(t, frequency * sample_length_sec);
                 sample += raw_sample;
             } else if (this->wave_type == WaveType::triangle) {
-                const double wave_time = (voice.phase * frequency);
                 const double t_wrap    = wave_time - trunc(wave_time);
                 if (t_wrap < 0.5) sample = (t_wrap * 4.0) - 1.0;
                 else sample = 1.0 - (t_wrap - 0.5) * 4.0;
             } else if (this->wave_type == WaveType::sawtooth) {
-                const double wave_time = (voice.phase * frequency);
                 const double phase     = wave_time - trunc(wave_time);
                 double raw_sample      = (phase * 2.0) - 1.0;
                 raw_sample -= poly_blep(phase, frequency * sample_length_sec);
@@ -92,7 +91,7 @@ void WavOsc::process_block(const size_t n_frames, float* output) {
                                  ((float)Common::lut_panning[0 + (size_t)((voice.panning + 1.0f) * 127.0)] / 4095.0f);
             output[2 * i + 1] += (float)(sample * final_volume) *
                                  ((float)Common::lut_panning[254 - (size_t)((voice.panning + 1.0f) * 127.0)] / 4095.0f);
-            voice.phase += sample_length_sec;
+            voice.phase += sample_length_sec * frequency;
         }
     }
 }

@@ -20,6 +20,6 @@ namespace Midi {
 
         int type() { return (status >> 4) & 0x07; }
 
-        uint16_t data16() { return (data2 << 8) + data1; }
+        uint16_t data14() { return (data2 << 7) + data1; }
     };
 } // namespace Midi

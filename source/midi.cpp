@@ -72,7 +72,7 @@ namespace Midi {
                     const uint8_t pressure = message.data1;
                     track.midi_channel_aftertouch(channel, pressure);
                 } else if (type == 6) {
-                    const uint16_t value = message.data16();
+                    const uint16_t value = message.data14();
                     track.midi_pitch_wheel(channel, value);
                 }
             }
