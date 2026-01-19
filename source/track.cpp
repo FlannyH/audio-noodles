@@ -33,4 +33,9 @@ void Track::midi_channel_aftertouch(int channel, uint8_t pressure) {
     LOG(Debug, "[Channel %2i] Channel Aftertouch: pressure %i", channel, pressure);
 }
 
-void Track::midi_pitch_wheel(int channel, uint16_t value) { LOG(Debug, "[Channel %2i] Pitch Wheel: %i", channel, value); }
+void Track::midi_pitch_wheel(int channel, uint16_t value) { 
+    const double value_normalized = ((double)value / 8192.0) - 1.0;
+    const double value_in_range = value_normalized * this->pitch_wheel_range_cents;
+    LOG(Debug, "[Channel %2i] Pitch Wheel: %4.2f cents", channel, value_in_range); 
+    this->debug_processor->set_pitch_wheel(value_in_range);
+}
