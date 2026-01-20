@@ -31,6 +31,7 @@ struct WavOsc : Processor {
     std::vector<Voice> voice_pool;
     VolEnvParams params;
     WaveType wave_type       = WaveType::sawtooth;
+    double pitch_prev        = 0.0;
     float square_pulse_width = 0.375f;
     float unison_depth       = 0.3f;
     float unison_wideness    = 1.0f;
