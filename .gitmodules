@@ -21,5 +21,5 @@
 	url = https://github.com/marzer/tomlplusplus.git
 [submodule "external/flangui"]
 	path = external/flangui
-	url = git@github.com:FlannyH/FlanGUI.git
+	url = https://github.com/FlannyH/FlanGUI.git
 	branch = refactor
