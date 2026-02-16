@@ -1,7 +1,6 @@
-#include <cstdio>
+#include "graph.hpp"
 #include "midi.hpp"
 #include "mixer.hpp"
-#include "session.hpp"
 #include <ui/panel.hpp>
 #include <ui/components.hpp>
 #include <ui/panel_manager.hpp>
@@ -11,7 +10,7 @@ int main() {
     Midi::init();
     Mixer::init();
     Gfx::init(Gfx::RenderAPI::OpenGL, 1280, 720, "Audio Noodles");
-    Session::tracks().push_back(Track{});
+    Graph::create_track();
 
     while (Gfx::should_stay_open()) {
         Gfx::set_cursor_mode(Gfx::CursorMode::Arrow);

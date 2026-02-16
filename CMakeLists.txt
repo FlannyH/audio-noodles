@@ -35,8 +35,6 @@ project ("AudioNoodles")
 # Add source to this project's executable.
 add_executable (AudioNoodles 
   "source/audio_noodle.cpp"
-  "source/log.cpp"
-  "source/log.hpp"
   "source/adsr.cpp"
   "source/adsr.hpp"
   "source/midi.cpp"
@@ -46,8 +44,8 @@ add_executable (AudioNoodles
   "source/track.cpp"
   "source/track.hpp"
   "source/common.hpp"
-  "source/session.cpp"
-  "source/session.hpp"
+  "source/graph.cpp"
+  "source/graph.hpp"
   "source/processor.cpp"
   "source/processor.hpp"
   "source/processors/wav_osc.cpp"
