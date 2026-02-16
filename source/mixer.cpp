@@ -28,7 +28,8 @@ namespace Mixer {
         memset(output_buffer, 0, sizeof(float) * 2 * frames_per_buffer);
 
         for (auto& processor: processors) {
-            processor->process_block(frames_per_buffer, (float*)output_buffer);
+            if (!processor) continue;
+            processor->audio_process_block(frames_per_buffer, (float*)output_buffer);
         }
 
         block_start_time_value += (1.0 / output_sample_rate) * frames_per_buffer;

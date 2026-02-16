@@ -1,0 +1,36 @@
+[panel_meta]
+title = "Track"
+default_size = [720, 320]
+min_size = [720, 320]
+max_size = [720, 320]
+bg_color = [0.1, 0.1, 0.2, 1.0]
+
+# MIDI port selector
+[elements.midi_port_numberbox]
+type = "numberbox"
+panel_anchor = "top left"
+top_left = [12, 12]
+bottom_right = [76, 76]
+color_inner = [1.0, 1.0, 0.0, 0.0]
+color_outer = [1.0, 1.0, 0.0, 1.0]
+thickness = 2.0
+min = 0.0
+max = 127.0
+step = 1.0
+step_fine = 1.0
+default_value = 1.0
+visual_decimal_places = 0
+variable = "midi_port"
+
+# MIDI port selector
+[elements.wave_type_combobox]
+type = "combobox"
+panel_anchor = "top left"
+top_left = [78, 16]
+bottom_right = [708, 76]
+depth = 0.1
+entries = ["(no devices found)"]
+item_height = 40.0
+list_height = 200.0
+default_index = 0
+variable = "midi_port"

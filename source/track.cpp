@@ -1,20 +1,55 @@
 #include "track.hpp"
+#include "components.hpp"
 #include "log.hpp"
-#include "mixer.hpp"
+#include "midi.hpp"
+#include "panel_manager.hpp"
+#include "value_system.hpp"
 
 Track::Track() {
-    this->debug_processor = std::make_shared<WavOsc>();
-    Mixer::register_processor(this->debug_processor);
+    // this->debug_processor = std::make_shared<WavOsc>();
+    this->ui_panel_index = UI::load_panel("assets/layout/track.toml");
+
+    // Find panel numberbox and set max range
+    std::vector<std::string> devices = Midi::get_device_list();
+    UI::Panel& panel = UI::get_panel(this->ui_panel_index);
+    for (auto& entity : panel.scene.view<UI::Value, UI::NumberRange>()) {
+        UI::Value* value = panel.scene.get_component<UI::Value>(entity);
+        if (value->name != "midi_port") {
+            continue;
+        }
+        UI::NumberRange* range = panel.scene.get_component<UI::NumberRange>(entity);
+        if (range) {
+            range->min = 0.0;
+            range->max = devices.size() - 1;
+        }
+    }
+
+    // Find panel combobox
+    UI::Combobox* combobox = nullptr;
+    for (auto& entity : panel.scene.view<UI::Combobox, UI::Value>()) {
+        UI::Combobox* curr_combobox = panel.scene.get_component<UI::Combobox>(entity);
+        UI::Value* value = panel.scene.get_component<UI::Value>(entity);
+        if (value->name == "midi_port") {
+            combobox = curr_combobox;
+        }
+    }
+    if (!combobox) return;
+    
+    // Put MIDI device names in the panel's combobox
+    combobox->list_items.resize(devices.size());
+    for (size_t i = 0; i < devices.size(); ++i) {
+        combobox->list_items[i] = std::wstring(devices[i].begin(), devices[i].end());
+    }
 }
 
 void Track::midi_note_on(int channel, uint8_t key, uint8_t velocity) {
     LOG(Debug, "[Channel %2i] Note On: key %i, velocity %i", channel, key, velocity);
-    this->debug_processor->key_on(key, velocity);
+    // this->debug_processor->key_on(key, velocity);
 }
 
 void Track::midi_note_off(int channel, uint8_t key, uint8_t velocity) {
     LOG(Debug, "[Channel %2i] Note Off: key %i, velocity %i", channel, key, velocity);
-    this->debug_processor->key_off(key);
+    // this->debug_processor->key_off(key);
 }
 
 void Track::midi_poly_aftertouch(int channel, uint8_t key, uint8_t pressure) {
@@ -37,5 +72,9 @@ void Track::midi_pitch_wheel(int channel, uint16_t value) {
     const double value_normalized = ((double)value / 8192.0) - 1.0;
     const double value_in_range = value_normalized * this->pitch_wheel_range_cents;
     LOG(Debug, "[Channel %2i] Pitch Wheel: %4.2f cents", channel, value_in_range); 
-    this->debug_processor->set_pitch_wheel(value_in_range);
+    // this->debug_processor->set_pitch_wheel(value_in_range);
+}
+
+void Track::audio_process_block(const size_t n_samples, float* output) {
+    // TODO: implement me
 }

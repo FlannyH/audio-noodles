@@ -24,9 +24,9 @@ struct Voice {
 
 struct WavOsc : Processor {
     WavOsc();
-    void process_block(const size_t n_frames, float* output) override;
-    virtual void key_on(uint8_t key, uint8_t velocity) override;
-    virtual void key_off(uint8_t key) override;
+    void audio_process_block(const size_t n_frames, float* output) override;
+    virtual void midi_note_on(int channel, uint8_t key, uint8_t velocity) override;
+    virtual void midi_note_off(int channel, uint8_t key, uint8_t velocity) override;
 
     std::vector<Voice> voice_pool;
     VolEnvParams params;

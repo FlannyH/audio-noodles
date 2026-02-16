@@ -1,9 +1,12 @@
 #pragma once
 #include <cstdint>
+#include <string>
+#include <vector>
 
 namespace Midi {
     void init();
     void process();
+    std::vector<std::string>& get_device_list();
 
     constexpr int midi_channel_global = -1;
 

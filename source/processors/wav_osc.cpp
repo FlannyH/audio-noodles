@@ -24,7 +24,7 @@ WavOsc::WavOsc() {
     this->ui_panel_index = UI::load_panel("assets/layout/wav_osc.toml");
 }
 
-void WavOsc::process_block(const size_t n_frames, float* output) {
+void WavOsc::audio_process_block(const size_t n_frames, float* output) {
     const double sample_length_sec = 1.0 / Mixer::sample_rate();
 
     if (this->ui_panel_index == -1) return;
@@ -47,7 +47,7 @@ void WavOsc::process_block(const size_t n_frames, float* output) {
     const double pitch_wheel_end = this->pitch_wheel;
 
     for (size_t i = 0; i < n_frames; ++i) {
-        // Smooth automation
+        // Smooth automation for pitch
         const double pitch_wheel_curr = std::lerp(pitch_wheel_start, pitch_wheel_end, (double)i / (double)n_frames);
 
         for (auto& voice: this->voice_pool) {
@@ -104,7 +104,7 @@ void WavOsc::process_block(const size_t n_frames, float* output) {
     pitch_prev = pitch_wheel;
 }
 
-void WavOsc::key_on(uint8_t key, uint8_t velocity) {
+void WavOsc::midi_note_on(int channel, uint8_t key, uint8_t velocity) {
     auto& panel     = UI::get_panel(this->ui_panel_index);
     this->wave_type = (WaveType)round(panel.scene.value_pool.get<double>("wave_type") + 1.0);
     LOG(Debug, "wave_type = %i", (int)this->wave_type);
@@ -144,7 +144,8 @@ void WavOsc::key_on(uint8_t key, uint8_t velocity) {
     }
 }
 
-void WavOsc::key_off(uint8_t key) {
+void WavOsc::midi_note_off(int channel, uint8_t key, uint8_t velocity) {
+    (void)velocity;
     for (auto& voice: this->voice_pool) {
         if (voice.key == key) {
             voice.vol_env.stage = VolEnvStage::release;
