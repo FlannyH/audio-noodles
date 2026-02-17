@@ -7,30 +7,23 @@
 #include <mutex>
 
 namespace Midi {
-    std::shared_ptr<RtMidiIn> midi_in;
-    std::vector<MidiMessage> message_queue;
     std::vector<std::string> port_names;
-    std::mutex message_queue_mutex;
+    uint32_t port_name_version = 0;
 
-    void midi_message_callback(double delta_time, std::vector<unsigned char>* message, void* user_data) {
-        MidiMessage midi_message{};
-        midi_message.status = message->at(0);
-        if (message->size() > 1) midi_message.data1 = message->at(1);
-        if (message->size() > 2) midi_message.data2 = message->at(2);
-        if (message->size() > 3) midi_message.data3 = message->at(3);
+    std::vector<std::string>& get_device_list(bool refresh) {
+        if (port_name_version > 0 && !refresh) {
+            return port_names;
+        }
+        
+        LOG(Debug, "Fetching MIDI port names");
 
-        message_queue_mutex.lock();
-        message_queue.push_back(midi_message);
-        message_queue_mutex.unlock();
-    }
-
-    void init() {
-        midi_in            = std::make_shared<RtMidiIn>();
+        auto midi_in            = std::make_shared<RtMidiIn>();
         const auto n_ports = midi_in->getPortCount();
 
         if (n_ports == 0) {
-            LOG(Warning, "No MIDI devices connected!");
-            return;
+            LOG(Info, "No MIDI devices connected");
+            ++port_name_version;
+            return port_names;
         }
 
         port_names.resize(n_ports);
@@ -39,16 +32,41 @@ namespace Midi {
             port_names[i] = midi_in->getPortName(i);
         }
 
-        midi_in->openPort(4);
-        midi_in->setCallback(&midi_message_callback);
-
-        LOG(Info, "MIDI device connected: \"%s\"", midi_in->getPortName(4).c_str());
+        ++port_name_version;
+        return port_names;
     }
 
-    void process() {
-        if (message_queue.empty()) return;
+    void midi_message_callback(double delta_time, std::vector<unsigned char>* message, void* user_data) {
+        MidiMessage midi_message{};
+        midi_message.status = message->at(0);
+        if (message->size() > 1) midi_message.data1 = message->at(1);
+        if (message->size() > 2) midi_message.data2 = message->at(2);
+        if (message->size() > 3) midi_message.data3 = message->at(3);
 
+        Device* device = (Device*)user_data;
+        device->message_queue_mutex.lock();
+        device->message_queue.push_back(midi_message);
+        device->message_queue_mutex.unlock();
+    }
+
+    Device::Device(size_t port) {
+        this->port = port;
+        get_device_list(true);
+        
+        this->midi_in = std::make_shared<RtMidiIn>();
+        this->midi_in->openPort(port);
+        this->midi_in->setCallback(&midi_message_callback, this);
+
+        LOG(Info, "MIDI device connected: \"%s\"", midi_in->getPortName(port).c_str());
+    }
+
+    void Device::process(size_t track_id) {
+        auto track_p = Graph::get_tracks().at(track_id);
+        std::shared_ptr<Track> track = std::static_pointer_cast<Track>(track_p);
+        
         message_queue_mutex.lock();
+        
+        if (message_queue.empty()) goto end;
 
         for (auto& message: message_queue) {
             const int type    = message.type();
@@ -91,12 +109,8 @@ namespace Midi {
             }
         }
 
-        message_queue_mutex.unlock();
-
         message_queue.clear();
-    }
 
-    std::vector<std::string>& get_device_list() {
-        return port_names;
+        end: message_queue_mutex.unlock();
     }
 } // namespace Midi

@@ -1,5 +1,4 @@
 #include "graph.hpp"
-#include "midi.hpp"
 #include "mixer.hpp"
 #include <ui/panel.hpp>
 #include <ui/components.hpp>
@@ -7,7 +6,6 @@
 #include <graphics/renderer.hpp>
 
 int main() {
-    Midi::init();
     Mixer::init();
     Gfx::init(Gfx::RenderAPI::OpenGL, 1280, 720, "Audio Noodles");
     Graph::create_track();
@@ -19,9 +17,7 @@ int main() {
         Gfx::begin_frame();
         UI::panel_input();
         UI::panel_render();
+        Graph::dispatch();
         Gfx::end_frame();
-
-        // todo: move this to separate thread
-        Midi::process();
     };
 }

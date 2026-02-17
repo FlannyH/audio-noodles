@@ -34,3 +34,16 @@ item_height = 40.0
 list_height = 200.0
 default_index = 0
 variable = "midi_port"
+
+# DEBUG TEXT
+[elements.debug_text]
+type = "text"
+panel_anchor = "top left"
+top_left = [12, 88]
+bottom_right = [708, 308]
+depth = 0.1
+text = "qwertyuiop"
+text_scale = [2.0, 2.0]
+text_color = [0.0, 1.0, 1.0, 1.0]
+text_ui_anchor = "top left"
+text_text_anchor = "top left"

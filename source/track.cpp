@@ -5,8 +5,9 @@
 #include "panel_manager.hpp"
 #include "value_system.hpp"
 
-Track::Track() {
+Track::Track(size_t id) {
     // this->debug_processor = std::make_shared<WavOsc>();
+    this->track_id = id;
     this->ui_panel_index = UI::load_panel("assets/layout/track.toml");
 
     // Find panel numberbox and set max range
@@ -40,11 +41,24 @@ Track::Track() {
     for (size_t i = 0; i < devices.size(); ++i) {
         combobox->list_items[i] = std::wstring(devices[i].begin(), devices[i].end());
     }
+
+    this->midi_device = std::make_shared<Midi::Device>(0);
 }
 
 void Track::midi_note_on(int channel, uint8_t key, uint8_t velocity) {
     LOG(Debug, "[Channel %2i] Note On: key %i, velocity %i", channel, key, velocity);
     // this->debug_processor->key_on(key, velocity);
+
+    // Update debug text
+    UI::Panel& panel = UI::get_panel(this->ui_panel_index);
+
+    for (auto& entity : panel.scene.view<UI::Text, UI::Value>()) {
+        auto* text = panel.scene.get_component<UI::Text>(entity);
+        const auto* value = panel.scene.get_component<UI::Value>(entity);
+        if (text && value->name == "elements.debug_text") {
+            text->text = L"midi_on";
+        }
+    }
 }
 
 void Track::midi_note_off(int channel, uint8_t key, uint8_t velocity) {
@@ -76,5 +90,14 @@ void Track::midi_pitch_wheel(int channel, uint16_t value) {
 }
 
 void Track::audio_process_block(const size_t n_samples, float* output) {
-    // TODO: implement me
+    if (this->track_id == -1) return;
+    this->midi_device->process(this->track_id);
+
+    UI::Panel& panel = UI::get_panel(this->ui_panel_index);
+    const int target_port = (int)panel.scene.value_pool.get<double>("midi_port");
+
+    if (this->midi_device->port != target_port) {
+        this->midi_device.reset();
+        this->midi_device = std::make_shared<Midi::Device>(target_port);
+    }
 }
