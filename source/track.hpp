@@ -6,9 +6,9 @@
 #include "processor.hpp"
 
 struct Track : Processor {
-    int track_id = -1;
-    uint16_t midi_input_channel_mask        = 1;
-    double pitch_wheel_range_cents          = 200.0;
+    int track_id                     = -1;
+    uint16_t midi_input_channel_mask = 1;
+    double pitch_wheel_range_cents   = 200.0;
     std::shared_ptr<Midi::Device> midi_device;
     // std::shared_ptr<WavOsc> debug_processor = nullptr;
 

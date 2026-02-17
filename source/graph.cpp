@@ -13,9 +13,7 @@ namespace Graph {
         return tracks.size() - 1;
     }
 
-    std::vector<std::shared_ptr<Processor>>& get_tracks() { 
-        return tracks; 
-    }
+    std::vector<std::shared_ptr<Processor>>& get_tracks() { return tracks; }
 
     void dispatch() {
         // todo: actually execute the graph

@@ -44,7 +44,7 @@ void WavOsc::audio_process_block(const size_t n_frames, float* output) {
     this->params.release = 1.0 / panel.scene.value_pool.get<double>("adsr_release");
 
     const double pitch_wheel_start = this->pitch_prev;
-    const double pitch_wheel_end = this->pitch_wheel;
+    const double pitch_wheel_end   = this->pitch_wheel;
 
     for (size_t i = 0; i < n_frames; ++i) {
         // Smooth automation for pitch

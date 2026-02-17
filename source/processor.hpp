@@ -12,6 +12,6 @@ struct Processor {
     virtual void midi_channel_aftertouch(int channel, uint8_t pressure) {}
     virtual void midi_pitch_wheel(int channel, uint16_t value) {}
 
-    double pitch_wheel = 0.0;
+    double pitch_wheel    = 0.0;
     size_t ui_panel_index = -1;
 };
