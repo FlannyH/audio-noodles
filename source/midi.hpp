@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <mutex>
 
 namespace Midi {
     std::vector<std::string>& get_device_list(bool refresh = false);
