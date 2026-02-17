@@ -24,4 +24,5 @@ namespace Graph {
     
     size_t create_track();
     std::vector<std::shared_ptr<Processor>>& get_tracks();
+    void dispatch();
 } // namespace Graph
