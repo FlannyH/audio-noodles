@@ -7,17 +7,15 @@ on:
   - pull_request
 
 jobs:
-  check-formatting:
-    name: Ensure correct code formatting
+  clang-format-checking:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: clang-format Check
-        uses: jidicula/clang-format-action@v4.15.0
+      - uses: actions/checkout@v4
+      - uses: DoozyX/clang-format-lint-action@v0.20
         with:
-          clang-format-version: '16'
-          check-path: '.'
+          source: './source'
+          extensions: 'c,h,cpp,hpp'
+          style: 'file'
 
   build:
     runs-on: ${{ matrix.os }}

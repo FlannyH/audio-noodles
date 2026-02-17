@@ -11,8 +11,8 @@ namespace Graph {
     typedef uint32_t PortID;
 
     enum class LinkType {
-        none = 0,
-        midi = 1,
+        none  = 0,
+        midi  = 1,
         audio = 2,
     };
 
@@ -21,7 +21,7 @@ namespace Graph {
         PortID dst_id;
         LinkType type;
     };
-    
+
     size_t create_track();
     std::vector<std::shared_ptr<Processor>>& get_tracks();
     void dispatch();

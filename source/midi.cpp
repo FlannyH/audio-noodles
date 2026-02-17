@@ -14,10 +14,10 @@ namespace Midi {
         if (port_name_version > 0 && !refresh) {
             return port_names;
         }
-        
+
         LOG(Debug, "Fetching MIDI port names");
 
-        auto midi_in            = std::make_shared<RtMidiIn>();
+        auto midi_in       = std::make_shared<RtMidiIn>();
         const auto n_ports = midi_in->getPortCount();
 
         if (n_ports == 0) {
@@ -52,7 +52,7 @@ namespace Midi {
     Device::Device(size_t port) {
         this->port = port;
         get_device_list(true);
-        
+
         this->midi_in = std::make_shared<RtMidiIn>();
         this->midi_in->openPort(port);
         this->midi_in->setCallback(&midi_message_callback, this);
@@ -61,11 +61,11 @@ namespace Midi {
     }
 
     void Device::process(size_t track_id) {
-        auto track_p = Graph::get_tracks().at(track_id);
+        auto track_p                 = Graph::get_tracks().at(track_id);
         std::shared_ptr<Track> track = std::static_pointer_cast<Track>(track_p);
-        
+
         message_queue_mutex.lock();
-        
+
         if (message_queue.empty()) goto end;
 
         for (auto& message: message_queue) {
@@ -111,6 +111,7 @@ namespace Midi {
 
         message_queue.clear();
 
-        end: message_queue_mutex.unlock();
+    end:
+        message_queue_mutex.unlock();
     }
 } // namespace Midi
