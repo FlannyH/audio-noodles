@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-// todo: PascalCase as per naming convention
+// todo(naming_convention): desc: figure out consistent naming conventions for this codebase
 enum class VolEnvStage {
     idle = 0,
     delay,
