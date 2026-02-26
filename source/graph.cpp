@@ -16,7 +16,7 @@ namespace Graph {
     std::vector<std::shared_ptr<Processor>>& get_tracks() { return tracks; }
 
     void dispatch() {
-        // todo: actually execute the graph
-        tracks[0]->audio_process_block(0, nullptr); // TODO: UGLY HACK DELETE ME
+        // todo(graph_dispatch): desc: actually execute the graph insteadof just executing the first one
+        tracks[0]->audio_process_block(0, nullptr);
     }
 } // namespace Graph

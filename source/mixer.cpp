@@ -62,7 +62,7 @@ namespace Mixer {
 
         PaError error = Pa_OpenStream(
             &stream, NULL, &output_parameters, output_sample_rate, paFramesPerBufferUnspecified, paClipOff, &pa_callback,
-            NULL // todo: userdata?
+            NULL // todo(pa_user_data): desc: userdata?
         );
         if (error != paNoError || stream == NULL) {
             LOG(Error, "Failed to open audio stream!\n");
