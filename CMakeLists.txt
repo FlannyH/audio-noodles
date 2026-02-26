@@ -65,26 +65,18 @@ endif()
 set(RTMIDI_BUILD_TESTING OFF)
 set(OPTION_BUILD_TOOLS OFF)
 set(OPTION_BUILD_EXAMPLES OFF)
+set(FLANGUI_DEBUG_RENDER_QUEUE ON)
 
 # todo: only compile on windows and linux on x86/64 CPUs
-add_subdirectory(external/glfw)
-add_subdirectory(external/glbinding)
-add_subdirectory(external/glm)
 add_subdirectory(external/portaudio)
 add_subdirectory(external/rtmidi)
 add_subdirectory(external/flangui)
 target_link_libraries(AudioNoodles 
-  glfw
-  glbinding::glbinding
-  glm::glm
   portaudio
   rtmidi
   flangui
 )
 target_include_directories(AudioNoodles PRIVATE 
-  ${CMAKE_CURRENT_SOURCE_DIR}/external/glfw/include/
-  ${CMAKE_CURRENT_SOURCE_DIR}/external/glm/
-  ${CMAKE_CURRENT_SOURCE_DIR}/external/stb/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/portaudio/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/rtmidi/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/tomlplusplus/include/
