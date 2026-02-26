@@ -21,7 +21,7 @@ Track::Track(size_t id) {
         UI::NumberRange* range = panel.scene.get_component<UI::NumberRange>(entity);
         if (range) {
             range->min = 0.0;
-            range->max = devices.size() - 1;
+            range->max = (double)devices.size() - 1.0;
         }
     }
 
@@ -90,7 +90,9 @@ void Track::midi_pitch_wheel(int channel, uint16_t value) {
 }
 
 void Track::audio_process_block(const size_t n_samples, float* output) {
-    if (this->track_id == -1) return;
+    if (this->track_id == SIZE_MAX) return;
+    if (!this->midi_device) return;
+
     this->midi_device->process(this->track_id);
 
     UI::Panel& panel      = UI::get_panel(this->ui_panel_index);

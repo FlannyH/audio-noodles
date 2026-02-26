@@ -29,6 +29,8 @@ if(GIT_FOUND)
 else()
   message(FATAL_ERROR "Failed to find Git!")
 endif()
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 
 project ("AudioNoodles")
 

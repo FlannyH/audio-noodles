@@ -34,7 +34,7 @@ void WavOsc::audio_process_block(const size_t n_frames, float* output) {
     this->unison_depth       = (float)panel.scene.value_pool.get<double>("unison_depth");
     this->unison_wideness    = (float)panel.scene.value_pool.get<double>("unison_wideness");
     this->unison_phase_shift = (float)panel.scene.value_pool.get<double>("unison_phase_shift");
-    this->unison_count       = (float)panel.scene.value_pool.get<double>("unison_count");
+    this->unison_count       = (int)panel.scene.value_pool.get<double>("unison_count");
 
     this->params.delay   = panel.scene.value_pool.get<double>("adsr_delay");
     this->params.attack  = panel.scene.value_pool.get<double>("adsr_attack");

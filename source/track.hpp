@@ -6,7 +6,7 @@
 #include "processor.hpp"
 
 struct Track : Processor {
-    int track_id                     = -1;
+    size_t track_id                     = SIZE_MAX;
     uint16_t midi_input_channel_mask = 1;
     double pitch_wheel_range_cents   = 200.0;
     std::shared_ptr<Midi::Device> midi_device;

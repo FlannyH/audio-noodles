@@ -54,10 +54,12 @@ namespace Midi {
         get_device_list(true);
 
         this->midi_in = std::make_shared<RtMidiIn>();
-        this->midi_in->openPort(port);
-        this->midi_in->setCallback(&midi_message_callback, this);
+        if (this->midi_in->getPortCount() > port) {
+            this->midi_in->openPort((unsigned int)port);
+            this->midi_in->setCallback(&midi_message_callback, this);
 
-        LOG(Info, "MIDI device connected: \"%s\"", midi_in->getPortName(port).c_str());
+            LOG(Info, "MIDI device connected: \"%s\"", midi_in->getPortName((unsigned int)port).c_str());
+        }
     }
 
     void Device::process(size_t track_id) {
