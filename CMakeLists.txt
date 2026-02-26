@@ -67,7 +67,7 @@ endif()
 set(RTMIDI_BUILD_TESTING OFF)
 set(OPTION_BUILD_TOOLS OFF)
 set(OPTION_BUILD_EXAMPLES OFF)
-set(FLANGUI_DEBUG_RENDER_QUEUE ON)
+set(FLANGUI_DEBUG_RENDER_QUEUE OFF)
 
 # todo: only compile on windows and linux on x86/64 CPUs
 add_subdirectory(external/portaudio)
