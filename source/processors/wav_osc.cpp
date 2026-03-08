@@ -55,9 +55,10 @@ void WavOsc::audio_process_block(const size_t n_frames, float* output) {
 
             voice.vol_env.tick(sample_length_sec, this->params);
             const double key_relative_to_a4 = ((double)voice.actual_note) + (pitch_wheel_curr / 100.0) - 69.0; // nice
-            const double frequency          = 440.0 * pow(2.0, key_relative_to_a4 / 12.0); // todo(wavosc_non_440hz): desc: non-440 hz tuning
-                                                                                                // todo(wavosc_mod_vibrato): desc: vibrato
-                                                                                                // todo(wavosc_microtonality): desc: microtonality
+            const double frequency =
+                440.0 * pow(2.0, key_relative_to_a4 / 12.0); // todo(wavosc_non_440hz): desc: non-440 hz tuning
+                                                             // todo(wavosc_mod_vibrato): desc: vibrato
+                                                             // todo(wavosc_microtonality): desc: microtonality
             double sample = 0.0;
 
             const double wave_time = voice.phase;
