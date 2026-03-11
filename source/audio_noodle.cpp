@@ -15,6 +15,8 @@ int main() {
         Input::update();
 
         Gfx::begin_frame();
+        Gfx::set_view_offset_2d({0, 0});
+        Gfx::set_view_scale_2d({1, 1});
         UI::panel_input();
         UI::panel_render();
         Graph::dispatch();

@@ -47,3 +47,11 @@ text_scale = [2.0, 2.0]
 text_color = [0.0, 1.0, 1.0, 1.0]
 text_ui_anchor = "top left"
 text_text_anchor = "top left"
+
+# PIN
+[elements.midi_out_pin]
+type = "pin"
+pin_type = "midi"
+pin_direction = "output"
+pin_name = "midi_out"
+pin_position_y = 24.0

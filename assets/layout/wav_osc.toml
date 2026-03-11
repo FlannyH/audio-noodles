@@ -355,3 +355,11 @@ step_fine = 0.001
 default_value = 0.0
 visual_decimal_places = 3
 variable = "adsr_release"
+
+# PIN
+[elements.midi_in_pin]
+type = "pin"
+pin_type = "midi"
+pin_direction = "input"
+pin_name = "midi_in"
+pin_position_y = 24.0
