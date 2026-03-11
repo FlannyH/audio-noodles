@@ -1,6 +1,7 @@
 #include <vector>
 
 #include "graph.hpp"
+#include "processors/wav_osc.hpp"
 #include "track.hpp"
 
 namespace Graph {
@@ -10,6 +11,7 @@ namespace Graph {
 
     size_t create_track() {
         tracks.emplace_back(std::make_shared<Track>(tracks.size()));
+        processors.emplace_back(std::make_shared<WavOsc>());
         return tracks.size() - 1;
     }
 

@@ -98,6 +98,7 @@ void Track::audio_process_block(const size_t n_samples, float* output) {
     UI::Panel& panel      = UI::get_panel(this->ui_panel_index);
     const int target_port = (int)panel.scene.value_pool.get<double>("midi_port");
 
+    // todo(audio_thread_midi_device): desc: recreate midi device outside audio processing functions
     if (this->midi_device->port != target_port) {
         this->midi_device.reset();
         this->midi_device = std::make_shared<Midi::Device>(target_port);
