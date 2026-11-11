@@ -47,9 +47,9 @@ Output::Output(size_t id) {
     }
 
     this->ui_panel_index = UI::load_panel("assets/layout/output.toml");
+    UI::Panel& panel = UI::get_panel(this->ui_panel_index);
 
     // Find panel combobox
-    UI::Panel& panel       = UI::get_panel(this->ui_panel_index);
     UI::Combobox* combobox = nullptr;
     for (auto& entity: panel.scene.view<UI::Combobox, UI::Value>()) {
         UI::Combobox* curr_combobox = panel.scene.get_component<UI::Combobox>(entity);
@@ -80,12 +80,27 @@ Output::Output(size_t id) {
 
     this->max_index = combobox->list_items.size() - 1;
 
+    // Find panel numberbox and set max range
+    for (auto& entity: panel.scene.view<UI::Value, UI::NumberRange>()) {
+        UI::Value* value = panel.scene.get_component<UI::Value>(entity);
+        if (value->name != "output_port") {
+            continue;
+        }
+        UI::NumberRange* range = panel.scene.get_component<UI::NumberRange>(entity);
+        if (range) {
+            range->min = 0.0;
+            range->max = combobox->list_items.size() - 1.0;
+        }
+    }
+
+    if (combobox->current_selected_index < 0) return;
+    if (combobox->current_selected_index >= this->list_device_indices.size()) return;
+
     const PaDeviceIndex dev_i                  = this->list_device_indices[combobox->current_selected_index];
     const PaStreamParameters output_parameters = {dev_i, 2, paFloat32, Pa_GetDeviceInfo(dev_i)->defaultLowOutputLatency, NULL};
-    Pa_OpenStream(
-        &this->stream, NULL, &output_parameters, output_sample_rate, paFramesPerBufferUnspecified, paClipOff, &pa_callback,
-        this);
-    Pa_StartStream(this->stream);
+    if (!Pa_OpenStream(&this->stream, NULL, &output_parameters, output_sample_rate, paFramesPerBufferUnspecified, paClipOff, &pa_callback, this)) {
+        Pa_StartStream(this->stream);
+    }
 }
 
 void Output::audio_process_block(
@@ -112,10 +127,9 @@ void Output::audio_process_block(
         const PaStreamParameters output_parameters = {
             output_device, 2, paFloat32, Pa_GetDeviceInfo((int)output_port)->defaultLowOutputLatency, NULL,
         };
-        error = Pa_OpenStream(
-            &this->stream, NULL, &output_parameters, output_sample_rate, paFramesPerBufferUnspecified, paNoFlag, &pa_callback,
-            this);
-        error = Pa_StartStream(this->stream);
+        if (!(error = Pa_OpenStream(&this->stream, NULL, &output_parameters, output_sample_rate, paFramesPerBufferUnspecified, paNoFlag, &pa_callback, this))) {
+            error = Pa_StartStream(this->stream);
+        }
         (void)error; // it's just here for debugging
 
         this->selected_index = output_port;
