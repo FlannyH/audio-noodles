@@ -23,7 +23,7 @@ visual_decimal_places = 0
 variable = "midi_port"
 
 # MIDI port selector
-[elements.wave_type_combobox]
+[elements.midi_port_combobox]
 type = "combobox"
 panel_anchor = "top left"
 top_left = [78, 16]

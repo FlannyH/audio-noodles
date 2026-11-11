@@ -24,7 +24,7 @@ struct Voice {
 
 struct WavOsc : Processor {
     WavOsc();
-    void audio_process_block(const size_t n_frames, float* output) override;
+    virtual void audio_process_block(const size_t n_frames, const double output_sample_rate, const Sample* input, Sample* output, std::vector<std::shared_ptr<Processor>> targets) override;
     virtual void midi_note_on(int channel, uint8_t key, uint8_t velocity) override;
     virtual void midi_note_off(int channel, uint8_t key, uint8_t velocity) override;
 

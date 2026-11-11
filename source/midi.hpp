@@ -33,7 +33,7 @@ namespace Midi {
         std::mutex message_queue_mutex;
         size_t port = 0;
         Device(size_t port = 0);
-        void process(size_t track_id);
+        std::vector<MidiMessage> pull_messages(size_t track_id);
     };
 
     std::vector<std::string>& get_device_name_list();

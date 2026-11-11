@@ -34,3 +34,8 @@ namespace Common {
 
 #define TODO()
 } // namespace Common
+
+struct Sample {
+    float left;
+    float right;
+};
