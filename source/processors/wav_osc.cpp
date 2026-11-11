@@ -1,6 +1,7 @@
 #include "wav_osc.hpp"
-#include "../mixer.hpp"
 #include "../common.hpp"
+#include "glm/ext/scalar_common.hpp"
+#include "glm/ext/scalar_constants.hpp"
 #include <ui/panel_manager.hpp>
 
 #include <cmath>
@@ -24,10 +25,12 @@ WavOsc::WavOsc() {
     this->ui_panel_index = UI::load_panel("assets/layout/wav_osc.toml");
 }
 
-void WavOsc::audio_process_block(const size_t n_frames, float* output) {
-    const double sample_length_sec = 1.0 / Mixer::sample_rate();
+void WavOsc::audio_process_block(const size_t n_frames, const double output_sample_rate, const Sample* input, Sample* output, std::vector<std::shared_ptr<Processor>> targets) {
+    const double sample_length_sec = 1.0 / output_sample_rate;
 
     if (this->ui_panel_index == -1) return;
+
+    LOG(Info, "WavOsc::audio_process_block()");
 
     auto& panel              = UI::get_panel(this->ui_panel_index);
     this->square_pulse_width = (float)panel.scene.value_pool.get<double>("square_pulse_width");
@@ -93,11 +96,11 @@ void WavOsc::audio_process_block(const size_t n_frames, float* output) {
             }
             const double volume_multiplier = (double)voice.velocity;
             const double adsr_volume       = voice.vol_env.adsr_volume;
-            double final_volume            = volume_multiplier * adsr_volume * Mixer::global_volume();
+            double final_volume            = volume_multiplier * adsr_volume;
             final_volume                   = final_volume * final_volume;
-            output[2 * i + 0] += (float)(sample * final_volume) *
+            output[i].left += (float)(sample * final_volume) *
                                  ((float)Common::lut_panning[0 + (size_t)((voice.panning + 1.0f) * 127.0)] / 4095.0f);
-            output[2 * i + 1] += (float)(sample * final_volume) *
+            output[i].right += (float)(sample * final_volume) *
                                  ((float)Common::lut_panning[254 - (size_t)((voice.panning + 1.0f) * 127.0)] / 4095.0f);
             voice.phase += sample_length_sec * frequency;
         }
@@ -111,38 +114,43 @@ void WavOsc::midi_note_on(int channel, uint8_t key, uint8_t velocity) {
     this->wave_type = (WaveType)round(panel.scene.value_pool.get<double>("wave_type") + 1.0);
     LOG(Debug, "wave_type = %i", (int)this->wave_type);
 
-    float fkey              = (float)key - (this->unison_depth / 2.0f);
-    float fphase            = -this->unison_phase_shift / 2.0f;
-    float fpan              = -this->unison_wideness;
-    const float key_delta   = this->unison_depth / (float)(this->unison_count - 1);
-    const float phase_delta = this->unison_phase_shift / (float)(this->unison_count - 1);
-    const float pan_delta   = this->unison_wideness * 2.0f / (float)(this->unison_count - 1);
+    float key_center = (float)key;
+    float phase_center = 0.0f;
+    float pan_center = 0.0f;
 
-    if (this->unison_count == 1) {
-        fkey   = (float)key;
-        fphase = this->unison_phase_shift;
-        fpan   = 0.0f;
-    }
+    float key_range = (this->unison_depth / 2.0f);
+    float phase_range = (this->unison_phase_shift / 2.0f);
+    float pan_range = (this->unison_wideness / 2.0f);
+
+    const float max_unison_i = (float)(this->unison_count - 1);
 
     for (int i = 0; i < this->unison_count; ++i) {
+        float t_key   = 0.0f;
+        float t_phase = 0.0f;
+        float t_pan   = 0.0f;
+
+        if (this->unison_count > 1) {
+            float neg_to_pos = ((i / max_unison_i) * 2.0f) - 1.0f;
+            float sign = (neg_to_pos >= 0.0f) ? +1.0f : -1.0f;
+            float absolute = fabsf(neg_to_pos);
+            t_key = powf(absolute * 0.5f * glm::pi<float>(), 0.5f) * sign;
+            t_phase = t_key;
+            t_pan = neg_to_pos;
+        }
+
         for (auto& voice: this->voice_pool) {
             if (voice.vol_env.stage != VolEnvStage::idle) continue;
 
-            float wrapped_phase      = (fphase < 0.0f) ? (fphase + 1.0f) : (fphase);
-            wrapped_phase            = (wrapped_phase >= 1.0f) ? (wrapped_phase - 1.0f) : (wrapped_phase);
+            float wrapped_phase      = glm::repeat(phase_center + (t_phase * phase_range));
             voice.phase              = wrapped_phase;
-            voice.actual_note        = fkey;
-            voice.panning            = fpan;
+            voice.actual_note        = key_center + (t_key * key_range);
+            voice.panning            = pan_center + (t_pan * pan_range);
             voice.key                = key;
             voice.velocity           = ((float)velocity / 127.0f) / sqrtf((float)this->unison_count);
             voice.vol_env.stage      = VolEnvStage::delay;
             voice.vol_env.stage_time = 0.0;
             break;
         }
-
-        fkey += key_delta;
-        fphase += phase_delta;
-        fpan += pan_delta;
     }
 }
 

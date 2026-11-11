@@ -35,23 +35,23 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 project ("AudioNoodles")
 
 # Add source to this project's executable.
-add_executable (AudioNoodles 
+add_executable (AudioNoodles
   "source/audio_noodle.cpp"
   "source/adsr.cpp"
   "source/adsr.hpp"
   "source/midi.cpp"
   "source/midi.hpp"
-  "source/mixer.cpp"
-  "source/mixer.hpp"
-  "source/track.cpp"
-  "source/track.hpp"
   "source/common.hpp"
   "source/graph.cpp"
   "source/graph.hpp"
   "source/processor.cpp"
   "source/processor.hpp"
+  "source/processors/track.cpp"
+  "source/processors/track.hpp"
   "source/processors/wav_osc.cpp"
   "source/processors/wav_osc.hpp"
+  "source/processors/output.cpp"
+  "source/processors/output.hpp"
 )
 
 # Set debug working directory
@@ -73,12 +73,12 @@ set(FLANGUI_DEBUG_RENDER_QUEUE OFF)
 add_subdirectory(external/portaudio)
 add_subdirectory(external/rtmidi)
 add_subdirectory(external/flangui)
-target_link_libraries(AudioNoodles 
+target_link_libraries(AudioNoodles
   portaudio
   rtmidi
   flangui
 )
-target_include_directories(AudioNoodles PRIVATE 
+target_include_directories(AudioNoodles PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/external/portaudio/include/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/rtmidi/
   ${CMAKE_CURRENT_SOURCE_DIR}/external/tomlplusplus/include/

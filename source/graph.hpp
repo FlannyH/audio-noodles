@@ -22,7 +22,8 @@ namespace Graph {
         LinkType type;
     };
 
+    size_t create_output();
     size_t create_track();
     std::vector<std::shared_ptr<Processor>>& get_tracks();
-    void dispatch();
+    void run();
 } // namespace Graph

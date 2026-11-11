@@ -1,12 +1,12 @@
+#include <components.hpp>
+#include <log.hpp>
+#include <panel_manager.hpp>
+#include <value_system.hpp>
+
 #include "track.hpp"
-#include "components.hpp"
-#include "log.hpp"
-#include "midi.hpp"
-#include "panel_manager.hpp"
-#include "value_system.hpp"
+#include "../midi.hpp"
 
 Track::Track(size_t id) {
-    // this->debug_processor = std::make_shared<WavOsc>();
     this->track_id       = id;
     this->ui_panel_index = UI::load_panel("assets/layout/track.toml");
 
@@ -47,7 +47,6 @@ Track::Track(size_t id) {
 
 void Track::midi_note_on(int channel, uint8_t key, uint8_t velocity) {
     LOG(Debug, "[Channel %2i] Note On: key %i, velocity %i", channel, key, velocity);
-    // this->debug_processor->key_on(key, velocity);
 
     // Update debug text
     UI::Panel& panel = UI::get_panel(this->ui_panel_index);
@@ -63,7 +62,6 @@ void Track::midi_note_on(int channel, uint8_t key, uint8_t velocity) {
 
 void Track::midi_note_off(int channel, uint8_t key, uint8_t velocity) {
     LOG(Debug, "[Channel %2i] Note Off: key %i, velocity %i", channel, key, velocity);
-    // this->debug_processor->key_off(key);
 }
 
 void Track::midi_poly_aftertouch(int channel, uint8_t key, uint8_t pressure) {
@@ -86,21 +84,26 @@ void Track::midi_pitch_wheel(int channel, uint16_t value) {
     const double value_normalized = ((double)value / 8192.0) - 1.0;
     const double value_in_range   = value_normalized * this->pitch_wheel_range_cents;
     LOG(Debug, "[Channel %2i] Pitch Wheel: %4.2f cents", channel, value_in_range);
-    // this->debug_processor->set_pitch_wheel(value_in_range);
 }
 
-void Track::audio_process_block(const size_t n_samples, float* output) {
+void Track::audio_process_block(const size_t n_samples, const double output_sample_rate, const Sample* input, Sample* output, std::vector<std::shared_ptr<Processor>> targets) {
     if (this->track_id == SIZE_MAX) return;
     if (!this->midi_device) return;
 
-    this->midi_device->process(this->track_id);
+    LOG(Info, "Track::audio_process_block() - midi stuff");
 
     UI::Panel& panel      = UI::get_panel(this->ui_panel_index);
     const int target_port = (int)panel.scene.value_pool.get<double>("midi_port");
 
-    // todo(audio_thread_midi_device): desc: recreate midi device outside audio processing functions
     if (this->midi_device->port != target_port) {
         this->midi_device.reset();
         this->midi_device = std::make_shared<Midi::Device>(target_port);
     }
+
+    auto midi_messages = this->midi_device->pull_messages(this->track_id);
+
+    for (auto& target : targets) {
+        target->consume_midi(midi_messages);
+    }
+    this->consume_midi(midi_messages);
 }

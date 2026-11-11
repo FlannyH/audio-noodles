@@ -164,8 +164,8 @@ panel_anchor = "top left"
 top_left = [320, 336]
 bottom_right = [768, 384]
 depth = 0.1
-min = 0.0
-max = 1.0
+min = -2.0
+max = 2.0
 step = 0.01
 step_fine = 0.001
 default_value = 0.0
@@ -356,10 +356,18 @@ default_value = 0.0
 visual_decimal_places = 3
 variable = "adsr_release"
 
-# PIN
+# input
 [elements.midi_in_pin]
 type = "pin"
 pin_type = "midi"
 pin_direction = "input"
 pin_name = "midi_in"
+pin_position_y = 24.0
+
+#output
+[elements.audio_out_pin]
+type = "pin"
+pin_type = "audio"
+pin_direction = "output"
+pin_name = "audio_out"
 pin_position_y = 24.0
