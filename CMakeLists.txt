@@ -52,6 +52,8 @@ add_executable (AudioNoodles
   "source/processors/wav_osc.hpp"
   "source/processors/output.cpp"
   "source/processors/output.hpp"
+  "source/processors/param_eq.cpp"
+  "source/processors/param_eq.hpp"
 )
 
 # Set debug working directory
