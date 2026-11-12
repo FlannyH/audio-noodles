@@ -26,4 +26,5 @@ namespace Graph {
     size_t create_track();
     std::vector<std::shared_ptr<Processor>>& get_tracks();
     void run();
+    size_t get_sample_rate();
 } // namespace Graph

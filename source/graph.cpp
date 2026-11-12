@@ -5,6 +5,7 @@
 #include "graph.hpp"
 #include "processor.hpp"
 #include "processors/output.hpp"
+#include "processors/param_eq.hpp"
 #include "processors/wav_osc.hpp"
 #include "processors/track.hpp"
 
@@ -29,9 +30,11 @@ namespace Graph {
         auto track = std::make_shared<Track>(tracks.size());
         auto wav_osc = std::make_shared<WavOsc>();
         auto wav_osc2 = std::make_shared<WavOsc>();
+        auto param_eq = std::make_shared<ParamEq>();
         processors.emplace_back(track);
         processors.emplace_back(wav_osc);
         processors.emplace_back(wav_osc2);
+        processors.emplace_back(param_eq);
         tracks.emplace_back(track);
         return tracks.size() - 1;
     }
@@ -180,4 +183,9 @@ namespace Graph {
             dispatch(buffer_size);
         }
     }
+
+    size_t get_sample_rate() {
+        return curr_sample_rate;
+    }
+
 } // namespace Graph

@@ -1,0 +1,162 @@
+[panel_meta]
+title = "ParamEq"
+default_size = [512, 440]
+min_size = [512, 440]
+max_size = [512, 440]
+bg_color = [0.1, 0.1, 0.2, 1.0]
+
+# input
+[elements.audio_in_pin]
+type = "pin"
+pin_type = "audio"
+pin_direction = "input"
+pin_name = "audio_in"
+pin_position_y = 24.0
+
+#output
+[elements.audio_out_pin]
+type = "pin"
+pin_type = "audio"
+pin_direction = "output"
+pin_name = "audio_out"
+pin_position_y = 24.0
+
+[elements.slider_gain_low]
+type = "slider"
+panel_anchor = "top left"
+top_left = [16, 16]
+bottom_right = [96, 272]
+depth = 0.1
+min = -40.0
+max = 40.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.0
+visual_decimal_places = 3
+variable = "gain_low"
+
+[elements.slider_gain_low_mid]
+type = "slider"
+panel_anchor = "top left"
+top_left = [116, 16]
+bottom_right = [196, 272]
+depth = 0.1
+min = -40.0
+max = 40.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.0
+visual_decimal_places = 3
+variable = "gain_low_mid"
+
+[elements.slider_gain_mid]
+type = "slider"
+panel_anchor = "top left"
+top_left = [216, 16]
+bottom_right = [296, 272]
+depth = 0.1
+min = -40.0
+max = 40.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.0
+visual_decimal_places = 3
+variable = "gain_mid"
+
+[elements.slider_gain_high_mid]
+type = "slider"
+panel_anchor = "top left"
+top_left = [316, 16]
+bottom_right = [396, 272]
+depth = 0.1
+min = -40.0
+max = 40.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.0
+visual_decimal_places = 3
+variable = "gain_high_mid"
+
+[elements.slider_gain_high]
+type = "slider"
+panel_anchor = "top left"
+top_left = [416, 16]
+bottom_right = [496, 272]
+depth = 0.1
+min = -40.0
+max = 40.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.0
+visual_decimal_places = 3
+variable = "gain_high"
+
+[elements.knob_q_low]
+type = "wheelknob"
+panel_anchor = "top left"
+top_left = [16, 280]
+bottom_right = [96, 360]
+depth = 0.1
+min = 0.01
+max = 1.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.5
+visual_decimal_places = 3
+variable = "q_low"
+
+[elements.knob_q_low_mid]
+type = "wheelknob"
+panel_anchor = "top left"
+top_left = [116, 280]
+bottom_right = [196, 360]
+depth = 0.1
+min = 0.01
+max = 1.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.5
+visual_decimal_places = 3
+variable = "q_low_mid"
+
+[elements.knob_q_mid]
+type = "wheelknob"
+panel_anchor = "top left"
+top_left = [216, 280]
+bottom_right = [296, 360]
+depth = 0.1
+min = 0.01
+max = 1.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.5
+visual_decimal_places = 3
+variable = "q_mid"
+
+[elements.knob_q_high_mid]
+type = "wheelknob"
+panel_anchor = "top left"
+top_left = [316, 280]
+bottom_right = [396, 360]
+depth = 0.1
+min = 0.01
+max = 1.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.5
+visual_decimal_places = 3
+variable = "q_high_mid"
+
+[elements.knob_q_high]
+type = "wheelknob"
+panel_anchor = "top left"
+top_left = [416, 280]
+bottom_right = [496, 360]
+depth = 0.1
+min = 0.01
+max = 1.0
+step = 0.01
+step_fine = 0.001
+default_value = 0.5
+visual_decimal_places = 3
+variable = "q_high"
